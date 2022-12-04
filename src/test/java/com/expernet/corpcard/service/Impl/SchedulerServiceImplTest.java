@@ -249,7 +249,6 @@ public class SchedulerServiceImplTest {
         //1. delete 수행
         if (type.equals("user")) {
             userRepository.deleteAllInBatch();
-            userRepository.resetIncrement();
             deletedCnt = userRepository.count();
         } else if (type.equals("dept")) {
             deptRepository.deleteAllInBatch();
