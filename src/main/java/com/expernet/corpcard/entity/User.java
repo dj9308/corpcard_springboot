@@ -2,29 +2,36 @@ package com.expernet.corpcard.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Cascade;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 @Getter
+@Setter
 @Entity
-@Table(name = "tb_user")
+@Table(name = "TB_USER")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class User {
     @Id
-    @Column(name = "seq", nullable = false)
+    @Column(name = "SEQ")
     private long seq;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "USER_ID")
     private String userId;
 
-    @Column(name = "ofcds", nullable = false)
+    @OneToOne(mappedBy = "user")
+    private UserAddInfo userAddInfo;
+
+    @Column(name = "OFCDS")
     private String ofcds;
 
-    @Column(name = "user_nm", nullable = false)
+    @Column(name = "USER_NM")
     private String userNm;
 
-    @Column(name = "chief_yn", nullable = false)
+    @Column(name = "CHIEF_YN")
     private Character chiefYn;
 
-    @Column(name = "dept_cd", nullable = false)
+    @Column(name = "DEPT_CD")
     private String deptCd;
 
     @Builder

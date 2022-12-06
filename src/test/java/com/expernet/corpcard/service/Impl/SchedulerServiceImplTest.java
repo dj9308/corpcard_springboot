@@ -2,8 +2,11 @@ package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.entity.UserAddInfo;
 import com.expernet.corpcard.repository.DeptRepository;
+import com.expernet.corpcard.repository.UserAddInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
+import com.expernet.corpcard.util.SHA512Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -23,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.*;
@@ -55,6 +59,8 @@ public class SchedulerServiceImplTest {
     @Autowired
     private UserRepository userRepository;
     @Autowired
+    private UserAddInfoRepository userAddInfoRepository;
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
     @Test
@@ -70,27 +76,27 @@ public class SchedulerServiceImplTest {
         deleteData();
 
         long startTime = System.currentTimeMillis();
-        logger.info("### jpa insert 시작시간: "+formatTime(startTime));
+        logger.info("### jpa insert 시작시간: " + formatTime(startTime));
 
         userRepository.saveAllAndFlush(fittedDataList);
 
         long endTime = System.currentTimeMillis();
-        logger.info("### jpa insert 저장 시간: "+(endTime-startTime)/1000.0);
-        logger.info("### jpa insert 함수 종료 시간: "+formatTime(endTime));
+        logger.info("### jpa insert 저장 시간: " + (endTime - startTime) / 1000.0);
+        logger.info("### jpa insert 함수 종료 시간: " + formatTime(endTime));
 
         deleteData();
 
         startTime = System.currentTimeMillis();
-        logger.info("### jpa insert 시작시간: "+formatTime(startTime));
+        logger.info("### jpa insert 시작시간: " + formatTime(startTime));
 
         endTime = System.currentTimeMillis();
-        logger.info("### jpa insert 저장 시간: "+(endTime-startTime)/1000.0);
-        logger.info("### jpa insert 함수 종료 시간: "+formatTime(endTime));
+        logger.info("### jpa insert 저장 시간: " + (endTime - startTime) / 1000.0);
+        logger.info("### jpa insert 함수 종료 시간: " + formatTime(endTime));
 
         deleteData();
 
         startTime = System.currentTimeMillis();
-        logger.info("### jdbcTemplate 시작시간: "+formatTime(startTime));
+        logger.info("### jdbcTemplate 시작시간: " + formatTime(startTime));
 
         jdbcTemplate.batchUpdate(
                 "INSERT INTO TB_USER (" +
@@ -103,7 +109,7 @@ public class SchedulerServiceImplTest {
                     public void setValues(PreparedStatement ps, int i) throws SQLException {
                         User userInfo = (User) fittedDataList.get(i);
                         ps.setLong(1, userInfo.getSeq());
-                        ps.setString(2, userInfo.getUserId());
+//                        ps.setString(2, userInfo.getUserId());
                         ps.setString(3, userInfo.getOfcds());
                         ps.setString(4, userInfo.getUserNm());
                         ps.setString(5, userInfo.getDeptCd());
@@ -118,9 +124,8 @@ public class SchedulerServiceImplTest {
         );
 
         endTime = System.currentTimeMillis();
-        logger.info("### jdbcTemplate 저장 시간: "+(endTime-startTime)/1000.0);
-        logger.info("### jdbcTemplate 함수 종료 시간: "+formatTime(endTime));
-
+        logger.info("### jdbcTemplate 저장 시간: " + (endTime - startTime) / 1000.0);
+        logger.info("### jdbcTemplate 함수 종료 시간: " + formatTime(endTime));
 
 
         //then
@@ -145,6 +150,7 @@ public class SchedulerServiceImplTest {
         fitFileData();
         deleteData();
         insertData();
+        chkAndInsertUserAddInfo();
 
         //then
         assertNotEquals(resultMsg.get("CODE"), "ERR");
@@ -223,13 +229,13 @@ public class SchedulerServiceImplTest {
         fittedDataList = userList;
 
         //then
-        assertNotEquals(fittedDataList.size(),0);
+        assertNotEquals(fittedDataList.size(), 0);
     }
 
-    protected void pretreatDeptData(List<HashMap<String, Object>> list){
+    protected void pretreatDeptData(List<HashMap<String, Object>> list) {
         List<Dept> deptList = new ArrayList<>();
 
-        for(Map<String, Object> map : list){
+        for (Map<String, Object> map : list) {
             Dept deptInfo = Dept.builder()
                     .deptNm(map.get("full_name").toString())
                     .deptCd(map.get("id").toString())
@@ -243,7 +249,7 @@ public class SchedulerServiceImplTest {
     }
 
     @Test
-    public void deleteData(){
+    public void deleteData() {
         long deletedCnt = -1;
 
         //1. delete 수행
@@ -271,17 +277,17 @@ public class SchedulerServiceImplTest {
         long insertedCnt = -1;
 
         //when
-        if(type.equals("user")) {
+        if (type.equals("user")) {
             userRepository.saveAllAndFlush(fittedDataList);
             insertedCnt = userRepository.count();
-        } else if(type.equals("dept")) {
+        } else if (type.equals("dept")) {
             deptRepository.saveAllAndFlush(fittedDataList);
             insertedCnt = deptRepository.count();
         }
 
         //then
         chkInsertedAndWriteMsg(insertedCnt);
-        assertNotEquals(insertedCnt,-1);
+        assertNotEquals(insertedCnt, -1);
     }
 
     protected File[] sortFileList(File[] files) {
@@ -297,6 +303,44 @@ public class SchedulerServiceImplTest {
     public void chkInsertedAndWriteMsg(long num) {
         if (num > 0) writeMsg("inserted");
         else troubleShoot("insErr");
+    }
+
+    @Test
+    public void chkAndInsertUserAddInfo() {
+        //given
+        hasNoError = true;
+        //when
+        if (hasNoError) {
+            List<User> toSaveUserAddList = userRepository.findAllByUserIdNotInAddInfoQuery();
+            insertUserAddInfo(toSaveUserAddList);
+        }
+
+        //then
+
+    }
+
+    public void insertUserAddInfo(List<User> toSaveUserAddList) {
+        List<UserAddInfo> userInfoList = new ArrayList<>();
+
+        if (toSaveUserAddList != null) {
+            try{
+                for (User user : toSaveUserAddList) {
+                    String password = SHA512Util.SHA512Encode(user.getUserNm());
+
+                    UserAddInfo userAddInfo = UserAddInfo.builder()
+                            .userPasswd(password)
+                            .managerYn("N")
+                            .user(user)
+                            .build();
+
+                    userInfoList.add(userAddInfo);
+                }
+                userAddInfoRepository.saveAll(userInfoList);
+            }catch (Exception e){
+                e.printStackTrace();
+                troubleShoot("userAddErr");
+            }
+        }
     }
 
     public void troubleShoot(String message) {

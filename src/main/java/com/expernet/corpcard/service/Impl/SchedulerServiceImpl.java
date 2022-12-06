@@ -2,12 +2,16 @@ package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.entity.UserAddInfo;
 import com.expernet.corpcard.repository.DeptRepository;
+import com.expernet.corpcard.repository.UserAddInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
 import com.expernet.corpcard.service.SchedulerService;
+import com.expernet.corpcard.util.SHA512Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -56,8 +60,13 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * 사용자 추가정보 Repository
+     */
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    UserAddInfoRepository userAddInfoRepository;
+
+
 
     /**
      * user txt file path
@@ -89,6 +98,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         fitFileData();
         deleteData();
         insertData();
+        chkAndInsertUserAddInfo();
     }
 
     /**
@@ -267,6 +277,45 @@ public class SchedulerServiceImpl implements SchedulerService {
         }
     }
 
+    /**
+     * 사용자 추가정보 여부 확인 & 추가정보 삽입
+     */
+    @Test
+    public void chkAndInsertUserAddInfo() {
+        if (hasNoError && type.equals("user")) {
+            List<User> toSaveUserAddList = userRepository.findAllByUserIdNotInAddInfoQuery();
+            insertUserAddInfo(toSaveUserAddList);
+        }
+    }
+
+    /**
+     * 사용자 추가정보 삽입
+     * @param toSaveUserAddList : 추가정보 삽입 필요한 사용자 list
+     */
+    public void insertUserAddInfo(List<User> toSaveUserAddList) {
+        List<UserAddInfo> userInfoList = new ArrayList<>();
+
+        if (toSaveUserAddList != null) {
+            try{
+                for (User user : toSaveUserAddList) {
+                    String password = SHA512Util.SHA512Encode(user.getUserNm());
+
+                    UserAddInfo userAddInfo = UserAddInfo.builder()
+                            .userPasswd(password)
+                            .managerYn("N")
+                            .user(user)
+                            .build();
+
+                    userInfoList.add(userAddInfo);
+                }
+                userAddInfoRepository.saveAll(userInfoList);
+            }catch (Exception e){
+                e.printStackTrace();
+                troubleShoot("userAddErr");
+            }
+        }
+    }
+
     private void troubleShoot(String message) {
         hasNoError = false;
         writeMsg(message);
@@ -301,6 +350,10 @@ public class SchedulerServiceImpl implements SchedulerService {
             case "parseErr" -> {
                 resultMsg.put("CODE", "ERR");
                 resultMsg.put("MSG", type + " data parsing failed");
+            }
+            case "userAddErr" -> {
+                resultMsg.put("CODE", "ERR");
+                resultMsg.put("MSG", "User Additional Info Insert failed");
             }
             default -> {
                 resultMsg.put("CODE", "ERR");
