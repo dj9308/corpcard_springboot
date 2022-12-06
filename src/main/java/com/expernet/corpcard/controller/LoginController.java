@@ -7,7 +7,9 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -41,15 +43,25 @@ public class LoginController extends BaseController {
     @Resource(name = "LoginService")
     private LoginService loginService;
 
-    /**
-     * 로그인 페이지 접근
-     */
-    @RequestMapping(value = "/viewLogin", method = RequestMethod.GET)
-    public String viewLogin() {
-        HttpSession session = getSession();
-        User userInfo = (User) session.getAttribute("USER_INFO");
+//    /**
+//     * 로그인 페이지 접근
+//     */
+//    @RequestMapping(value = "/login", method = RequestMethod.GET)
+//    public String viewLogin() {
+//        HttpSession session = getSession();
+//        User userInfo = (User) session.getAttribute("USER_INFO");
+//
+//        if (userInfo == null) return "login";
+//        else return "redirect:/payhist";
+//    }
 
-        if (userInfo == null) return "login";
-        else return "redirect:/payhist";
+    @GetMapping("/")
+    public String index() {
+        return "index";
+    }
+
+    @GetMapping("/viewLogin")
+    public String viewLogin() {
+        return "login";
     }
 }
