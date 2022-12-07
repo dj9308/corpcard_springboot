@@ -6,7 +6,6 @@ import com.expernet.corpcard.entity.UserAddInfo;
 import com.expernet.corpcard.repository.DeptRepository;
 import com.expernet.corpcard.repository.UserAddInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
-import com.expernet.corpcard.util.SHA512Util;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
