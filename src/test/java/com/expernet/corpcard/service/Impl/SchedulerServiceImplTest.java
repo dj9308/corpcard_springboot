@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,6 +63,9 @@ public class SchedulerServiceImplTest {
     private UserAddInfoRepository userAddInfoRepository;
     @Autowired
     private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
 
     @Test
     public void testInsertSpeed() throws Exception {
@@ -325,7 +329,8 @@ public class SchedulerServiceImplTest {
         if (toSaveUserAddList != null) {
             try{
                 for (User user : toSaveUserAddList) {
-                    String password = SHA512Util.SHA512Encode(user.getUserNm());
+                    //TODO 비밀번호 설정 방식 협의 필요
+                    String password = passwordEncoder.encode(user.getUserId()+user.getUserId());
 
                     UserAddInfo userAddInfo = UserAddInfo.builder()
                             .userPasswd(password)
@@ -341,6 +346,11 @@ public class SchedulerServiceImplTest {
                 troubleShoot("userAddErr");
             }
         }
+    }
+
+    @Test
+    public void testInsert(){
+        User userinfo = userRepository.findByUserId("9");
     }
 
     public void troubleShoot(String message) {

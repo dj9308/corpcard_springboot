@@ -2,6 +2,7 @@ package com.expernet.corpcard.service;
 
 
 import com.expernet.corpcard.entity.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.Map;
 
@@ -22,6 +23,6 @@ import java.util.Map;
  *
  * </pre>
  */
-public interface LoginService {
-    Map actionLogin(User user);
+public interface LoginService extends UserDetailsService {
+
 }

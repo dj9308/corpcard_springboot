@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +67,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     @Autowired
     UserAddInfoRepository userAddInfoRepository;
 
-
+    @Autowired
+    BCryptPasswordEncoder passwordEncoder;
 
     /**
      * user txt file path
@@ -280,9 +282,8 @@ public class SchedulerServiceImpl implements SchedulerService {
     /**
      * 사용자 추가정보 여부 확인 & 추가정보 삽입
      */
-    @Test
     public void chkAndInsertUserAddInfo() {
-        if (hasNoError && type.equals("user")) {
+        if (hasNoError) {
             List<User> toSaveUserAddList = userRepository.findAllByUserIdNotInAddInfoQuery();
             insertUserAddInfo(toSaveUserAddList);
         }
@@ -298,7 +299,8 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (toSaveUserAddList != null) {
             try{
                 for (User user : toSaveUserAddList) {
-                    String password = SHA512Util.SHA512Encode(user.getUserNm());
+                    //TODO 비밀번호 설정 방식 협의 필요
+                    String password = passwordEncoder.encode(user.getUserId()+user.getUserId());
 
                     UserAddInfo userAddInfo = UserAddInfo.builder()
                             .userPasswd(password)
