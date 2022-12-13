@@ -29,17 +29,6 @@ public class ErrorController extends BaseController {
      */
     @RequestMapping(value = "/error/{errorType}")
     public String error(@PathVariable String errorType, Model model) {
-        String errMsg;
-
-        if (errorType.equals("AUTH")) {
-            errMsg = "접근 권한이 없습니다";
-        } else {
-            errMsg = "오류가 발생하였습니다";
-        }
-
-        model.addAttribute("CODE", "ERR");
-        model.addAttribute("MSG", errMsg);
-
-        return "error";
+        return "error/403";
     }
 }

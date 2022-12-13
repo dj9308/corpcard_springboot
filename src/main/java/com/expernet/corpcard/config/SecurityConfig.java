@@ -15,9 +15,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,9 +23,6 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Stream;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -128,11 +123,7 @@ public class SecurityConfig {
                     HttpSession session = request.getSession();
                     session.invalidate();
                 })
-                .logoutSuccessHandler((request, response, authentication) -> response.sendRedirect("/viewLogin"))
-            .and()
-                //예외 처리
-                .exceptionHandling()
-                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendRedirect("/error/AUTH"));
+                .logoutSuccessHandler((request, response, authentication) -> response.sendRedirect("/viewLogin"));
         return http.build();
     }
 }
