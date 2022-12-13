@@ -1,12 +1,11 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.BaseController;
 import com.expernet.corpcard.service.LoginService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 
 /**
@@ -41,7 +40,7 @@ public class LoginController extends BaseController {
     /**
      * 로그인 페이지 이동
      */
-    @GetMapping("/viewLogin")
+    @RequestMapping("/viewLogin")
     public String viewLogin() {
         return "login";
     }

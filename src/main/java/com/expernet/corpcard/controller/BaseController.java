@@ -1,4 +1,4 @@
-package com.expernet.corpcard;
+package com.expernet.corpcard.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;

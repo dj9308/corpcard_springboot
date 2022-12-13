@@ -1,6 +1,9 @@
 package com.expernet.corpcard.config;
 
 import com.expernet.corpcard.service.LoginService;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,11 +12,22 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.AccessDeniedHandler;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Stream;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -65,6 +79,7 @@ public class SecurityConfig {
 
     /**
      * Security Connfiguration Setting
+     *
      * @param http : HttpSecurity
      */
     @Bean
@@ -78,8 +93,8 @@ public class SecurityConfig {
                         auth
                                 .requestMatchers("/layouts", "/login", "/user/**").permitAll()
                                 .requestMatchers("/css/**", "/js/**", "/font/**", "/icons/**").permitAll()
-                                .requestMatchers("/approval").hasRole("APPROVAL")
-                                .requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/approval").hasRole("CHIEF")
+                                .requestMatchers("/admin").hasRole("MANAGER")
                                 .anyRequest().authenticated();
                     } catch (Exception e) {
                         throw new RuntimeException(e);
@@ -91,26 +106,33 @@ public class SecurityConfig {
                 .usernameParameter("userId")
                 .passwordParameter("userPasswd")
                 .loginProcessingUrl("/login_proc")
-                .defaultSuccessUrl("/payhist", true)
                 .successHandler((request, response, authentication) -> {
-                    logger.info("Authentication successful");
-                    response.sendRedirect("/");
+                    Collection<GrantedAuthority> credentials = (Collection<GrantedAuthority>) authentication.getAuthorities();
+                    if(credentials.stream().anyMatch(a->a.getAuthority().equals("ROLE_CHIEF"))){
+                        response.sendRedirect("/approval");
+                    }else{
+                        response.sendRedirect("/payhist");
+                    }
                 })
                 .failureHandler((request, response, exception) -> {
-                    logger.info("Authentication failure");
-                    response.sendRedirect("/viewLogin?error=true");
+                    String errorMsg = "아이디 또는 비밀번호가 맞지 않습니다. 다시 확인해 주세요.";
+                    request.setAttribute("errorMsg", errorMsg);
+                    request.getRequestDispatcher("/viewLogin").forward(request, response);
                 })
                 .permitAll()
+            .and()
                 //로그아웃
-                .and()
                 .logout()
                 .logoutUrl("/logout")
                 .addLogoutHandler((request, response, authentication) -> {
                     HttpSession session = request.getSession();
                     session.invalidate();
                 })
-                .logoutSuccessHandler((request, response, authentication) -> response.sendRedirect("/login"));
-
+                .logoutSuccessHandler((request, response, authentication) -> response.sendRedirect("/viewLogin"))
+            .and()
+                //예외 처리
+                .exceptionHandling()
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.sendRedirect("/error/AUTH"));
         return http.build();
     }
 }

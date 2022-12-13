@@ -1,5 +1,6 @@
 package com.expernet.corpcard;
 
+import com.expernet.corpcard.controller.BaseController;
 import com.expernet.corpcard.service.SchedulerService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;

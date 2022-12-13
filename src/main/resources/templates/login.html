@@ -16,33 +16,27 @@
         <div class="row justify-content-sm-center h-100">
             <div class="col-xxl-4 col-xl-5 col-lg-5 col-md-7 col-sm-9">
                 <div class="text-center my-5">
-                    <h1>Please Login</h1>
+                    <h1 class="mb-0">법인카드 내역</h1>
+                    <h1>결재 시스템</h1>
 <!--                    <img src="https://getbootstrap.com/docs/5.0/assets/brand/bootstrap-logo.svg" alt="logo" width="100">-->
                 </div>
                 <div class="card shadow-lg">
                     <div class="card-body p-5">
-                        <form method="POST" th:action="@{/login_proc}" class="needs-validation" novalidate="" autocomplete="off">
+                        <div th:if="${errorMsg != null}" th:text="${errorMsg}" class="alert alert-danger" role="alert">
+                        </div>
+                        <form method="POST" th:action="@{/login_proc}" class="needs-validation">
                             <div class="mb-3">
                                 <label class="mb-2 text-muted" for="userId">아이디</label>
-                                <input id="userId" type="text" class="form-control" name="userId" value="" required autofocus>
-                                <div class="invalid-feedback">
-                                    ID를 입력하십시오.
-                                </div>
+                                <input id="userId" type="text" class="form-control" name="userId" required="required" autofocus>
                             </div>
-
                             <div class="mb-3">
                                 <div class="mb-2 w-100">
-                                    <label class="text-muted" for="userPasswd">패스워드</label>
-<!--                                    <a href="forgot.html" class="float-end">-->
-<!--                                        Forgot Password?-->
-<!--                                    </a>-->
+                                    <label class="text-muted" for="userPasswd">비밀번호</label>
                                 </div>
-                                <input id="userPasswd" type="password" class="form-control" name="userPasswd" required>
-                                <div class="invalid-feedback">
-                                    비밀번호를 입력하십시오.
+                                <input id="userPasswd" type="password" class="form-control" name="userPasswd" aria-describedby="validationFeedback" required>
+                                <div th:if="${errorMsg != null}" th:text="${errorMsg}" id="validationFeedback" class="invalid-feedback">
                                 </div>
                             </div>
-
                             <div class="d-flex align-items-center">
                                 <div class="form-check">
                                     <input type="checkbox" name="checkId" id="checkId" class="form-check-input">
@@ -69,10 +63,5 @@
 </section>
 
 <script type="text/javascript" th:src="@{/js/corpcard/login.js}"></script>
-<script>
-    $(document).ready(function() {
-        $login.init();
-    });
-</script>
 </body>
 </html>

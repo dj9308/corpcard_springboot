@@ -1,9 +1,5 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.BaseController;
-import com.expernet.corpcard.entity.User;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -14,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템

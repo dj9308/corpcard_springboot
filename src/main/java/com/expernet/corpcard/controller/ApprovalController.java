@@ -1,9 +1,9 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.BaseController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -28,5 +28,10 @@ public class ApprovalController extends BaseController {
 	 * Logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(ApprovalController.class);
+
+	@RequestMapping("/approval")
+	public String page(){
+		return "approval";
+	}
 
 }
