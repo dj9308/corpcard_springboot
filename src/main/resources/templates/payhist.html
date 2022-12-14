@@ -7,87 +7,135 @@
 <div th:replace="/fragments/nav.html :: fragment-nav"></div>
 <header class="py-5">
     <div class="container px-lg-5">
-        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
-            <div class="m-4 m-lg-5">
-                <h1 class="display-5 fw-bold">A warm welcome!</h1>
-                <p class="fs-4">Bootstrap utility classes are used to create this jumbotron since the old component has been removed from the framework. Why create custom CSS when you can use utilities?</p>
-                <a class="btn btn-primary btn-lg" href="#!">Call to action</a>
+        <div class="fs-3 fw-bold mb-4">
+            <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                 viewBox="0 0 16 16">
+                <image th:href="@{/icons/clipboard2-fill.svg}"></image>
+            </svg>
+            결제 내역
+        </div>
+        <div class="fs-5 mb-2 ms-1">
+            <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor"
+                 viewBox="0 0 16 16">
+                <image th:href="@{/icons/briefcase-fill.svg}"></image>
+            </svg>
+            기간별 통계
+        </div>
+        <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
+            <!--            <div class="mb-3 row">-->
+            <!--                <label for="datepicker" class="col-sm-2 col-form-label">검색 기간</label>-->
+            <!--                <div class="col-sm-10"><input type="text" id="datepicker" class="form-control"></div>-->
+            <!--            </div>-->
+            <table>
+                <tr>
+                    <th class="pe-3">검색 기간</th>
+                    <td>
+                        <input type="text" id="datepicker" class="form-control" style="width:250px">
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
+            <table class="fs-5 fw-bold">
+                <tr>
+                    <th class="pe-3">총 합계 : </th>
+                    <td id="totalSum">
+
+                    </td>
+                    <th class="pe-3"><span id="curMonth">12월</span> 합계 : </th>
+                    <td id="monthSum">
+
+                    </td>
+                </tr>
+            </table>
+            <div class="row gx-lg-2">
+                <div class="p-1 col-lg-6 col-xxl-6">
+                    <div class="card bg-light border-0 h-100 bg-white chart" style="height:400px" id="chart-bar">
+<!--                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
+<!--                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
+<!--                                    class="bi bi-collection"></i></div>-->
+<!--                            <h2 class="fs-4 fw-bold">Fresh new layout</h2>-->
+<!--                            <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>-->
+<!--                        </div>-->
+                    </div>
+                </div>
+                <div class="p-1 col-lg-6 col-xxl-6">
+                    <div class="card bg-light border-0 h-100 bg-white" style="height:400px" id="chart-pie">
+<!--                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
+<!--                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
+<!--                                    class="bi bi-cloud-download"></i></div>-->
+<!--                            <h2 class="fs-4 fw-bold">Free to download</h2>-->
+<!--                            <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>-->
+<!--                        </div>-->
+                    </div>
+                </div>
             </div>
         </div>
+
+        <!--        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">-->
+        <!--            <div class="m-4 m-lg-5">-->
+        <!--                <h1 class="display-5 fw-bold">A warm welcome!</h1>-->
+        <!--                <p class="fs-4">Bootstrap utility classes are used to create this jumbotron since the old component has-->
+        <!--                    been removed from the framework. Why create custom CSS when you can use utilities?</p>-->
+        <!--                <a class="btn btn-primary btn-lg" href="#!">Call to action</a>-->
+        <!--            </div>-->
+        <!--        </div>-->
     </div>
 </header>
 <!-- Page Content-->
 <section class="pt-4">
     <div class="container px-lg-5">
         <!-- Page Features-->
-        <div class="row gx-lg-5">
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-collection"></i></div>
-                        <h2 class="fs-4 fw-bold">Fresh new layout</h2>
-                        <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-cloud-download"></i></div>
-                        <h2 class="fs-4 fw-bold">Free to download</h2>
-                        <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-card-heading"></i></div>
-                        <h2 class="fs-4 fw-bold">Jumbotron hero header</h2>
-                        <p class="mb-0">The heroic part of this template is the jumbotron hero header!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-bootstrap"></i></div>
-                        <h2 class="fs-4 fw-bold">Feature boxes</h2>
-                        <p class="mb-0">We've created some custom feature boxes using Bootstrap icons!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-code"></i></div>
-                        <h2 class="fs-4 fw-bold">Simple clean code</h2>
-                        <p class="mb-0">We keep our dependencies up to date and squash bugs as they come!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-patch-check"></i></div>
-                        <h2 class="fs-4 fw-bold">A name you trust</h2>
-                        <p class="mb-0">Start Bootstrap has been the leader in free Bootstrap templates since 2013!</p>
-                    </div>
-                </div>
-            </div>
+        <div class="fs-5 mb-2 ms-1">
+            <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor"
+                 viewBox="0 0 16 16">
+                <image th:href="@{/icons/briefcase-fill.svg}"></image>
+            </svg>
+            결제 내역
         </div>
+        <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
+            <table>
+                <tr>
+                    <th class="pe-3">작성 연월</th>
+                    <td>
+                        <input type="month" class="form-control">
+                    </td>
+                </tr>
+            </table>
+        </div>
+<!--        <div class="row gx-lg-2">-->
+<!--            <div class="col-lg-6 col-xxl-6 mb-5">-->
+<!--                <div class="card bg-light border-0 h-100">-->
+<!--                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
+<!--                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
+<!--                                class="bi bi-collection"></i></div>-->
+<!--                        <h2 class="fs-4 fw-bold">Fresh new layout</h2>-->
+<!--                        <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <div class="col-lg-6 col-xxl-6 mb-5">-->
+<!--                <div class="card bg-light border-0 h-100">-->
+<!--                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
+<!--                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
+<!--                                class="bi bi-cloud-download"></i></div>-->
+<!--                        <h2 class="fs-4 fw-bold">Free to download</h2>-->
+<!--                        <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </section>
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
-<!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
-<script src="js/scripts.js"></script>
+<script th:src="@{/js/corpcard/payhist.js}"></script>
 <script>
-
-console.log(window.location.href);
+    $(function () {
+        $payhist.init();
+    });
 </script>
 </body>
 </html>
