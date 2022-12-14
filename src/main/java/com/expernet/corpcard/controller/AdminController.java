@@ -3,6 +3,8 @@ package com.expernet.corpcard.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -22,10 +24,15 @@ import org.springframework.stereotype.Controller;
  * </pre>
  */
 @Controller
-public class ManageController extends BaseController {
+public class AdminController extends BaseController {
 	/**
 	 * Logger
 	 */
-	private static final Logger logger = LoggerFactory.getLogger(ManageController.class);
+	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
+	@RequestMapping("/admin")
+	public String page(Model model){
+		model.addAttribute("menu", "admin");
+		return "admin";
+	}
 }

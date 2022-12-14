@@ -52,8 +52,8 @@ public class LoginServiceImpl implements LoginService {
         if(userinfo.getChiefYn().toString().equals("Y")){
             roles.add("CHIEF");
         }
-        if(userinfo.getUserAddInfo().getManagerYn().equals("Y")){
-            roles.add("MANAGER");
+        if(userinfo.getUserAddInfo().getAdminYn().equals("Y")){
+            roles.add("ADMIN");
         }
 
         return org.springframework.security.core.userdetails.User.builder()

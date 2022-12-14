@@ -3,6 +3,7 @@ package com.expernet.corpcard.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +40,8 @@ public class PayhistController extends BaseController {
      * 결제내역 페이지
      */
     @RequestMapping(value = "/payhist", method = RequestMethod.GET)
-    public String payhistView() {
+    public String payhistView(Model model) {
+        model.addAttribute("menu", "payhist");
         return "payhist";
     }
 

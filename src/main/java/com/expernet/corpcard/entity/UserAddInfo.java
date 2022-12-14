@@ -23,14 +23,14 @@ public class UserAddInfo {
     @Column(name = "USER_PASSWD")
     private String userPasswd;
 
-    @Column(name = "MANAGER_YN",columnDefinition = "char")
-    private String managerYn;
+    @Column(name = "ADMIN_YN",columnDefinition = "char")
+    private String adminYn;
 
     @Builder
-    public UserAddInfo(long seq, String userPasswd, String managerYn, User user) {
+    public UserAddInfo(long seq, String userPasswd, String adminYn, User user) {
         this.seq = seq;
         this.userPasswd = userPasswd;
-        this.managerYn = managerYn;
+        this.adminYn = adminYn;
         this.user = user;
     }
 }

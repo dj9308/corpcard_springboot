@@ -301,7 +301,7 @@ public class SchedulerServiceImpl implements SchedulerService {
 
                     UserAddInfo userAddInfo = UserAddInfo.builder()
                             .userPasswd(password)
-                            .managerYn("N")
+                            .adminYn("N")
                             .user(user)
                             .build();
 

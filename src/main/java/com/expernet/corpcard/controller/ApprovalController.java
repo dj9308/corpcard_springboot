@@ -3,6 +3,7 @@ package com.expernet.corpcard.controller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -30,8 +31,8 @@ public class ApprovalController extends BaseController {
 	private static final Logger logger = LoggerFactory.getLogger(ApprovalController.class);
 
 	@RequestMapping("/approval")
-	public String page(){
+	public String page(Model model){
+		model.addAttribute("menu", "approval");
 		return "approval";
 	}
-
 }

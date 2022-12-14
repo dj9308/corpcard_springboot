@@ -333,7 +333,7 @@ public class SchedulerServiceImplTest {
 
                     UserAddInfo userAddInfo = UserAddInfo.builder()
                             .userPasswd(password)
-                            .managerYn("N")
+                            .adminYn("N")
                             .user(user)
                             .build();
 
