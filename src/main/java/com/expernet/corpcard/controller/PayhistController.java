@@ -1,5 +1,11 @@
 package com.expernet.corpcard.controller;
 
+import com.expernet.corpcard.entity.CardUsehist;
+import com.expernet.corpcard.entity.Dept;
+import com.expernet.corpcard.entity.UsehistSubmitInfo;
+import com.expernet.corpcard.service.PayhistService;
+import com.expernet.corpcard.service.SchedulerService;
+import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -9,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -29,8 +36,13 @@ import java.util.List;
  * @since 2022.11.18
  */
 @Controller
-//@RequestMapping(value = "/payhist", method = RequestMethod.GET)
+@RequestMapping(value = "/payhist", method = RequestMethod.GET)
 public class PayhistController extends BaseController {
+    /**
+     * payhist Service
+     */
+    @Resource(name = "PayhistService")
+    private PayhistService payhistService;
     /**
      * Logger
      */
@@ -39,7 +51,7 @@ public class PayhistController extends BaseController {
     /**
      * 결제내역 페이지
      */
-    @RequestMapping(value = "/payhist", method = RequestMethod.GET)
+    @RequestMapping(value = "", method = RequestMethod.GET)
     public String payhistView(Model model) {
         model.addAttribute("menu", "payhist");
         return "payhist";
@@ -47,15 +59,16 @@ public class PayhistController extends BaseController {
 
     /**
      * 월별 통계 조회
-     * @param dataList  : 기간(년월)
-     * @param model     : modelMap
+     *
+     * @param dataList : 기간(년월)
+     * @param model    : modelMap
      */
     @RequestMapping(value = "/staticInfo", method = RequestMethod.GET)
     public String searchStaticInfo(@RequestParam List<HashMap<String, Object>> dataList, ModelMap model) {
         int result = 0;
-        try{
+        try {
 
-        } finally{
+        } finally {
 
         }
 
@@ -64,16 +77,54 @@ public class PayhistController extends BaseController {
 
     /**
      * 결제 내역 조회
-     * @param dataList  : 작성연월
-     * @param model     : modelMap
+     *
+     * @param paramMap : 작성연월
+     * @param model    : modelMap
      */
     @RequestMapping(value = "/payhistList", method = RequestMethod.GET)
-    public String searchPayhistInfo(@RequestParam List<HashMap<String, Object>> dataList, ModelMap model) {
-        int result = 0;
+    public String searchPayhistInfo(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+        List<CardUsehist> usehistList = new ArrayList<>();
+        try {
+            usehistList = payhistService.searchCardUsehistList(paramMap);
+        } finally {
+            if (usehistList != null && usehistList.size() > 0) {
+                model.addAttribute("result", usehistList);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", paramMap.get("WRT_YN") + "의 결제내역 조회 성공");
+                logger.info(paramMap.get("WRT_YN") + "의 결제내역 조회 성공.");
+            } else {
+                model.addAttribute("CODE", "EMPTY");
+                model.addAttribute("MSG", paramMap.get("WRT_YN") + "의 결제내역 없음");
+                logger.error(paramMap.get("WRT_YN") + "의 결제내역 없음");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 결제 내역 저장
+     *
+     * @param paramMap  : 결제 내역 정보
+     * @param model : modelMap
+     */
+    @RequestMapping(value = "/saveList", method = RequestMethod.POST)
+    public String savePayhistList(HashMap<String, Object> paramMap, ModelMap model) {
+        long result = -1;
+        UsehistSubmitInfo submitInfo = (UsehistSubmitInfo) paramMap.get("submitInfo");
+        List<HashMap<String, Object>> useList = (List<HashMap<String, Object>>) paramMap.get("useList");
+
         try{
-
-        } finally{
-
+            result = payhistService.saveCardUsehistList(paramMap);
+        }finally {
+            if (result > 0) {
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제 내역 저장 성공");
+                logger.info(paramMap.get("WRT_YN") + "의 결제내역 조회 성공.");
+            } else {
+                model.addAttribute("CODE", "EMPTY");
+                model.addAttribute("MSG", paramMap.get("WRT_YN") + "의 결제내역 없음");
+                logger.error(paramMap.get("WRT_YN") + "의 결제내역 없음");
+            }
         }
 
         return "jsonView";

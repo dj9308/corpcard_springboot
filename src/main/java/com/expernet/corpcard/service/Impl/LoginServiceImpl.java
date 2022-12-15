@@ -31,7 +31,7 @@ import java.util.List;
 @Service("LoginService")
 public class LoginServiceImpl implements LoginService {
     /**
-     * Security Connfiguration Setting
+     * Security Configuration Repository
      */
     @Autowired
     private UserRepository userRepository;
