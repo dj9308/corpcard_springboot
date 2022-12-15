@@ -22,7 +22,15 @@ const $payhist = (function () {
     * 버튼 이벤트
     */
     const initBtnEvent = function(){
-        
+
+        //첨부파일 btn
+        document.querySelector("#payhist-atch").onclick = function() {
+          const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+          const toastList = toastElList.map(function(toastEl) {
+            return new bootstrap.Toast(toastEl)
+          });
+          toastList.forEach(toast => toast.show());
+        };
     }
 
     /**

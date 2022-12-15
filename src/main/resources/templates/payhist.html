@@ -5,7 +5,7 @@
 <body>
 <!-- navbar -->
 <div th:replace="/fragments/nav.html :: fragment-nav"></div>
-<header class="py-5">
+<header class="py-2">
     <div class="container px-lg-5">
         <div class="fs-3 fw-bold mb-4">
             <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
@@ -22,10 +22,6 @@
             기간별 통계
         </div>
         <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
-            <!--            <div class="mb-3 row">-->
-            <!--                <label for="datepicker" class="col-sm-2 col-form-label">검색 기간</label>-->
-            <!--                <div class="col-sm-10"><input type="text" id="datepicker" class="form-control"></div>-->
-            <!--            </div>-->
             <table>
                 <tr>
                     <th class="pe-3">검색 기간</th>
@@ -38,11 +34,11 @@
         <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
             <table class="fs-5 fw-bold">
                 <tr>
-                    <th class="pe-3">총 합계 : </th>
+                    <th class="pe-3">총 합계 :</th>
                     <td id="totalSum">
 
                     </td>
-                    <th class="pe-3"><span id="curMonth">12월</span> 합계 : </th>
+                    <th class="pe-3"><span id="curMonth">12월</span> 합계 :</th>
                     <td id="monthSum">
 
                     </td>
@@ -51,35 +47,14 @@
             <div class="row gx-lg-2">
                 <div class="p-1 col-lg-6 col-xxl-6">
                     <div class="card bg-light border-0 h-100 bg-white chart" style="height:400px" id="chart-bar">
-<!--                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
-<!--                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
-<!--                                    class="bi bi-collection"></i></div>-->
-<!--                            <h2 class="fs-4 fw-bold">Fresh new layout</h2>-->
-<!--                            <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>-->
-<!--                        </div>-->
                     </div>
                 </div>
                 <div class="p-1 col-lg-6 col-xxl-6">
                     <div class="card bg-light border-0 h-100 bg-white" style="height:400px" id="chart-pie">
-<!--                        <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
-<!--                            <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
-<!--                                    class="bi bi-cloud-download"></i></div>-->
-<!--                            <h2 class="fs-4 fw-bold">Free to download</h2>-->
-<!--                            <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>-->
-<!--                        </div>-->
                     </div>
                 </div>
             </div>
         </div>
-
-        <!--        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">-->
-        <!--            <div class="m-4 m-lg-5">-->
-        <!--                <h1 class="display-5 fw-bold">A warm welcome!</h1>-->
-        <!--                <p class="fs-4">Bootstrap utility classes are used to create this jumbotron since the old component has-->
-        <!--                    been removed from the framework. Why create custom CSS when you can use utilities?</p>-->
-        <!--                <a class="btn btn-primary btn-lg" href="#!">Call to action</a>-->
-        <!--            </div>-->
-        <!--        </div>-->
     </div>
 </header>
 <!-- Page Content-->
@@ -103,28 +78,178 @@
                 </tr>
             </table>
         </div>
-<!--        <div class="row gx-lg-2">-->
-<!--            <div class="col-lg-6 col-xxl-6 mb-5">-->
-<!--                <div class="card bg-light border-0 h-100">-->
-<!--                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
-<!--                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
-<!--                                class="bi bi-collection"></i></div>-->
-<!--                        <h2 class="fs-4 fw-bold">Fresh new layout</h2>-->
-<!--                        <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--            <div class="col-lg-6 col-xxl-6 mb-5">-->
-<!--                <div class="card bg-light border-0 h-100">-->
-<!--                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">-->
-<!--                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i-->
-<!--                                class="bi bi-cloud-download"></i></div>-->
-<!--                        <h2 class="fs-4 fw-bold">Free to download</h2>-->
-<!--                        <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
+        <table class="mb-1 table table-sm table-bordered align-middle table-style1">
+            <tr>
+                <th>사용내역
+                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                                         viewBox="0 0 16 16">
+                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                    </svg>
+                </th>
+                <td>
+                    <input type="text" class="form-control">
+                </td>
+                <th>분류
+                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                         viewBox="0 0 16 16">
+                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                    </svg>
+                </th>
+                <td>
+                    <select class="form-select">
+                        <option>test1</option>
+                        <option>test2</option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <th>사용일시
+                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                         viewBox="0 0 16 16">
+                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                    </svg>
+                </th>
+                <td>
+                    <input type="date" class="form-control">
+                </td>
+                <th>금액
+                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                         viewBox="0 0 16 16">
+                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                    </svg>
+                </th>
+                <td>
+                    <input type="text" class="form-control">
+                </td>
+            </tr>
+            <tr>
+                <th>카드정보
+                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                         viewBox="0 0 16 16">
+                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                    </svg>
+                </th>
+                <td colspan="3">
+                    <select class="form-select">
+                        <option>test1</option>
+                        <option>test2</option>
+                    </select>
+                </td>
+            </tr>
+        </table>
+        <div class="text-center mb-4">
+            <button type="button" class="btn btn-secondary">작성</button>
+            <button type="button" class="btn btn-gray">초기화</button>
+        </div>
+            <div class="mb-1 fs-4 gx-5 row">
+                <div class="col">
+                    총 <span class="fw-bold" id="tot-cnt"></span> 건이 조회되었습니다. - <span class="fw-bold" id="status"></span>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-secondary" id="payhist-atch">첨부파일</button>
+                    <button type="button" class="btn btn-danger">PDF</button>
+                    <button type="button" class="btn btn-success">CSV</button>
+                    <button type="button" class="btn btn-primary">제출</button>
+                    <button type="button" class="btn btn-secondary">저장</button>
+                    <button type="button" class="btn btn-secondary">삭제</button>
+                </div>
+            </div>
+        <div class="table-responsive-xxl">
+            <table class="text-center table table-hover table-bordered table-sm align-middle table-style2">
+                <thead class="table-secondary">
+                <tr>
+                    <th scope="col">
+                        <input class="form-check-input me-1" type="checkbox" id="checkbox-all">
+                    </th>
+                    <th scope="col">사용일</th>
+                    <th scope="col">카드 정보</th>
+                    <th scope="col" style="width:150px;">사용내역</th>
+                    <th scope="col" class="th-style1">접대비</th>
+                    <th scope="col" class="th-style1">여비교통비</th>
+                    <th scope="col" class="th-style1">복리후생비</th>
+                    <th scope="col" class="th-style1">출장비</th>
+                    <th scope="col" class="th-style1">소모품비</th>
+                    <th scope="col" class="th-style1">차량유지비</th>
+                    <th scope="col" class="th-style1">도서구입비</th>
+                    <th scope="col" class="th-style1">교육비</th>
+                    <th scope="col" class="th-style1">지급수수료</th>
+                    <th scope="col" class="th-style1">기타</th>
+                    <th scope="col" style="width:100px;">합계</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <th scope="row">
+                        <input class="form-check-input me-1" type="checkbox" value="">
+                    </th>
+                    <td>12.04</td>
+                    <td>신한 XXXX</td>
+                    <td>XX 프로젝트 중식</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>28,000</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>28,000</td>
+                </tr>
+                <tr class="fw-bold">
+                    <th colspan="4">합계</th>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>28,000</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>28,000</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!--첨부파일 toast-->
+    <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <img th:src="@{/icons/paperclip.svg}" class="rounded me-2">
+                <strong class="me-auto">첨부파일</strong>
+                <small>
+                    파일 <span id="atch-cnt">11</span>개
+                </small>
+                <button type="button" class="ms-2 btn btn-outline-danger btn-sm">삭제</button>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <ul class="list-group">
+                <li class="list-group-item">
+                    <input class="form-check-input me-1" type="checkbox" value="">
+                    First checkbox
+                </li>
+                <li class="list-group-item">
+                    <input class="form-check-input me-1" type="checkbox" value="">
+                    Second checkbox
+                </li>
+                <li class="list-group-item">
+                    <input class="form-check-input me-1" type="checkbox" value="">
+                    Third checkbox
+                </li>
+                <li class="list-group-item">
+                    <input class="form-check-input me-1" type="checkbox" value="">
+                    Fourth checkbox
+                </li>
+                <li class="list-group-item">
+                    <input class="form-check-input me-1" type="checkbox" value="">
+                    Fifth checkbox
+                </li>
+            </ul>
+        </div>
     </div>
 </section>
 <!-- Footer-->
