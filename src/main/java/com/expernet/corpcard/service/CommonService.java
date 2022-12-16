@@ -23,7 +23,7 @@ import java.util.List;
  *
  * </pre>
  */
-public interface BaseService {
+public interface CommonService {
     /**
      * 분류 목록 조회
      */

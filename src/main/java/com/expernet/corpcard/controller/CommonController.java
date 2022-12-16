@@ -2,17 +2,13 @@ package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.ClassInfo;
-import com.expernet.corpcard.service.BaseService;
-import com.expernet.corpcard.service.PayhistService;
+import com.expernet.corpcard.service.CommonService;
 import jakarta.annotation.Resource;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,17 +29,18 @@ import java.util.List;
  * </pre>
  * @since 2022.11.08
  */
-public class BaseController {
+@Controller
+public class CommonController {
     /**
      * base Service
      */
-    @Resource(name = "BaseService")
-    private BaseService baseService;
+    @Resource(name = "CommonService")
+    private CommonService baseService;
 
     /**
      * Logger
      */
-    private static final Logger logger = LoggerFactory.getLogger(BaseController.class);
+    private static final Logger logger = LoggerFactory.getLogger(CommonController.class);
 
     /**
      * 분류 목록 조회

@@ -11,6 +11,7 @@ const $cmmn = (function() {
 
     /**
      * null이면 true 반환
+     * @param checkValue : node
      */
     const isNullorEmpty = function(checkValue) {
         //null 확인
@@ -24,16 +25,7 @@ const $cmmn = (function() {
         return false;
     }
 
-    /**
-     * select 표현(option 생성)
-     */
-    const paintSelect = function(json) {
-
-
-    }
-
     return{
         isNullorEmpty : isNullorEmpty,
-        paintSelect : paintSelect,
     }
 }());

@@ -24,12 +24,10 @@ const $payhist = (function () {
   */
   const initEvt = function () {
     const now = new Date;
-
-    //결제내역 현재 년월 표현
-    document.querySelector("#payhist-month").value = `${now.getFullYear()}-${now.getMonth()}`
+    const payhistMonth = document.querySelector("#payhistMonth");
 
     //년월 변경 시 결제내역 조회
-    document.querySelector("#payhist-month").addEventListener('change', function () {
+    payhistMonth.addEventListener('change', function () {
       const userId = document.querySelector('#userId').value;
       const wrtYn = this.value;
 
@@ -53,10 +51,18 @@ const $payhist = (function () {
           return alert("결제내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
         }
       });
+
+      //사용일시 선택 제한
+      setLimitHistDate();
     });
 
+    //결제내역 현재 년월 표현
+    payhistMonth.value = `${now.getFullYear()}-${now.getMonth()}`;
+    $(payhistMonth).trigger("change");
+    
+
     //첨부파일 btn
-    document.querySelector("#payhist-atch").onclick = function () {
+    document.querySelector("#payhistAtch").onclick = function () {
       const toastElList = [].slice.call(document.querySelectorAll('.toast'))
       const toastList = toastElList.map(function (toastEl) {
         return new bootstrap.Toast(toastEl)
@@ -65,29 +71,76 @@ const $payhist = (function () {
     };
   }
 
-   /**
-   * 결제 내역 form event handler
-   */
-  const initHistFormEvt = function(){
-    //분류 select
+  /**
+  * 결제 내역 form event handler
+  */
+  const initHistFormEvt = function () {
+  
+    //1.분류 select
     const classSelect = document.querySelector("#classSelect");
-
-      // 분류
-      $.ajax({
-        type: "GET",
-        url: "/base/classList",
-        success: function (data) {
-          if (data.CODE === "SUCCESS") {
-            $cmmn.
-          } else {
-            alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+    $.ajax({
+      type: "GET",
+      url: "/base/classList",
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+          const json = data.result;
+          for (let i in json) {
+            const option = document.createElement('option');
+            option.text = json[i].classNm;
+            option.value = json[i].seq;
+            classSelect.options.add(option);
           }
-        },
-        error: function () {
-          return alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        } else {
+          alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
         }
-      });
+      },
+      error: function () {
+        return alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
 
+    //2.카드 select
+    const cardSelect = document.querySelector("#cardSelect");
+    $.ajax({
+      type: "GET",
+      url: "/base/cardList",
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+          const json = data.result;
+          for (let i in json) {
+            const option = document.createElement('option');
+            option.text = `${json[i].cardComp} ${json[i].cardNum}`;
+            option.value = json[i].seq;
+            cardSelect.options.add(option);
+          }
+        } else {
+          alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      },
+      error: function () {
+        return alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
+
+    //3.사용일시 선택 제한
+    setLimitHistDate();
+    
+    //4.금액 표현
+
+  }
+
+  /**
+   * 사용일시 선택 제한
+   */
+  const setLimitHistDate = function (){
+    const chosenDate = document.querySelector("#payhistMonth").value;
+    const dateInput = document.querySelector("#useDate");
+    const date = new Date(chosenDate);
+    const year = date.getFullYear();
+    const month = date.getMonth()+1;
+
+    dateInput.setAttribute('min', `${year}-${month}-01`);
+    dateInput.setAttribute('max', `${year}-${month}-${new Date(year, month, 0).getDate()}`);
   }
 
   /**

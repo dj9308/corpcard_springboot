@@ -73,7 +73,7 @@
                 <tr>
                     <th class="pe-3">작성 연월</th>
                     <td>
-                        <input type="month" id="payhist-month" class="form-control">
+                        <input type="month" id="payhistMonth" class="form-control">
                     </td>
                 </tr>
             </table>
@@ -88,7 +88,7 @@
                         </svg>
                     </th>
                     <td>
-                        <input type="text" class="form-control" required="required">
+                        <input type="text" class="form-control" required="required" maxlength="25">
                     </td>
                     <th>분류
                         <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
@@ -97,9 +97,8 @@
                         </svg>
                     </th>
                     <td>
-                        <select class="form-select" id="classSelect">
-                            <option value="">---</option>
-                            <option>test2</option>
+                        <select class="form-select" id="classSelect" required>
+                            <option value="" selected>---</option>
                         </select>
                     </td>
                 </tr>
@@ -111,9 +110,9 @@
                         </svg>
                     </th>
                     <td>
-                        <input type="date" class="form-control" required>
+                        <input type="date" class="form-control" id="useDate">
                     </td>
-                    <th>금액
+                    <th>금액(원)
                         <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
                              viewBox="0 0 16 16">
                             <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
@@ -131,9 +130,8 @@
                         </svg>
                     </th>
                     <td colspan="3">
-                        <select class="form-select">
-                            <option>test1</option>
-                            <option>test2</option>
+                        <select class="form-select" id="cardSelect" required>
+                            <option value="" selected>---</option>
                         </select>
                     </td>
                 </tr>
@@ -148,11 +146,10 @@
                 총 <span class="fw-bold" id="tot-cnt"></span> 건이 조회되었습니다. - <span class="fw-bold" id="status"></span>
             </div>
             <div class="col text-end">
-                <button class="btn btn-secondary" id="payhist-atch">첨부파일</button>
+                <button class="btn btn-secondary" id="payhistAtch">첨부파일</button>
                 <button type="button" class="btn btn-danger">PDF</button>
                 <button type="button" class="btn btn-success">CSV</button>
                 <button type="button" class="btn btn-primary">제출</button>
-                <button type="button" class="btn btn-secondary">저장</button>
                 <button type="button" class="btn btn-secondary">삭제</button>
             </div>
         </div>

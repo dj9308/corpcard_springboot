@@ -1,6 +1,5 @@
 package com.expernet.corpcard;
 
-import com.expernet.corpcard.controller.BaseController;
 import com.expernet.corpcard.service.SchedulerService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ import java.util.Map;
  * @since 2022.11.21
  */
 @Component
-public class Scheduler extends BaseController {
+public class Scheduler{
 
     final String TYPE_USER = "user";
     final String TYPE_DEPT = "dept";

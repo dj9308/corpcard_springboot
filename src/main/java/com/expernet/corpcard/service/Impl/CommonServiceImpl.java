@@ -2,22 +2,14 @@ package com.expernet.corpcard.service.Impl;
 
 
 import com.expernet.corpcard.entity.CardInfo;
-import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.ClassInfo;
-import com.expernet.corpcard.entity.UsehistSubmitInfo;
 import com.expernet.corpcard.repository.CardInfoRepository;
-import com.expernet.corpcard.repository.CardUsehistRepository;
 import com.expernet.corpcard.repository.ClassInfoRepository;
-import com.expernet.corpcard.repository.UsehistSubmitInfoRepository;
-import com.expernet.corpcard.service.BaseService;
-import com.expernet.corpcard.service.PayhistService;
+import com.expernet.corpcard.service.CommonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -37,8 +29,8 @@ import java.util.List;
  * @since 2022.12.00
  */
 @Transactional
-@Service("BaseService")
-public class BaseServiceImpl implements BaseService {
+@Service("CommonService")
+public class CommonServiceImpl implements CommonService {
     /**
      * 분류 정보 Repository
      */
