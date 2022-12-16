@@ -88,7 +88,7 @@
                         </svg>
                     </th>
                     <td>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" required="required">
                     </td>
                     <th>분류
                         <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
@@ -97,8 +97,8 @@
                         </svg>
                     </th>
                     <td>
-                        <select class="form-select">
-                            <option>test1</option>
+                        <select class="form-select" id="classSelect">
+                            <option value="">---</option>
                             <option>test2</option>
                         </select>
                     </td>
@@ -139,7 +139,7 @@
                 </tr>
             </table>
             <div class="text-center mb-4">
-                <button type="button" class="btn btn-secondary">작성</button>
+                <button type="submit" class="btn btn-secondary">작성</button>
                 <button type="button" class="btn btn-gray">초기화</button>
             </div>
         </form>

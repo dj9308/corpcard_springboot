@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * @since 2022.11.08
  */
 @Controller
-public class LoginController extends BaseController {
+public class LoginController {
     /**
      * Logger
      */

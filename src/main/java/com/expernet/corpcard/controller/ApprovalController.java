@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * </pre>
  */
 @Controller
-public class ApprovalController extends BaseController {
+public class ApprovalController {
 	/**
 	 * Logger
 	 */

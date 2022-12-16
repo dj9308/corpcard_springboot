@@ -38,7 +38,7 @@ import java.util.List;
  */
 @Controller
 @RequestMapping(value = "/payhist", method = RequestMethod.GET)
-public class PayhistController extends BaseController {
+public class PayhistController {
     /**
      * payhist Service
      */

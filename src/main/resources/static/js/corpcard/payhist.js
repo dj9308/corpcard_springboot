@@ -13,16 +13,16 @@ const $payhist = (function () {
    * init
    */
   const init = function () {
-    initEvent();
+    initEvt();
     initStatsDatepicker();
-    paintHistSelect();
+    initHistFormEvt();
     paintCharts();
   }
 
   /**
   * event handler
   */
-  const initEvent = function () {
+  const initEvt = function () {
     const now = new Date;
 
     //결제내역 현재 년월 표현
@@ -42,7 +42,7 @@ const $payhist = (function () {
           WRT_YN: wrtYn
         },
         success: function (data) {
-          resetTable();
+          emptyTable();
           if (data.CODE === "SUCCESS") {
             paintHistList(data.result);
           } else if (data.CODE === "EMPTY") {
@@ -65,10 +65,28 @@ const $payhist = (function () {
     };
   }
 
-  /**
-   * 결제 내역 form select 설정
+   /**
+   * 결제 내역 form event handler
    */
-  const paintHistSelect = function(){
+  const initHistFormEvt = function(){
+    //분류 select
+    const classSelect = document.querySelector("#classSelect");
+
+      // 분류
+      $.ajax({
+        type: "GET",
+        url: "/base/classList",
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+            $cmmn.
+          } else {
+            alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        },
+        error: function () {
+          return alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      });
 
   }
 
