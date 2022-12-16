@@ -4,6 +4,8 @@ package com.expernet.corpcard.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.sql.Timestamp;
+
 @Getter
 @Entity
 @Table(name = "TB_DEPT")
@@ -25,6 +27,12 @@ public class Dept {
 
     @Column(name = "CHIEF_TITLE", nullable = false)
     private String chiefTitle;
+
+    @Column(name = "CREATED_AT")
+    private Timestamp createdAt;
+
+    @Column(name = "UPDATED_AT")
+    private Timestamp updatedAt;
 
     @Builder
     public Dept(long seq, String deptNm, String deptCd, String upperDeptCd, String chiefTitle) {

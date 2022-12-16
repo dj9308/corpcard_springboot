@@ -22,6 +22,10 @@ public class CardUsehist {
     @JoinColumn(name = "SUBMIT_SEQ")
     private UsehistSubmitInfo usehistSubmitInfo;
 
+//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+//    @JoinColumn(name = "CLASS_SEQ")
+//    private ClassInfo classInfo;
+
     @Column(name = "CLASS_SEQ")
     private long classSeq;
 
@@ -40,16 +44,23 @@ public class CardUsehist {
     @Column(name = "MONEY")
     private long money;
 
+    @Column(name = "CREATED_AT")
+    private Timestamp createdAt;
+
+    @Column(name = "UPDATED_AT")
+    private Timestamp updatedAt;
+
     @Builder
-    public CardUsehist(long seq, long classSeq, String usePlace, String cardComp, String cardNum,
-                       Timestamp useDate, long money, UsehistSubmitInfo usehistSubmitInfo){
+    public CardUsehist(long seq, UsehistSubmitInfo usehistSubmitInfo, long classSeq, String usePlace,
+                       String cardComp, String cardNum, Timestamp useDate, long money){
         this.seq = seq;
+        this.usehistSubmitInfo = usehistSubmitInfo;
         this.classSeq = classSeq;
+//        this.classInfo = classInfo;
         this.usePlace = usePlace;
         this.cardComp = cardComp;
         this.cardNum = cardNum;
         this.useDate = useDate;
         this.money = money;
-        this.usehistSubmitInfo = usehistSubmitInfo;
     }
 }

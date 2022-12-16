@@ -5,6 +5,7 @@ import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 
 @Getter
@@ -12,7 +13,7 @@ import java.util.Collection;
 @Entity
 @Table(name = "TB_USER")
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class User implements UserDetails {
+public class User {
     @Id
     @Column(name = "SEQ")
     private long seq;
@@ -35,6 +36,12 @@ public class User implements UserDetails {
     @Column(name = "DEPT_CD")
     private String deptCd;
 
+    @Column(name = "CREATED_AT")
+    private Timestamp createdAt;
+
+    @Column(name = "UPDATED_AT")
+    private Timestamp updatedAt;
+
     @Builder
     public User(long seq, String userId, String ofcds, String userNm, Character chiefYn, String deptCd) {
         this.seq = seq;
@@ -43,40 +50,5 @@ public class User implements UserDetails {
         this.userNm = userNm;
         this.chiefYn = chiefYn;
         this.deptCd = deptCd;
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getPassword() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return null;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return false;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return false;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return false;
     }
 }

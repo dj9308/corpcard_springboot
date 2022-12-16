@@ -18,8 +18,10 @@ public class UsehistSubmitInfo {
     @Column(name = "SEQ")
     private long seq;
 
-    @Column(name = "STATUS_SEQ")
-    private long statusSeq;
+
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "STATE_SEQ")
+    private StateInfo stateInfo;
 
     @Column(name = "WRITER_ID")
     private String writerId;
@@ -36,11 +38,17 @@ public class UsehistSubmitInfo {
     @Column(name = "WRT_YM")
     private Timestamp wrtYm;
 
+    @Column(name = "CREATED_AT")
+    private Timestamp createdAt;
+
+    @Column(name = "UPDATED_AT")
+    private Timestamp updatedAt;
+
     @Builder
-    public UsehistSubmitInfo(long seq, long statusSeq, String writerId, String writerDept, String writerOfcps,
+    public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept, String writerOfcps,
                              String writerNm, Timestamp wrtYm){
         this.seq = seq;
-        this.statusSeq = statusSeq;
+        this.stateInfo = stateInfo;
         this.writerId = writerId;
         this.writerDept = writerDept;
         this.writerOfcps = writerOfcps;
