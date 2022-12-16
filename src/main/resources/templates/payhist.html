@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head th:replace="/fragments/header.html :: fragment-header">
 </head>
 <body>
@@ -73,89 +73,92 @@
                 <tr>
                     <th class="pe-3">작성 연월</th>
                     <td>
-                        <input type="month" class="form-control">
+                        <input type="month" id="payhist-month" class="form-control">
                     </td>
                 </tr>
             </table>
         </div>
-        <table class="mb-1 table table-sm table-bordered align-middle table-style1">
-            <tr>
-                <th>사용내역
-                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
-                                         viewBox="0 0 16 16">
-                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
-                    </svg>
-                </th>
-                <td>
-                    <input type="text" class="form-control">
-                </td>
-                <th>분류
-                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
-                         viewBox="0 0 16 16">
-                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
-                    </svg>
-                </th>
-                <td>
-                    <select class="form-select">
-                        <option>test1</option>
-                        <option>test2</option>
-                    </select>
-                </td>
-            </tr>
-            <tr>
-                <th>사용일시
-                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
-                         viewBox="0 0 16 16">
-                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
-                    </svg>
-                </th>
-                <td>
-                    <input type="date" class="form-control">
-                </td>
-                <th>금액
-                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
-                         viewBox="0 0 16 16">
-                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
-                    </svg>
-                </th>
-                <td>
-                    <input type="text" class="form-control">
-                </td>
-            </tr>
-            <tr>
-                <th>카드정보
-                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
-                         viewBox="0 0 16 16">
-                        <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
-                    </svg>
-                </th>
-                <td colspan="3">
-                    <select class="form-select">
-                        <option>test1</option>
-                        <option>test2</option>
-                    </select>
-                </td>
-            </tr>
-        </table>
-        <div class="text-center mb-4">
-            <button type="button" class="btn btn-secondary">작성</button>
-            <button type="button" class="btn btn-gray">초기화</button>
-        </div>
-            <div class="mb-1 fs-4 gx-5 row">
-                <div class="col">
-                    총 <span class="fw-bold" id="tot-cnt"></span> 건이 조회되었습니다. - <span class="fw-bold" id="status"></span>
-                </div>
-                <div class="col text-end">
-                    <button class="btn btn-secondary" id="payhist-atch">첨부파일</button>
-                    <button type="button" class="btn btn-danger">PDF</button>
-                    <button type="button" class="btn btn-success">CSV</button>
-                    <button type="button" class="btn btn-primary">제출</button>
-                    <button type="button" class="btn btn-secondary">저장</button>
-                    <button type="button" class="btn btn-secondary">삭제</button>
-                </div>
+        <form>
+            <table class="mb-1 table table-sm table-bordered align-middle table-style1">
+                <tr>
+                    <th>사용내역
+                        <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                             viewBox="0 0 16 16">
+                            <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                        </svg>
+                    </th>
+                    <td>
+                        <input type="text" class="form-control" required>
+                    </td>
+                    <th>분류
+                        <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                             viewBox="0 0 16 16">
+                            <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                        </svg>
+                    </th>
+                    <td>
+                        <select class="form-select">
+                            <option>test1</option>
+                            <option>test2</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <th>사용일시
+                        <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                             viewBox="0 0 16 16">
+                            <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                        </svg>
+                    </th>
+                    <td>
+                        <input type="date" class="form-control" required>
+                    </td>
+                    <th>금액
+                        <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                             viewBox="0 0 16 16">
+                            <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                        </svg>
+                    </th>
+                    <td>
+                        <input type="text" class="form-control" required>
+                    </td>
+                </tr>
+                <tr>
+                    <th>카드정보
+                        <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
+                             viewBox="0 0 16 16">
+                            <image class="svg-red" th:href="@{/icons/asterisk.svg}"></image>
+                        </svg>
+                    </th>
+                    <td colspan="3">
+                        <select class="form-select">
+                            <option>test1</option>
+                            <option>test2</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+            <div class="text-center mb-4">
+                <button type="button" class="btn btn-secondary">작성</button>
+                <button type="button" class="btn btn-gray">초기화</button>
             </div>
+        </form>
+        <div class="mb-1 fs-4 gx-5 row">
+            <div class="col">
+                총 <span class="fw-bold" id="tot-cnt"></span> 건이 조회되었습니다. - <span class="fw-bold" id="status"></span>
+            </div>
+            <div class="col text-end">
+                <button class="btn btn-secondary" id="payhist-atch">첨부파일</button>
+                <button type="button" class="btn btn-danger">PDF</button>
+                <button type="button" class="btn btn-success">CSV</button>
+                <button type="button" class="btn btn-primary">제출</button>
+                <button type="button" class="btn btn-secondary">저장</button>
+                <button type="button" class="btn btn-secondary">삭제</button>
+            </div>
+        </div>
         <div class="table-responsive-xxl">
-            <table class="text-center table table-hover table-bordered table-sm align-middle table-style2">
+            <table id="histTable"
+                   class="text-center table table-hover table-bordered table-sm align-middle table-style2">
                 <thead class="table-secondary">
                 <tr>
                     <th scope="col">
@@ -252,6 +255,7 @@
         </div>
     </div>
 </section>
+<input type="hidden" th:value="${#authentication.name}" id="userId">
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
@@ -261,6 +265,8 @@
     $(function () {
         $payhist.init();
     });
+
+
 </script>
 </body>
 </html>

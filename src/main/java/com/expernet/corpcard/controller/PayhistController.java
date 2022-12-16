@@ -14,6 +14,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -81,7 +82,7 @@ public class PayhistController extends BaseController {
      * @param paramMap : 작성연월
      * @param model    : modelMap
      */
-    @RequestMapping(value = "/payhistList", method = RequestMethod.GET)
+    @RequestMapping(value = "/searchList", method = RequestMethod.GET)
     public String searchPayhistInfo(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
         List<CardUsehist> usehistList = new ArrayList<>();
         try {
@@ -94,8 +95,8 @@ public class PayhistController extends BaseController {
                 logger.info(paramMap.get("WRT_YN") + "의 결제내역 조회 성공.");
             } else {
                 model.addAttribute("CODE", "EMPTY");
-                model.addAttribute("MSG", paramMap.get("WRT_YN") + "의 결제내역 없음");
-                logger.error(paramMap.get("WRT_YN") + "의 결제내역 없음");
+                model.addAttribute("MSG", "결제내역 없음");
+                logger.info("결제내역 없음");
             }
         }
         return "jsonView";

@@ -10,5 +10,5 @@ import java.util.List;
 
 @Repository
 public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> {
-    List<CardUsehist> findBySubmitSeq(long submitSeq);
+    List<CardUsehist> findAllByUsehistSubmitInfo_Seq(long submitSeq);
 }

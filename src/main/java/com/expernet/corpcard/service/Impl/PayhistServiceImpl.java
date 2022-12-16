@@ -58,7 +58,7 @@ public class PayhistServiceImpl implements PayhistService {
         UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
 
         if(submitInfo != null) {
-            result = cardUsehistRepository.findBySubmitSeq(submitInfo.getSeq());
+            result = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
         }
 
         return result;
