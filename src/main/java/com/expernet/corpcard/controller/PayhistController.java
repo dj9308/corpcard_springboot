@@ -3,18 +3,19 @@ package com.expernet.corpcard.controller;
 import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.UsehistSubmitInfo;
+import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.service.CommonService;
 import com.expernet.corpcard.service.PayhistService;
 import com.expernet.corpcard.service.SchedulerService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class PayhistController {
      */
     @Resource(name = "PayhistService")
     private PayhistService payhistService;
+
     /**
      * Logger
      */
@@ -91,8 +93,8 @@ public class PayhistController {
             if (usehistList != null && usehistList.size() > 0) {
                 model.addAttribute("result", usehistList);
                 model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", paramMap.get("WRT_YN") + "의 결제내역 조회 성공");
-                logger.info(paramMap.get("WRT_YN") + "의 결제내역 조회 성공.");
+                model.addAttribute("MSG", paramMap.get("WRT_YM") + "의 결제내역 조회 성공");
+                logger.info(paramMap.get("WRT_YM") + "의 결제내역 조회 성공.");
             } else {
                 model.addAttribute("CODE", "EMPTY");
                 model.addAttribute("MSG", "결제내역 없음");
@@ -105,26 +107,26 @@ public class PayhistController {
     /**
      * 결제 내역 저장
      *
-     * @param paramMap  : 결제 내역 정보
+     * @param cardUsehist  : 결제 내역 정보
      * @param model : modelMap
      */
-    @RequestMapping(value = "/saveList", method = RequestMethod.POST)
-    public String savePayhistList(HashMap<String, Object> paramMap, ModelMap model) {
-        long result = -1;
-        UsehistSubmitInfo submitInfo = (UsehistSubmitInfo) paramMap.get("submitInfo");
-        List<HashMap<String, Object>> useList = (List<HashMap<String, Object>>) paramMap.get("useList");
+    @RequestMapping(value = "/saveInfo", method = RequestMethod.POST)
+    public String savePayhistList(@RequestBody CardUsehist cardUsehist, ModelMap model) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails)principal;
+        Object result = null;
 
         try{
-            result = payhistService.saveCardUsehistList(paramMap);
+            result = payhistService.saveCardUsehistInfo(cardUsehist, userDetails.getUsername());
         }finally {
-            if (result > 0) {
+            if (result != null) {
                 model.addAttribute("CODE", "SUCCESS");
                 model.addAttribute("MSG", "결제 내역 저장 성공");
-                logger.info(paramMap.get("WRT_YN") + "의 결제내역 조회 성공.");
+                logger.info("결제 내역 저장 성공");
             } else {
-                model.addAttribute("CODE", "EMPTY");
-                model.addAttribute("MSG", paramMap.get("WRT_YN") + "의 결제내역 없음");
-                logger.error(paramMap.get("WRT_YN") + "의 결제내역 없음");
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "결제 내역 저장 실패");
+                logger.error("결제 내역 저장 실패");
             }
         }
 

@@ -1,33 +1,33 @@
 package com.expernet.corpcard.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "CARD_USEHIST")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class CardUsehist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
     private long seq;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SUBMIT_SEQ")
     private UsehistSubmitInfo usehistSubmitInfo;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CLASS_SEQ")
     private ClassInfo classInfo;
 
-    @Column(name = "USE_PLACE")
-    private String usePlace;
+    @Column(name = "USE_HIST")
+    private String useHist;
 
     @Column(name = "CARD_COMP")
     private String cardComp;
@@ -41,19 +41,21 @@ public class CardUsehist {
     @Column(name = "MONEY")
     private long money;
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 
     @Builder
-    public CardUsehist(long seq, UsehistSubmitInfo usehistSubmitInfo, ClassInfo classInfo, String usePlace,
+    public CardUsehist(long seq, UsehistSubmitInfo usehistSubmitInfo, ClassInfo classInfo, String useHist,
                        String cardComp, String cardNum, Timestamp useDate, long money){
         this.seq = seq;
         this.usehistSubmitInfo = usehistSubmitInfo;
         this.classInfo = classInfo;
-        this.usePlace = usePlace;
+        this.useHist = useHist;
         this.cardComp = cardComp;
         this.cardNum = cardNum;
         this.useDate = useDate;

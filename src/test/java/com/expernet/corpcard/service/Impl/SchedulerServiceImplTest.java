@@ -69,8 +69,8 @@ public class SchedulerServiceImplTest {
     @Test
     public void testInsertSpeed() throws Exception {
         //given
-        type = "user";
-        filePath = userFilePath;
+        type = "dept";
+        filePath = deptFilePath;
         hasNoError = true;
 
         //when
@@ -144,8 +144,8 @@ public class SchedulerServiceImplTest {
     @Test
     public void syncData() {
         //given
-        type = "user";
-        filePath = userFilePath;
+        type = "dept";
+        filePath = deptFilePath;
         hasNoError = true;
 
         //when
@@ -237,9 +237,10 @@ public class SchedulerServiceImplTest {
 
     protected void pretreatDeptData(List<HashMap<String, Object>> list) {
         List<Dept> deptList = new ArrayList<>();
-
+        int deptSeq = 1;
         for (Map<String, Object> map : list) {
             Dept deptInfo = Dept.builder()
+                    .seq(deptSeq++)
                     .deptNm(map.get("full_name").toString())
                     .deptCd(map.get("id").toString())
                     .upperDeptCd((map.get("upper") == null) ? null : map.get("upper").toString())

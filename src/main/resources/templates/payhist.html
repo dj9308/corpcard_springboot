@@ -78,7 +78,7 @@
                 </tr>
             </table>
         </div>
-        <form>
+        <form id="histForm" onsubmit="return false;">
             <table class="mb-1 table table-sm table-bordered align-middle table-style1">
                 <tr>
                     <th>사용내역
@@ -88,7 +88,7 @@
                         </svg>
                     </th>
                     <td>
-                        <input type="text" class="form-control" required="required" maxlength="25">
+                        <input type="text" name="useHist" class="form-control" required="required" maxlength="25">
                     </td>
                     <th>분류
                         <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
@@ -97,7 +97,7 @@
                         </svg>
                     </th>
                     <td>
-                        <select class="form-select" id="classSelect" required>
+                        <select class="form-select" id="classSelect" name="classSeq" required>
                             <option value="" selected>---</option>
                         </select>
                     </td>
@@ -110,7 +110,7 @@
                         </svg>
                     </th>
                     <td>
-                        <input type="date" class="form-control" id="useDate">
+                        <input type="date" class="form-control" id="useDate" name="useDate">
                     </td>
                     <th>금액(원)
                         <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="8" height="8"
@@ -119,7 +119,7 @@
                         </svg>
                     </th>
                     <td>
-                        <input type="text" class="form-control" required>
+                        <input type="text" class="form-control" name="money" required>
                     </td>
                 </tr>
                 <tr>
@@ -130,20 +130,20 @@
                         </svg>
                     </th>
                     <td colspan="3">
-                        <select class="form-select" id="cardSelect" required>
+                        <select class="form-select" id="cardSelect" name="cardSelect" required>
                             <option value="" selected>---</option>
                         </select>
                     </td>
                 </tr>
             </table>
             <div class="text-center mb-4">
-                <button type="submit" class="btn btn-secondary">작성</button>
+                <button type="submit" id="payhistSubmit" class="btn btn-secondary">작성</button>
                 <button type="button" class="btn btn-gray">초기화</button>
             </div>
         </form>
         <div class="mb-1 fs-4 gx-5 row">
             <div class="col">
-                총 <span class="fw-bold" id="tot-cnt"></span> 건이 조회되었습니다. - <span class="fw-bold" id="status"></span>
+                총 <span class="fw-bold" id="listTotCnt"></span> 건이 조회되었습니다. - <span class="fw-bold" id="submitStts"></span>
             </div>
             <div class="col text-end">
                 <button class="btn btn-secondary" id="payhistAtch">첨부파일</button>

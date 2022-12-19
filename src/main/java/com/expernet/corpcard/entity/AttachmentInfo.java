@@ -5,20 +5,22 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Getter
 @Entity
 @Table(name = "ATTACHMENT_INFO")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class AttachmentInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
     private long seq;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "SUBMIT_SEQ")
     private UsehistSubmitInfo usehistSubmitInfo;
 
@@ -37,9 +39,11 @@ public class AttachmentInfo {
     @Column(name = "UPLOAD_FN")
     private String uploadFn;
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 

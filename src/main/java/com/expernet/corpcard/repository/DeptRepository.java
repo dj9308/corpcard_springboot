@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DeptRepository extends JpaRepository<Dept, Long> {
-
+    Dept findByDeptCd(String deptCd);
 }

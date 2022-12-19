@@ -5,13 +5,15 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Getter
 @Entity
 @Table(name = "USEHIST_SUBMIT_INFO")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class UsehistSubmitInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,7 +21,7 @@ public class UsehistSubmitInfo {
     private long seq;
 
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "STATE_SEQ")
     private StateInfo stateInfo;
 
@@ -29,29 +31,31 @@ public class UsehistSubmitInfo {
     @Column(name = "WRITER_DEPT")
     private String writerDept;
 
-    @Column(name = "WRITER_OFCPS")
-    private String writerOfcps;
+    @Column(name = "WRITER_OFCDS")
+    private String writerOfcds;
 
     @Column(name = "WRITER_NM")
     private String writerNm;
 
     @Column(name = "WRT_YM")
-    private Timestamp wrtYm;
+    private String wrtYm;
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 
     @Builder
-    public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept, String writerOfcps,
-                             String writerNm, Timestamp wrtYm){
+    public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept, String writerOfcds,
+                             String writerNm, String wrtYm){
         this.seq = seq;
         this.stateInfo = stateInfo;
         this.writerId = writerId;
         this.writerDept = writerDept;
-        this.writerOfcps = writerOfcps;
+        this.writerOfcds = writerOfcds;
         this.writerNm = writerNm;
         this.wrtYm = wrtYm;
     }

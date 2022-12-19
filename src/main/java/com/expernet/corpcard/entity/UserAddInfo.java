@@ -1,24 +1,25 @@
 package com.expernet.corpcard.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Getter
 @Entity
 @Table(name = "USER_ADD_INFO")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class UserAddInfo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
     private long seq;
 
-    @OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name ="USER_ID", referencedColumnName = "USER_ID")
     private User user;
 
@@ -28,9 +29,11 @@ public class UserAddInfo {
     @Column(name = "ADMIN_YN",columnDefinition = "char")
     private String adminYn;
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 

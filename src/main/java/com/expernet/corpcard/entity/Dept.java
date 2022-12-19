@@ -3,13 +3,15 @@ package com.expernet.corpcard.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Getter
 @Entity
 @Table(name = "TB_DEPT")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class Dept {
 
     @Id
@@ -28,9 +30,11 @@ public class Dept {
     @Column(name = "CHIEF_TITLE", nullable = false)
     private String chiefTitle;
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 

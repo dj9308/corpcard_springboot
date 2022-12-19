@@ -2,6 +2,8 @@ package com.expernet.corpcard.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -12,7 +14,7 @@ import java.util.Collection;
 @Setter
 @Entity
 @Table(name = "TB_USER")
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
+@NoArgsConstructor
 public class User {
     @Id
     @Column(name = "SEQ")
@@ -36,9 +38,11 @@ public class User {
     @Column(name = "DEPT_CD")
     private String deptCd;
 
+    @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
+    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 

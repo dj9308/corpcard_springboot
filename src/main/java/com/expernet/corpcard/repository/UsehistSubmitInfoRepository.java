@@ -8,5 +8,5 @@ import java.util.Date;
 
 @Repository
 public interface UsehistSubmitInfoRepository extends JpaRepository<UsehistSubmitInfo, Long> {
-    UsehistSubmitInfo findByWriterIdAndWrtYm(String writerId, Date wrtYm);
+    UsehistSubmitInfo findByWriterIdAndWrtYm(String writerId, String wrtYm);
 }

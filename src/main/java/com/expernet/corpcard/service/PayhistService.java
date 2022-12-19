@@ -33,19 +33,20 @@ public interface PayhistService {
 
     /**
      * 법인카드 사용내역 저장
-     * @param paramMap: 사용내역 정보
+     * @param cardUsehist: 사용내역 정보
+     * @param userId : 사용자 ID
      */
-    long saveCardUsehistList(HashMap<String, Object> paramMap);
+    Object saveCardUsehistInfo(CardUsehist cardUsehist, String userId);
 
     /**
      * 법인카드 사용내역 삭제
      * @param cardUsehistList: 사용내역 list
      */
-    long deleteCardUsehistList(List<CardUsehist> cardUsehistList);
+    Object deleteCardUsehistInfo(List<CardUsehist> cardUsehistList);
 
     /**
      * 법인카드 사용내역 수정
      * @param cardUsehistList: 사용내역 list
      */
-    long updateCardUsehistList(List<CardUsehist> cardUsehistList);
+    Object updateCardUsehistInfo(List<CardUsehist> cardUsehistList);
 }

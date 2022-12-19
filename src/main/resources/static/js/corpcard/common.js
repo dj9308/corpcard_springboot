@@ -25,7 +25,51 @@ const $cmmn = (function() {
         return false;
     }
 
+    /**
+   * form 정보를 json 형식으로 변환
+   * @param formId : formId
+   */
+    const serializeObject = function(formId){
+        const form = $(`#${formId}`);
+        let obj = null;
+
+        try {
+            if (form[0].tagName && form[0].tagName.toUpperCase() == "FORM") {
+                var arr = form.serializeArray();
+                if (arr) {
+                    obj = {};
+                    jQuery.each(arr, function() {
+                        obj[this.name] = this.value;
+                    });
+                }//if ( arr ) {
+            }
+        } catch (e) {
+            alert(e.message);
+        }
+        return obj;
+    }
+
+  /**
+   * 테이블 초기화
+   * @param tableId : String (Table tag id)
+   */
+    const emptyTable = function(tableId) {
+        $(`#${tableId}>tbody`).empty();
+    }
+
+    /**
+       * 테이블 row 생성
+       * @param tableId : String (Table tag id)
+       * @param json : JSON(1.컬럼 정보 리스트, 2.데이터 리스트)
+       */
+    const paintTableRows = function(tableId, json){
+
+    }
+
     return{
-        isNullorEmpty : isNullorEmpty,
+        isNullorEmpty : isNullorEmpty,      //null이면 true 반환
+        serializeObject : serializeObject,   //form 정보를 json 형식으로 변환
+        emptyTable : emptyTable,            //테이블 초기화
+        paintTableRows : paintTableRows,    //테이블 row 생성
     }
 }());
