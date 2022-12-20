@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -63,16 +62,22 @@ public class PayhistServiceImpl implements PayhistService {
      * @param paramMap: 제출 seq
      */
     @Override
-    public List<CardUsehist> searchCardUsehistList(HashMap<String, Object> paramMap) {
-        List<CardUsehist> result = new ArrayList<>();
-        String writerId = paramMap.get("WRITER_ID").toString();
-        String wrtYm = paramMap.get("WRT_YM").toString();
-        UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
-
+    public HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap) {
+        HashMap<String, Object> result = new HashMap<>();
+        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
         if(submitInfo != null) {
-            result = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
+            List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
+            if(list.size() > 0){
+                //제출 상태
+                result.put("stateNm", submitInfo.getStateInfo().getStateNm());
+                //사용내역 리스트
+                result.put("list", list);
+                //분류별 합계
+                result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitInfo.getSeq()));
+                //총계
+                result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(submitInfo.getSeq()));
+            }
         }
-
         return result;
     }
 
@@ -112,10 +117,11 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 법인카드 사용내역 삭제
-     * @param cardUsehistList: 사용내역 list
+     * @param list: 삭제할 내역 seq list
      */
     @Override
-    public Object deleteCardUsehistInfo(List<CardUsehist> cardUsehistList) {
+    public Object deleteCardUsehistInfo(List<Long> list) {
+        cardUsehistRepository.deleteAllById(list);
         return 0;
     }
 
@@ -126,5 +132,15 @@ public class PayhistServiceImpl implements PayhistService {
     @Override
     public Object updateCardUsehistInfo(List<CardUsehist> cardUsehistList) {
         return 0;
+    }
+
+    /**
+     * 제출 내역 조회
+     * @param paramMap: 사용자 정보 및 작성년월
+     */
+    private UsehistSubmitInfo searchSubmitInfo(HashMap<String, Object> paramMap){
+        String writerId = paramMap.get("WRITER_ID").toString();
+        String wrtYm = paramMap.get("WRT_YM").toString();
+        return usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
     }
 }

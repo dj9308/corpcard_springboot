@@ -19,10 +19,10 @@ public class StateInfo {
     private long seq;
 
     @Column(name = "STATE_CD")
-    private String classCd;
+    private String stateCd;
 
     @Column(name = "STATE_NM")
-    private String classNm;
+    private String stateNm;
 
     @CreationTimestamp
     @Column(name = "CREATED_AT")
@@ -33,9 +33,9 @@ public class StateInfo {
     private Timestamp updatedAt;
 
     @Builder
-    public StateInfo(long seq, String classCd, String classNm){
+    public StateInfo(long seq, String stateCd, String stateNm){
         this.seq = seq;
-        this.classCd = classCd;
-        this.classNm = classNm;
+        this.stateCd = stateCd;
+        this.stateNm = stateNm;
     }
 }

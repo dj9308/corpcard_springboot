@@ -29,7 +29,7 @@ public interface PayhistService {
      * 법인카드 사용내역 조회
      * @param paramMap: 제출 seq
      */
-    List<CardUsehist> searchCardUsehistList(HashMap<String, Object> paramMap);
+    HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap);
 
     /**
      * 법인카드 사용내역 저장
@@ -40,9 +40,9 @@ public interface PayhistService {
 
     /**
      * 법인카드 사용내역 삭제
-     * @param cardUsehistList: 사용내역 list
+     * @param list): 삭제할 내역 seq list
      */
-    Object deleteCardUsehistInfo(List<CardUsehist> cardUsehistList);
+    Object deleteCardUsehistInfo(List<Long> list);
 
     /**
      * 법인카드 사용내역 수정

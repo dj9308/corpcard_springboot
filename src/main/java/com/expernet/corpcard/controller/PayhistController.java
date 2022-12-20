@@ -86,12 +86,12 @@ public class PayhistController {
      */
     @RequestMapping(value = "/searchList", method = RequestMethod.GET)
     public String searchPayhistInfo(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
-        List<CardUsehist> usehistList = new ArrayList<>();
+        HashMap<String, Object> result = null;
         try {
-            usehistList = payhistService.searchCardUsehistList(paramMap);
+            result = payhistService.searchCardUsehistList(paramMap);
         } finally {
-            if (usehistList != null && usehistList.size() > 0) {
-                model.addAttribute("result", usehistList);
+            if (result != null && result.get("list") != null) {
+                model.addAttribute("result", result);
                 model.addAttribute("CODE", "SUCCESS");
                 model.addAttribute("MSG", paramMap.get("WRT_YM") + "의 결제내역 조회 성공");
                 logger.info(paramMap.get("WRT_YM") + "의 결제내역 조회 성공.");
@@ -118,6 +118,7 @@ public class PayhistController {
 
         try{
             result = payhistService.saveCardUsehistInfo(cardUsehist, userDetails.getUsername());
+
         }finally {
             if (result != null) {
                 model.addAttribute("CODE", "SUCCESS");
@@ -130,6 +131,18 @@ public class PayhistController {
             }
         }
 
+        return "jsonView";
+    }
+
+    /**
+     * 결제 내역 리스트 삭제
+     *
+     * @param seqList  : 삭제할 내역 seq
+     * @param model : modelMap
+     */
+    @RequestMapping(value = "/deleteList", method = RequestMethod.POST)
+    public String deletePayhistList(@RequestParam List<Long> seqList, ModelMap model) {
+        Object deletedList = payhistService.deleteCardUsehistInfo(seqList);
         return "jsonView";
     }
 }

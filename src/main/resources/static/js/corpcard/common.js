@@ -49,6 +49,34 @@ const $cmmn = (function() {
         return obj;
     }
 
+    /**
+     * 쉼표 삭제
+     * @param value : String
+     */
+    const uncomma = function(value) {
+        const str = new String(value);
+        return str.replace(/,/g, "");
+    }
+
+    /**
+     * 문자 삭제 및 쉼표 추가
+     * @param value : String (input value)
+     */
+    const convertToCurrency = function (obj) {
+        let answer = new String(obj);
+        let err;
+
+        if (!isNaN(answer.split(",").join(""))) {
+            if (answer.includes('.')) {
+                err = String(obj).split('.')[0];
+                answer = err.toString().split(",").join("").replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                answer = answer.concat("." + String(obj).split('.')[1]);
+            } else {
+                answer = answer.toString().split(",").join("").replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            }
+        }
+        return answer;
+    }
   /**
    * 테이블 초기화
    * @param tableId : String (Table tag id)
@@ -60,16 +88,19 @@ const $cmmn = (function() {
     /**
        * 테이블 row 생성
        * @param tableId : String (Table tag id)
-       * @param json : JSON(1.컬럼 정보 리스트, 2.데이터 리스트)
+       * @param columnCnt : number (테이블 컬럼 갯수)
+       * @param json : JSON(1.paramList 2.dataList)
        */
     const paintTableRows = function(tableId, json){
 
     }
 
     return{
-        isNullorEmpty : isNullorEmpty,      //null이면 true 반환
-        serializeObject : serializeObject,   //form 정보를 json 형식으로 변환
-        emptyTable : emptyTable,            //테이블 초기화
-        paintTableRows : paintTableRows,    //테이블 row 생성
+        isNullorEmpty : isNullorEmpty,          //null이면 true 반환
+        serializeObject : serializeObject,      //form 정보를 json 형식으로 변환
+        uncomma : uncomma,                      //쉼표 삭제
+        convertToCurrency : convertToCurrency,  //문자 삭제 및 쉼표 추가
+        emptyTable : emptyTable,                //테이블 초기화
+        paintTableRows : paintTableRows,        //테이블 row 생성
     }
 }());
