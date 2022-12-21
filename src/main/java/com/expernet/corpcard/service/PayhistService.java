@@ -58,7 +58,8 @@ public interface PayhistService {
     Object updateCardUsehistInfo(CardUsehist cardUsehist);
 
     /**
-     * 제출
+     * 법인카드 결제 내역 제출
+     * @param paramMap : 제출 정보
      */
-    Object updateStateSeq();
+    Object updateStateSeq(HashMap<String, Object> paramMap);
 }

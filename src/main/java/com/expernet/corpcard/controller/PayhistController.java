@@ -193,7 +193,7 @@ public class PayhistController {
      * @param paramMap : row seq list
      * @param model    : modelMap
      */
-    @RequestMapping(value = "/deleteList", method = RequestMethod.POST)
+    @RequestMapping(value = "/deleteList", method = RequestMethod.DELETE)
     public String deletePayhistList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
         long result = 0;
         try {
@@ -216,8 +216,27 @@ public class PayhistController {
         return "jsonView";
     }
 
-//    @RequestMapping(value = "/updateSteate", method = RequestMethod.PATCH)
-//    public String deletePayhistList(ModelMap model) {
-//
-//    }
+    /**
+     * 법인카드 결제 내역 제출
+     * @param paramMap : 제출 정보
+     * @param model    : modelMap
+     */
+    @RequestMapping(value = "/updateState", method = RequestMethod.PATCH)
+    public String updateStateSeq(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+        Object result = null;
+        try {
+            result = payhistService.updateStateSeq(paramMap);
+        } finally {
+            if (result != null) {
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제 내역 제출 성공");
+                logger.info("제출 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "결제 내역 제출 실패");
+                logger.error("결제 내역 제출 실패");
+            }
+        }
+        return "jsonView";
+    }
 }

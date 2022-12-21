@@ -72,7 +72,7 @@ public class PayhistServiceImpl implements PayhistService {
             List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
             if(list.size() > 0){
                 //제출 상태
-                result.put("stateNm", submitInfo.getStateInfo().getStateNm());
+                result.put("stateInfo", submitInfo.getStateInfo());
                 //사용내역 리스트
                 result.put("list", list);
                 //분류별 합계
@@ -154,6 +154,17 @@ public class PayhistServiceImpl implements PayhistService {
     @Override
     public Object updateCardUsehistInfo(CardUsehist cardUsehist) {
         return cardUsehistRepository.save(cardUsehist);
+    }
+
+    /**
+     * 법인카드 결제 내역 제출
+     * @param paramMap : 제출 정보
+     */
+    @Override
+    public Object updateStateSeq(HashMap<String, Object> paramMap) {
+        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+        submitInfo.setStateInfo(StateInfo.builder().seq(2).build());
+        return usehistSubmitInfoRepository.save(submitInfo);
     }
 
     /**
