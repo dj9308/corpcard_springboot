@@ -7,12 +7,14 @@ import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.CommonService;
 import com.expernet.corpcard.service.PayhistService;
 import com.expernet.corpcard.service.SchedulerService;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -79,13 +81,13 @@ public class PayhistController {
     }
 
     /**
-     * 결제 내역 조회
+     * 결제 내역 목록 조회
      *
      * @param paramMap : 작성연월
      * @param model    : modelMap
      */
     @RequestMapping(value = "/searchList", method = RequestMethod.GET)
-    public String searchPayhistInfo(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+    public String searchPayhistList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
         HashMap<String, Object> result = null;
         try {
             result = payhistService.searchCardUsehistList(paramMap);
@@ -105,21 +107,47 @@ public class PayhistController {
     }
 
     /**
+     * 결제 내역 단일 정보 조회
+     *
+     * @param paramMap : 결제 내역 seq
+     * @param model    : modelMap
+     */
+    @RequestMapping(value = "/searchInfo", method = RequestMethod.GET)
+    public String searchPayhistInfo(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+        CardUsehist result = null;
+        try {
+            result = payhistService.searchCardUsehistInfo(paramMap);
+        } finally {
+            if (result != null) {
+                model.addAttribute("result", result);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제내역 조회 성공");
+                logger.info("결제내역 조회 성공");
+            } else {
+                model.addAttribute("CODE", "EMPTY");
+                model.addAttribute("MSG", "결제내역 조회 실패");
+                logger.info("결제내역 조회 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
      * 결제 내역 저장
      *
-     * @param cardUsehist  : 결제 내역 정보
-     * @param model : modelMap
+     * @param cardUsehist : 결제 내역 정보
+     * @param model       : modelMap
      */
     @RequestMapping(value = "/saveInfo", method = RequestMethod.POST)
     public String savePayhistList(@RequestBody CardUsehist cardUsehist, ModelMap model) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails)principal;
+        UserDetails userDetails = (UserDetails) principal;
         Object result = null;
 
-        try{
+        try {
             result = payhistService.saveCardUsehistInfo(cardUsehist, userDetails.getUsername());
 
-        }finally {
+        } finally {
             if (result != null) {
                 model.addAttribute("CODE", "SUCCESS");
                 model.addAttribute("MSG", "결제 내역 저장 성공");
@@ -135,14 +163,61 @@ public class PayhistController {
     }
 
     /**
-     * 결제 내역 리스트 삭제
+     * 결제 내역 수정
      *
-     * @param seqList  : 삭제할 내역 seq
-     * @param model : modelMap
+     * @param cardUsehist : 사용 내역
+     * @param model    : modelMap
      */
-    @RequestMapping(value = "/deleteList", method = RequestMethod.POST)
-    public String deletePayhistList(@RequestParam List<Long> seqList, ModelMap model) {
-        Object deletedList = payhistService.deleteCardUsehistInfo(seqList);
+    @RequestMapping(value = "/updateInfo", method = RequestMethod.POST)
+    public String updatePayhistInfo(@RequestBody CardUsehist cardUsehist, ModelMap model) {
+        Object result = null;
+        try {
+            result = payhistService.updateCardUsehistInfo(cardUsehist);
+        } finally {
+            if (result != null) {
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제 내역 수정 성공");
+                logger.info("결제 내역 수정 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "결제 내역 수정 실패");
+                logger.error("결제 내역 수정 실패");
+            }
+        }
         return "jsonView";
     }
+
+    /**
+     * 결제 내역 리스트 삭제
+     *
+     * @param paramMap : row seq list
+     * @param model    : modelMap
+     */
+    @RequestMapping(value = "/deleteList", method = RequestMethod.POST)
+    public String deletePayhistList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+        long result = 0;
+        try {
+            result = payhistService.deleteCardUsehistInfo(paramMap);
+        } catch (JsonProcessingException e) {
+            model.addAttribute("CODE", "ERR");
+            model.addAttribute("MSG", "결제 내역 삭제 실패");
+            logger.error("결제 내역 삭제 실패");
+        } finally {
+            if (result > 0) {
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제 내역 " + result + "건 삭제 성공");
+                logger.info("결제 내역 " + result + "건 삭제 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "결제 내역 삭제 실패");
+                logger.error("결제 내역 삭제 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+//    @RequestMapping(value = "/updateSteate", method = RequestMethod.PATCH)
+//    public String deletePayhistList(ModelMap model) {
+//
+//    }
 }

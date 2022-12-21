@@ -7,6 +7,9 @@ import com.expernet.corpcard.repository.DeptRepository;
 import com.expernet.corpcard.repository.UsehistSubmitInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
 import com.expernet.corpcard.service.PayhistService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,6 +85,16 @@ public class PayhistServiceImpl implements PayhistService {
     }
 
     /**
+     * 법인카드 결제 내역 딘일 정보 조회
+     * @param paramMap: 결제 내역 seq
+     */
+    @Override
+    public CardUsehist searchCardUsehistInfo(HashMap<String, Object> paramMap) {
+        return cardUsehistRepository.findById(Long.valueOf(String.valueOf(paramMap.get("seq"))))
+                .orElse(null);
+    }
+
+    /**
      * 법인카드 사용내역 저장
      * @param cardUsehist : 결제 내역 정보
      * @param userId : 사용자 ID
@@ -117,21 +130,30 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 법인카드 사용내역 삭제
-     * @param list: 삭제할 내역 seq list
+     * @param paramMap: 제출 정보 & 삭제할 seq list
      */
     @Override
-    public Object deleteCardUsehistInfo(List<Long> list) {
+    public long deleteCardUsehistInfo(HashMap<String, Object> paramMap) throws JsonProcessingException {
+        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+        String seqJSON = paramMap.get("SEQ_LIST").toString();
+        List<Long> list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {});
+        long result = 0;
+        long preCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq()).size();
         cardUsehistRepository.deleteAllById(list);
-        return 0;
+        long curCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq()).size();
+        if(preCnt > curCnt) {
+            result = preCnt - curCnt;
+        }
+        return result;
     }
 
     /**
      * 법인카드 사용내역 수정
-     * @param cardUsehistList: 사용내역 list
+     * @param cardUsehist: 사용내역
      */
     @Override
-    public Object updateCardUsehistInfo(List<CardUsehist> cardUsehistList) {
-        return 0;
+    public Object updateCardUsehistInfo(CardUsehist cardUsehist) {
+        return cardUsehistRepository.save(cardUsehist);
     }
 
     /**

@@ -1,6 +1,6 @@
 /************************************************************
  파일명    :    payhist.js
- 설명     : 결제내역 페이지 JavaScript
+ 설명     : 결제 내역 페이지 JavaScript
  수정일        수정자        Version        설명
  ----------    ----------    ----------    ----------
  2022.12.14    설동재        1.0            최초 생성
@@ -26,7 +26,7 @@ const $payhist = (function () {
   * 초기 이벤트
   */
   const initEvt = function () {
-    //결제내역 작성 btn
+    //결제 내역 작성 or 수정
     document.querySelector("#histForm").addEventListener('submit', function (event) {
         if(new RegExp(/[^0-9,]/, "g").test(document.querySelector("#histMoney").value)){
             alert("금액은 숫자만 입력 가능합니다.");
@@ -47,7 +47,7 @@ const $payhist = (function () {
         }
         delete data.cardSelect;
 
-        //2.결제 내역 저장
+        //2.결제 내역 저장 or 수정
          $.ajax({
              type: "post",
              url: "/payhist/saveInfo",
@@ -68,8 +68,8 @@ const $payhist = (function () {
     });
 
     //결제 내역 초기화 btn
-    document.querySelector("#payhistReset").addEventListener("click", function (e) {
-        $("#histForm")[0].reset();
+    document.querySelector("#histReset").addEventListener("click", function (e) {
+        changeForm("save");
     });
 
     //첨부파일 btn
@@ -83,45 +83,60 @@ const $payhist = (function () {
 
     //삭제 btn
     document.querySelector("#deleteRow").addEventListener("click", function (e) {
+        const wrtYm = document.querySelector("#payhistMonth").value;
         const seqList = [];
+        //1.체크된 row 조회
         $('.table-check').each(function (index) {
             if($(this).is(":checked")){
-                seqList.push($(this).val());
+                seqList.push($(this).val()*1);
             }
         });
+
+        if(seqList.length === 0){
+            return alert("삭제하려는 결제 내역이 없습니다.");
+        }
+        //2.체크된 row list 삭제
         $.ajax({
             type: "POST",
             url: "/payhist/deleteList",
             dataType: "json",
             data: {
               WRITER_ID: userId,
-              WRT_YM: wrtYm
+              WRT_YM: wrtYm,
+              SEQ_LIST : JSON.stringify(seqList)
             },
             success: function (data) {
-              //1)제출 상태 표현
-              document.querySelector("#stateNm").innerText = data.result.stateNm;
-              //2) 테이블 초기화
-              $cmmn.emptyTable("histTable");
-              //3) 테이블 row 생성
-              const tbody = document.querySelector("#histTable>tbody");
-              if (data.CODE === "SUCCESS") {
-                paintTable(tbody, data.result);
-              } else if (data.CODE === "EMPTY") {
-                  const newRow = tbody.insertRow();
-                  const newCell = newRow.insertCell();
-
-                  document.querySelector("#listTotCnt").innerText = "0";
-                  newCell.setAttribute('colspan', '15');
-                  newCell.classList.add("fw-bold");
-                  newCell.innerText = "해당 년월의 결제 내역이 없습니다.";
-              }
+                if(data.CODE === "SUCCESS"){
+                    selectPayhistList();
+                }else{
+                    return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+                }
             },
             error: function () {
-              return alert("결제내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+              return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
             }
           });
 
+        $("#checkAll").prop('checked', false);
     });
+
+    //제출 btn
+    $("#submitHist").on("click", function(){
+        $.ajax({
+        type: "PATCH",
+        url: "/payhist/updateState",
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+
+          } else if (data.CODE === "ERR") {
+            return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        },
+        error: function () {
+          return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      });
+    })
   }
 
   /**
@@ -132,7 +147,8 @@ const $payhist = (function () {
     if($cmmn.isNullorEmpty(wrtYm)){
         wrtYm = document.querySelector("#payhistMonth").value;
     }
-    //1.결제내역 리스트 조회
+
+    //1.결제 내역 리스트 조회
     $.ajax({
             type: "GET",
             url: "/payhist/searchList",
@@ -142,18 +158,18 @@ const $payhist = (function () {
               WRT_YM: wrtYm
             },
             success: function (data) {
-              //1)제출 상태 표현
-              document.querySelector("#stateNm").innerText = data.result.stateNm;
-              //2) 테이블 초기화
+              //1)테이블 초기화
               $cmmn.emptyTable("histTable");
-              //3) 테이블 row 생성
+              //2)테이블 row 생성
               const tbody = document.querySelector("#histTable>tbody");
               if (data.CODE === "SUCCESS") {
                 paintTable(tbody, data.result);
+                document.querySelector("#stateNm").innerText = data.result.stateNm;
               } else if (data.CODE === "EMPTY") {
                   const newRow = tbody.insertRow();
                   const newCell = newRow.insertCell();
 
+                  document.querySelector("#stateNm").innerText = "제출 전";
                   document.querySelector("#listTotCnt").innerText = "0";
                   newCell.setAttribute('colspan', '15');
                   newCell.classList.add("fw-bold");
@@ -161,7 +177,7 @@ const $payhist = (function () {
               }
             },
             error: function () {
-              return alert("결제내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+              return alert("결제 내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
             }
           });
 
@@ -171,17 +187,16 @@ const $payhist = (function () {
 
   /**
   * 결제 내역 조회
-  * @param { Object } tbody : 결제내역 table body 태그
-  * @param { JSON } data : 결제내역 데이터
+  * @param { Object } tbody : 결제 내역 table body 태그
+  * @param { JSON } data : 결제 내역 데이터
   */
   const paintTable = function(tbody, data){
     //1.총 건수 설정
     document.querySelector("#listTotCnt").innerText = data.list.length;
-    //2.결제내역 row 생성
+    //2.결제 내역 row 생성
     for(let i=0 ; i<data.list.length;i++){
         const rowData = data.list[i];
         const newRow = tbody.insertRow();
-
         //삭제 체크 박스
         const chkbox = document.createElement("input");
         chkbox.setAttribute("type", "checkbox");
@@ -208,6 +223,8 @@ const $payhist = (function () {
         }
         //합계
         newRow.insertCell().innerHTML = $cmmn.convertToCurrency(rowData.money);
+        //row 이벤트 핸들러
+        rowEvtHandler(newRow);
     }
 
     //3.총계 row 생성
@@ -231,6 +248,87 @@ const $payhist = (function () {
     }
     //총계
     newRow.insertCell().innerHTML = $cmmn.convertToCurrency(data.sum);
+  }
+  /**
+  * 결제 내역 테이블 row event handler
+  */
+  const rowEvtHandler = function (row){
+      $(row).on("click", function(){
+        if($(this).hasClass("table-active")){
+            $(this).removeClass("table-active");
+            changeForm("save");
+        }else{
+          const seq = $(this).children("td").eq(0).children("input").val();
+          $("#histTable > tbody > tr").removeClass("table-active");
+          $(this).addClass("table-active");
+          changeForm("update");
+          selectPayhistInfo(seq);
+        }
+      });
+  }
+
+  /**
+  * 결제 내역 form 변경
+  * @param {String} type : save(저장) or update(수정)
+  * @param {Object} tr : tr tag
+  */
+  const changeForm = function(type) {
+    if(type ==="update"){
+        $("#histSave").css("display", "none");
+        $("#histUpdate").css("display", "");
+    }else{
+        $("#histSave").css("display", "");
+        $("#histUpdate").css("display", "none");
+        $("#histTable > tbody > tr").removeClass("table-active");
+        $("#histForm")[0].reset();
+    }
+  }
+
+  /**
+  * 결제 내역 단일 조회
+  * @param {int} seq : 선택한 결제 내역 seq
+  */
+  const selectPayhistInfo = function(seq) {
+    $.ajax({
+          type: "GET",
+          url: "/payhist/searchInfo",
+          dataType: "json",
+          data: {
+            seq : seq,
+          },
+           contentType: "application/json",
+           dataType: 'json',
+          success: function (data) {
+            const result = data.result
+            if (data.CODE === "SUCCESS") {
+            const optionList = $(`#histForm select[name=cardSelect]`).children("option");
+            const date = new Date(result.useDate);
+            const year = date.getFullYear();
+            const month = date.getMonth()+1;
+            const days = date.getDate();
+
+            $("#histForm input[name=seq]").val(result.seq);
+            $("#histForm input[name=useHist]").val(result.useHist);
+            $("#histForm input[name=money]").val($cmmn.convertToCurrency(result.money));
+            $(`#histForm select[name=classSeq] option:eq(${result.classInfo.seq})`).prop("selected",true);
+            $("#histForm input[name=useDate]").val(`${year}-${month < 10 ? `0${month}` : month}-${
+                days < 10 ? `0${days}` : days}`);
+            for(let i=1; i < optionList.length;i++){
+                const cardComp = optionList[i].innerText.split(" ")[0];
+                const cardNum = optionList[i].innerText.split(" ")[1];
+                if(cardComp === result.cardComp && cardNum === result.cardNum){
+                    $(optionList[i]).prop("selected",true);
+                    break;
+                }
+            }
+            } else {
+              alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+            }
+          },
+          error: function () {
+            return alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        });
   }
 
   /**
@@ -409,11 +507,11 @@ const $payhist = (function () {
     const month = now.getMonth()+1;
     const payhistMonth = document.querySelector("#payhistMonth");
 
-    //결제내역 현재 년월 표현
+    //결제 내역 현재 년월 표현
     payhistMonth.value = `${now.getFullYear()}-${month < 10 ? `0${month}` : month}`;
     selectPayhistList();
 
-    //년월 변경 시 결제내역 조회
+    //년월 변경 시 결제 내역 조회
     payhistMonth.addEventListener('change', function () {
       selectPayhistList(this.value);
     });

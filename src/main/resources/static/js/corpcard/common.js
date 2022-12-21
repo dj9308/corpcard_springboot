@@ -33,18 +33,14 @@ const $cmmn = (function() {
         const form = $(`#${formId}`);
         let obj = null;
 
-        try {
-            if (form[0].tagName && form[0].tagName.toUpperCase() == "FORM") {
-                var arr = form.serializeArray();
-                if (arr) {
-                    obj = {};
-                    jQuery.each(arr, function() {
-                        obj[this.name] = this.value;
-                    });
-                }//if ( arr ) {
+        if (form[0].tagName && form[0].tagName.toUpperCase() == "FORM") {
+            var arr = form.serializeArray();
+            if (arr) {
+                obj = {};
+                jQuery.each(arr, function() {
+                    obj[this.name] = this.value;
+                });
             }
-        } catch (e) {
-            alert(e.message);
         }
         return obj;
     }

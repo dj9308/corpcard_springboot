@@ -2,6 +2,7 @@ package com.expernet.corpcard.service;
 
 import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.UsehistSubmitInfo;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,27 +27,38 @@ import java.util.List;
 public interface PayhistService {
 
     /**
-     * 법인카드 사용내역 조회
+     * 법인카드 결제 내역 목록 조회
      * @param paramMap: 제출 seq
      */
     HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap);
 
     /**
-     * 법인카드 사용내역 저장
-     * @param cardUsehist: 사용내역 정보
+     * 법인카드 결제 내역 딘일 정보 조회
+     * @param paramMap: 결제 내역 seq
+     */
+    CardUsehist searchCardUsehistInfo(HashMap<String, Object> paramMap);
+
+    /**
+     * 법인카드 결제 내역 저장
+     * @param cardUsehist: 결제 내역 정보
      * @param userId : 사용자 ID
      */
     Object saveCardUsehistInfo(CardUsehist cardUsehist, String userId);
 
     /**
-     * 법인카드 사용내역 삭제
-     * @param list): 삭제할 내역 seq list
+     * 법인카드 결제 내역 삭제
+     * @param paramMap): 제출 정보 & 결제내역 seq list
      */
-    Object deleteCardUsehistInfo(List<Long> list);
+    long deleteCardUsehistInfo(HashMap<String, Object> paramMap) throws JsonProcessingException;
 
     /**
-     * 법인카드 사용내역 수정
-     * @param cardUsehistList: 사용내역 list
+     * 법인카드 결제 내역 수정
+     * @param cardUsehist: 결제 내역
      */
-    Object updateCardUsehistInfo(List<CardUsehist> cardUsehistList);
+    Object updateCardUsehistInfo(CardUsehist cardUsehist);
+
+    /**
+     * 제출
+     */
+    Object updateStateSeq();
 }

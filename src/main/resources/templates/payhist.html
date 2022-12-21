@@ -136,10 +136,12 @@
                         </select>
                     </td>
                 </tr>
+                <input type="text" name="seq" class="form-control" style="visibility:hidden;">
             </table>
             <div class="text-center mb-4">
-                <button type="submit" id="payhistSubmit" class="btn btn-secondary">작성</button>
-                <button type="button" id="payhistReset" class="btn btn-gray">초기화</button>
+                <button type="submit" id="histSave" class="btn btn-secondary">작성</button>
+                <button type="submit" id="histUpdate" class="btn btn-secondary" style="display:none;">수정</button>
+                <button type="button" id="histReset" class="btn btn-gray">초기화</button>
             </div>
         </form>
         <div class="mb-1 fs-4 gx-5 row">
@@ -150,7 +152,7 @@
                 <button class="btn btn-secondary" id="payhistAtch">첨부파일</button>
                 <button type="button" class="btn btn-danger">PDF</button>
                 <button type="button" class="btn btn-success">CSV</button>
-                <button type="button" class="btn btn-primary">제출</button>
+                <button type="button" class="btn btn-primary" id="submitHist">제출</button>
                 <button type="button" id="deleteRow" class="btn btn-secondary">삭제</button>
             </div>
         </div>
