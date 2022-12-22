@@ -1,19 +1,24 @@
 package com.expernet.corpcard.service.Impl;
 
 
+import com.expernet.corpcard.controller.PayhistController;
 import com.expernet.corpcard.entity.*;
-import com.expernet.corpcard.repository.CardUsehistRepository;
-import com.expernet.corpcard.repository.DeptRepository;
-import com.expernet.corpcard.repository.UsehistSubmitInfoRepository;
-import com.expernet.corpcard.repository.UserRepository;
+import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.PayhistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FilenameUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.*;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -61,16 +66,34 @@ public class PayhistServiceImpl implements PayhistService {
     private CardUsehistRepository cardUsehistRepository;
 
     /**
+     * 첨부파일 Repository
+     */
+    @Autowired
+    private AttachmentInfoRepository attachmentInfoRepository;
+
+    /**
+     * Upload file path
+     */
+    @Value("${upload.filePath}")
+    private String uploadPath;
+
+    /**
+     * Logger
+     */
+    private static final Logger logger = LoggerFactory.getLogger(PayhistServiceImpl.class);
+
+    /**
      * 법인카드 사용내역 조회
+     *
      * @param paramMap: 제출 seq
      */
     @Override
     public HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap) {
         HashMap<String, Object> result = new HashMap<>();
         UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
-        if(submitInfo != null) {
+        if (submitInfo != null) {
             List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
-            if(list.size() > 0){
+            if (list.size() > 0) {
                 //제출 상태
                 result.put("stateInfo", submitInfo.getStateInfo());
                 //사용내역 리스트
@@ -86,6 +109,7 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 법인카드 결제 내역 딘일 정보 조회
+     *
      * @param paramMap: 결제 내역 seq
      */
     @Override
@@ -96,33 +120,25 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 법인카드 사용내역 저장
+     *
      * @param cardUsehist : 결제 내역 정보
-     * @param userId : 사용자 ID
+     * @param userId      : 사용자 ID
      */
     @Override
     public Object saveCardUsehistInfo(CardUsehist cardUsehist, String userId) {
         //1.제출 정보 존재여부 확인
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
-        String wrtYn = format.format(cardUsehist.getUseDate());
-        UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(userId, wrtYn);
+        String wrtYm = format.format(cardUsehist.getUseDate());
+        UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(userId, wrtYm);
 
         //2.제출 정보 없을 시 생성
-        if(submitInfo == null){
-            User userInfo = userRepository.findByUserId(userId);
-            Dept deptInfo = deptRepository.findByDeptCd(userInfo.getDeptCd());
-            StateInfo stateInfo = StateInfo.builder().seq(1).build();
-
-            UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
-                    .stateInfo(stateInfo)
-                    .writerId(userInfo.getUserId())
-                    .writerDept(deptInfo.getDeptNm())
-                    .writerOfcds(userInfo.getOfcds())
-                    .writerNm(userInfo.getUserNm())
-                    .wrtYm(wrtYn)
-                    .build();
-            submitInfo = usehistSubmitInfoRepository.save(histInfo);
+        if (submitInfo == null) {
+            HashMap<String, Object> paramMap = new HashMap<>();
+            paramMap.put("WRITER_ID", userId);
+            paramMap.put("WRT_YM", wrtYm);
+            submitInfo = saveSubmitInfo(paramMap);
         }
-        
+
         //3.결제내역 저장
         cardUsehist.setUsehistSubmitInfo(submitInfo);
         return cardUsehistRepository.save(cardUsehist);
@@ -130,25 +146,34 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 법인카드 사용내역 삭제
+     *
      * @param paramMap: 제출 정보 & 삭제할 seq list
      */
     @Override
-    public long deleteCardUsehistInfo(HashMap<String, Object> paramMap) throws JsonProcessingException {
+    public long deleteCardUsehistInfo(HashMap<String, Object> paramMap) {
         UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
         String seqJSON = paramMap.get("SEQ_LIST").toString();
-        List<Long> list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {});
         long result = 0;
+        List<Long> list;
+        try {
+            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            return 0;
+        }
         long preCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq()).size();
         cardUsehistRepository.deleteAllById(list);
         long curCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq()).size();
-        if(preCnt > curCnt) {
-            result = preCnt - curCnt;
+
+        if (list.size() == preCnt - curCnt) {
+            result = list.size();
         }
         return result;
     }
 
     /**
      * 법인카드 사용내역 수정
+     *
      * @param cardUsehist: 사용내역
      */
     @Override
@@ -158,6 +183,7 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 법인카드 결제 내역 제출
+     *
      * @param paramMap : 제출 정보
      */
     @Override
@@ -168,12 +194,137 @@ public class PayhistServiceImpl implements PayhistService {
     }
 
     /**
+     * 첨부파일 조회
+     *
+     * @param paramMap : 제출 정보
+     */
+    @Override
+    public List<AttachmentInfo> searchAtchList(HashMap<String, Object> paramMap) {
+        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+        return attachmentInfoRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
+    }
+
+    /**
+     * 첨부파일 업로드
+     *
+     * @param paramMap : 제출 정보
+     * @param fileList : 업로드된 파일 list
+     */
+    @Override
+    public List<AttachmentInfo> uploadAtch(HashMap<String, Object> paramMap, List<MultipartFile> fileList) {
+        List<AttachmentInfo> result = new ArrayList<>();
+
+        //1.제출 정보 조회
+        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+
+        //2.제출 정보 없을 시 생성
+        if (submitInfo == null) {
+            submitInfo = saveSubmitInfo(paramMap);
+        }
+
+        //3.첨부파일 저장
+        //1)제출 번호별 디렉토리 생성
+        String path = uploadPath + File.separator + submitInfo.getSeq();
+        File directory = new File(path);
+        if (directory.mkdirs()) {
+            logger.info("제출번호 " + submitInfo.getSeq() + "번의 디렉토리 생성 성공");
+        }
+        for (MultipartFile file : fileList) {
+            //1)파일 정보 db 저장
+            SimpleDateFormat sdfCurrent = new SimpleDateFormat("yyyyMMddhhmmssSSS", Locale.KOREA);
+            Timestamp ts = new Timestamp(System.currentTimeMillis());
+            String filePropNm = sdfCurrent.format(ts.getTime());
+            String originalFilename = file.getOriginalFilename();
+            long fileSize = file.getSize();
+
+            AttachmentInfo atchInfo = AttachmentInfo.builder()
+                    .usehistSubmitInfo(submitInfo)
+                    .fileNm(FilenameUtils.getName(originalFilename))
+                    .fileExtNm(FilenameUtils.getExtension(originalFilename))
+                    .filePropNm(filePropNm)
+                    .filePath(uploadPath + File.separator + submitInfo.getSeq())
+                    .uploadFn(fileSize)
+                    .build();
+
+            result.add(attachmentInfoRepository.save(atchInfo));
+
+            //2)파일 저장
+            try {
+                FileOutputStream fos = new FileOutputStream(path + File.separator + filePropNm);
+                fos.write(file.getBytes());
+                fos.close();
+            } catch (IOException e) {
+                attachmentInfoRepository.deleteById(result.get(result.size() - 1).getSeq());
+                result.remove(result.size() - 1);
+                logger.error(originalFilename + " 파일 업로드 실패");
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 업로드된 파일 삭제
+     *
+     * @param paramMap: 첨부파일 seq list
+     */
+    @Override
+    public long deleteAtch(HashMap<String, Object> paramMap) {
+        //1.seq 리스트 데이터 설정
+        String seqJSON = paramMap.get("SEQ_LIST").toString();
+        List<Long> list;
+        long result = 0;
+        try {
+            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            return result;
+        }
+        //2.파일 및 첨부파일 정보 삭제
+        for (long seq : list) {
+            AttachmentInfo fileInfo = attachmentInfoRepository.findById(seq).orElse(null);
+            if (fileInfo != null) {
+                File file = new File(fileInfo.getFilePath() + File.separator + fileInfo.getFilePropNm());
+                if (file.delete()) {
+                    attachmentInfoRepository.deleteById(seq);
+                    result++;
+                }
+            }
+        }
+        if (list.size() != result) {
+            result = 0;
+        }
+        return result;
+    }
+
+    /**
      * 제출 내역 조회
+     *
      * @param paramMap: 사용자 정보 및 작성년월
      */
-    private UsehistSubmitInfo searchSubmitInfo(HashMap<String, Object> paramMap){
+    private UsehistSubmitInfo searchSubmitInfo(HashMap<String, Object> paramMap) {
         String writerId = paramMap.get("WRITER_ID").toString();
         String wrtYm = paramMap.get("WRT_YM").toString();
         return usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
+    }
+
+    /**
+     * 제출 내역 저장
+     *
+     * @param paramMap: 사용자 정보 및 작성년월
+     */
+    private UsehistSubmitInfo saveSubmitInfo(HashMap<String, Object> paramMap) {
+        User userInfo = userRepository.findByUserId(paramMap.get("WRITER_ID").toString());
+        Dept deptInfo = deptRepository.findByDeptCd(userInfo.getDeptCd());
+        StateInfo stateInfo = StateInfo.builder().seq(1).build();
+
+        UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
+                .stateInfo(stateInfo)
+                .writerId(userInfo.getUserId())
+                .writerDept(deptInfo.getDeptNm())
+                .writerOfcds(userInfo.getOfcds())
+                .writerNm(userInfo.getUserNm())
+                .wrtYm(paramMap.get("WRT_YM").toString())
+                .build();
+        return usehistSubmitInfoRepository.save(histInfo);
     }
 }

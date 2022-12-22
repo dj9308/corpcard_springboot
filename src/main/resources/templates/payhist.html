@@ -149,9 +149,9 @@
                 총 <span class="fw-bold" id="listTotCnt"></span>건이 조회되었습니다. - <span class="fw-bold" id="stateNm"></span>
             </div>
             <div class="col text-end">
-                <button class="btn btn-secondary" id="payhistAtch">첨부파일</button>
-                <button type="button" class="btn btn-danger">PDF</button>
-                <button type="button" class="btn btn-success">CSV</button>
+                <button class="btn btn-secondary" id="histAtchBtn">첨부파일</button>
+                <button type="button" class="btn btn-danger" id="histPdfBtn">PDF</button>
+                <button type="button" class="btn btn-success" id="histCsvBtn">CSV</button>
                 <button type="button" class="btn btn-primary" id="submitHist">제출</button>
                 <button type="button" id="deleteRow" class="btn btn-secondary">삭제</button>
             </div>
@@ -192,33 +192,40 @@
                 <img th:src="@{/icons/paperclip.svg}" class="rounded me-2">
                 <strong class="me-auto">첨부파일</strong>
                 <small>
-                    파일 <span id="atch-cnt">11</span>개
+                    파일 <span id="atchCnt"></span>개
                 </small>
-                <button type="button" class="ms-2 btn btn-outline-danger btn-sm">삭제</button>
+                <button type="button" class="ms-2 btn btn-outline-secondary btn-sm" id="atchAddBtn">추가</button>
+                <label for="atchUpload" class="" style="display:none">
+                    <input type="file" name="atchUpload" id="atchUpload" accept=".png, .jpg, .pdf" multiple/>
+                </label>
+                <button type="button" class="ms-2 btn btn-outline-danger btn-sm" id="atchDelBtn">삭제</button>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
-            <ul class="list-group">
-                <li class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    First checkbox
-                </li>
-                <li class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    Second checkbox
-                </li>
-                <li class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    Third checkbox
-                </li>
-                <li class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    Fourth checkbox
-                </li>
-                <li class="list-group-item">
-                    <input class="form-check-input me-1" type="checkbox" value="">
-                    Fifth checkbox
-                </li>
-            </ul>
+            <div class="toast-body">
+                <span id="atchEmpty">해당 연월의 첨부파일이 없습니다.</span>
+                <ul class="list-group" id="atchList">
+                    <li class="list-group-item">
+                        <input class="form-check-input me-1 atch-check" type="checkbox" value="">
+                        First checkbox
+                    </li>
+                    <li class="list-group-item">
+                        <input class="form-check-input me-1" type="checkbox" value="">
+                        Second checkbox
+                    </li>
+                    <li class="list-group-item">
+                        <input class="form-check-input me-1" type="checkbox" value="">
+                        Third checkbox
+                    </li>
+                    <li class="list-group-item">
+                        <input class="form-check-input me-1" type="checkbox" value="">
+                        Fourth checkbox
+                    </li>
+                    <li class="list-group-item">
+                        <input class="form-check-input me-1" type="checkbox" value="">
+                        Fifth checkbox
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </section>
@@ -232,8 +239,6 @@
     $(function () {
         $payhist.init();
     });
-
-
 </script>
 </body>
 </html>

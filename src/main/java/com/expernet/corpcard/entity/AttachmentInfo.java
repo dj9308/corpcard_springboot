@@ -20,7 +20,7 @@ public class AttachmentInfo {
     @Column(name = "SEQ")
     private long seq;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "SUBMIT_SEQ")
     private UsehistSubmitInfo usehistSubmitInfo;
 
@@ -37,7 +37,7 @@ public class AttachmentInfo {
     private String filePath;
 
     @Column(name = "UPLOAD_FN")
-    private String uploadFn;
+    private long uploadFn;
 
     @CreationTimestamp
     @Column(name = "CREATED_AT")
@@ -49,7 +49,7 @@ public class AttachmentInfo {
 
     @Builder
     public AttachmentInfo(long seq, UsehistSubmitInfo usehistSubmitInfo, String fileNm, String fileExtNm,
-                          String filePropNm, String filePath, String uploadFn) {
+                          String filePropNm, String filePath, long uploadFn) {
         this.seq = seq;
         this.usehistSubmitInfo = usehistSubmitInfo;
         this.fileNm = fileNm;

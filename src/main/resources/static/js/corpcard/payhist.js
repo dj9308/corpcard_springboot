@@ -10,17 +10,18 @@ const $payhist = (function () {
   'use strict';
 
   const userId = document.querySelector('#userId').value;   // 사용자 ID
-  let wrtYm                                                 // 작성년월
+  let wrtYm                                                 // 작성연월
 
   /**
    * init
    */
   const init = function () {
-    initBtnEvt();
-    initStatsDatePicker();
-    paintCharts();
-    initHistFormEvt();
-    initHistTable();
+    initBtnEvt();           //버튼 이벤트
+    initStatsDatePicker();  //기간별 통계 date picker
+    paintCharts();          //차트 조회
+    initHistForm();         //결제 내역 Form
+    initHistTable();        //결제 내역 Table
+    initAtchToast();       //첨부 파일 toast
   }
 
   /**
@@ -74,7 +75,7 @@ const $payhist = (function () {
     });
 
     //첨부파일 btn
-    $("#payhistAtch").on("click", function (event) {
+    $("#histAtchBtn").on("click", function (event) {
       const toastElList = [].slice.call(document.querySelectorAll('.toast'))
       const toastList = toastElList.map(function (toastEl) {
         return new bootstrap.Toast(toastEl)
@@ -82,7 +83,46 @@ const $payhist = (function () {
       toastList.forEach(toast => toast.show());
     });
 
-    //삭제 btn
+
+    //PDF btn
+    $("#histPdfBtn").on("click", function (event) {
+
+    });
+
+    //CSV btn
+    $("#histCsvBtn").on("click", function (event) {
+
+    });
+
+    //제출 btn
+    $("#submitHist").on("click", function () {
+      if (confirm("제출 하시겠습니까?")) {
+        if($("histTable > tbody > tr").length === 0){
+            return alert("저장된 결제 내역이 없습니다.");
+        }
+        $.ajax({
+          type: "PATCH",
+          url: "/payhist/updateState",
+          dataType: "json",
+          data: {
+            WRITER_ID: userId,
+            WRT_YM: wrtYm,
+          },
+          success: function (data) {
+            if (data.CODE === "SUCCESS") {
+              window.location.reload();
+            } else if (data.CODE === "ERR") {
+              return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+            }
+          },
+          error: function () {
+            return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        });
+      }
+    });
+
+    //Table row 삭제 btn
     document.querySelector("#deleteRow").addEventListener("click", function (e) {
       //1.체크된 row 조회
       const seqList = [];
@@ -119,33 +159,73 @@ const $payhist = (function () {
       $("#checkAll").prop('checked', false);
     });
 
-    //제출 btn
-    $("#submitHist").on("click", function () {
-      if (confirm("제출 하시겠습니까?")) {
-        if($("histTable > tbody > tr").length === 0){
-            return alert("저장된 결제 내역이 없습니다.");
+    //첨부파일 toast 추가 btn
+    $("#atchAddBtn").on("click", function (event) {
+        $("#atchUpload").trigger('click');
+    });
+      $("#atchUpload").on('click', function () {
+          this.value = null;
+      });
+      $("#atchUpload").on('change', function (e) {
+        //formData 설정
+        const formData = new FormData();
+        const data = {
+          WRITER_ID: userId,
+          WRT_YM: wrtYm,
+        };
+        formData.append('key', new Blob([ JSON.stringify(data) ], {type : "application/json"}));
+        for(let i =0 ;i<this.files.length; i++){
+            formData.append("files", this.files[i]);
         }
+        //첨부파일 업로드
         $.ajax({
-          type: "PATCH",
-          url: "/payhist/updateState",
-          dataType: "json",
-          data: {
-            WRITER_ID: userId,
-            WRT_YM: wrtYm,
-          },
-          success: function (data) {
-            if (data.CODE === "SUCCESS") {
-              window.location.reload();
-            } else if (data.CODE === "ERR") {
-              return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          type:"POST",
+          url:"/payhist/uploadAtch",
+          enctype: 'multipart/form-data',
+          data:formData,
+          processData:false,
+          contentType:false,
+          success:function(data){
+            if(data.CODE ==="SUCCESS"){
+              paintAtchList(data.result);
             }
-          },
-          error: function () {
-            return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
           }
         });
-      }
-    })
+      });
+
+    //첨부파일 toast 삭제 btn
+    $("#atchDelBtn").on("click", function (event) {
+        //1.체크된 row 조회
+        const atchList = [];
+        $('.atch-check').each(function (index) {
+            if ($(this).is(":checked")) {
+              atchList.push($(this).val() * 1);
+            }
+        });
+          if (atchList.length === 0) {
+            return alert("삭제하려는 첨부파일이 없습니다.");
+          }
+
+      //2.체크된 row list 삭제
+      $.ajax({
+        type: "DELETE",
+        url: "/payhist/deleteAtchList",
+        dataType: "json",
+        data: {
+          SEQ_LIST: JSON.stringify(atchList)
+        },
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+            deleteAtchInfo(atchList);
+          } else {
+            return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        },
+        error: function () {
+          return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      });
+    });
   }
 
   /**
@@ -189,7 +269,7 @@ const $payhist = (function () {
           document.querySelector("#listTotCnt").innerText = "0";
           newCell.setAttribute('colspan', '15');
           newCell.classList.add("fw-bold");
-          newCell.innerText = "해당 년월의 결제 내역이 없습니다.";
+          newCell.innerText = "해당 연월의 결제 내역이 없습니다.";
         }
       },
       error: function () {
@@ -354,7 +434,7 @@ const $payhist = (function () {
   /**
   * 결제 내역 form event handler
   */
-  const initHistFormEvt = function () {
+  const initHistForm = function () {
     //분류 select
     const classSelect = document.querySelector("#classSelect");
     $.ajax({
@@ -526,21 +606,90 @@ const $payhist = (function () {
     const month = now.getMonth() + 1;
     const payhistMonth = document.querySelector("#payhistMonth");
 
-    //결제 내역 현재 년월 표현
+    //결제 내역 현재 연월 표현
     payhistMonth.value = `${now.getFullYear()}-${month < 10 ? `0${month}` : month}`;
     wrtYm = payhistMonth.value;
     selectPayhistList();
 
-    //년월 변경 시 결제 내역 조회
+    //연월 변경 시 결제 내역 조회
     $(payhistMonth).on('change', function () {
       wrtYm = this.value;
       selectPayhistList();
+      initAtchToast();
     });
 
     //체크박스 전체 설정
     document.querySelector("#checkAll").addEventListener('click', function () {
       $(".table-check").prop('checked', $(this).prop('checked'));
     });
+  }
+
+  /**
+   * 첨부파일 toast 설정
+   */
+  const initAtchToast = function () {
+    //1.기존 첨부파일 list 초기화
+    $("#atchList > li").remove();
+    $("#atchEmpty").css("display","");
+
+    //2.해당 연월의 첨부파일 리스트 조회
+    $.ajax({
+      type: "GET",
+      url: "/payhist/searchAtchList",
+      dataType: "json",
+      data: {
+        WRITER_ID: userId,
+        WRT_YM: wrtYm,
+      },
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+            paintAtchList(data.result);
+        } else if (data.CODE === "ERR") {
+          return alert("첨부파일 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      },
+      error: function () {
+        return alert("첨부파일 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
+  }
+
+  /**
+   * 첨부파일 리스트 생성
+   * @param {Array} data : 첨부파일 정보 Array
+   */
+  const paintAtchList = function (data) {
+    if($cmmn.isNullorEmpty(data)){
+      return false;
+    }
+    $("#atchEmpty").css("display","none");
+    const atchList = document.querySelector("#atchList");
+    for(let i=0;i<data.length;i++){
+      const list = document.createElement("li");
+      const chkbox = document.createElement("input");
+      const aTag = document.createElement("a");
+      list.className += "list-group-item";
+      chkbox.setAttribute("type", "checkbox");
+      chkbox.setAttribute("value", data[i].seq);
+      chkbox.className += "form-check-input me-1 atch-check";
+      aTag.innerText = data[i].fileNm;
+      list.appendChild(chkbox);
+      list.appendChild(aTag);
+      document.querySelector("#atchList").appendChild(list);
+    }
+  }
+
+  /**
+   * 선택한 첨부파일 리스트 삭제
+   * @param {Array} data : 삭제된 첨부파일 Seq Array
+   */
+  const deleteAtchInfo = function(data){
+    for(let i = 0; i<data.length; i++){
+      $(`.atch-check[value=${data[i].seq}]`).parent("li").remove();
+    }
+    if($("#atchList > li").length == 0){
+        $("#atchEmpty").css("display","");
+    }
   }
 
   return {

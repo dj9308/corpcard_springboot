@@ -1,11 +1,16 @@
 package com.expernet.corpcard.service;
 
+import com.expernet.corpcard.entity.AttachmentInfo;
 import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.UsehistSubmitInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -62,4 +67,23 @@ public interface PayhistService {
      * @param paramMap : 제출 정보
      */
     Object updateStateSeq(HashMap<String, Object> paramMap);
+
+    /**
+     * 첨부파일 조회
+     * @param paramMap  : 제출 정보
+     */
+    List<AttachmentInfo> searchAtchList(HashMap<String, Object> paramMap);
+
+    /**
+     * 첨부파일 업로드
+     * @param paramMap  : 제출 정보
+     * @param fileList  : 업로드된 파일 list
+     */
+    List<AttachmentInfo> uploadAtch(HashMap<String, Object> paramMap, List<MultipartFile> fileList);
+
+    /**
+     * 첨부파일 삭제
+     * @param paramMap  : 첨부파일 seq list
+     */
+    long deleteAtch(HashMap<String, Object> paramMap);
 }

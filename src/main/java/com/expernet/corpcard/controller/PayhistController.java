@@ -1,14 +1,12 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.entity.CardUsehist;
-import com.expernet.corpcard.entity.Dept;
-import com.expernet.corpcard.entity.UsehistSubmitInfo;
-import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.service.CommonService;
 import com.expernet.corpcard.service.PayhistService;
 import com.expernet.corpcard.service.SchedulerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,10 +16,14 @@ import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -166,7 +168,7 @@ public class PayhistController {
      * 결제 내역 수정
      *
      * @param cardUsehist : 사용 내역
-     * @param model    : modelMap
+     * @param model       : modelMap
      */
     @RequestMapping(value = "/updateInfo", method = RequestMethod.POST)
     public String updatePayhistInfo(@RequestBody CardUsehist cardUsehist, ModelMap model) {
@@ -218,6 +220,7 @@ public class PayhistController {
 
     /**
      * 법인카드 결제 내역 제출
+     *
      * @param paramMap : 제출 정보
      * @param model    : modelMap
      */
@@ -235,6 +238,87 @@ public class PayhistController {
                 model.addAttribute("CODE", "ERR");
                 model.addAttribute("MSG", "결제 내역 제출 실패");
                 logger.error("결제 내역 제출 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 첨부파일 조회
+     *
+     * @param paramMap  : 제출 정보
+     * @param model     : modelMap
+     */
+    @RequestMapping(value = "/searchAtchList", method = RequestMethod.GET)
+    public String searchAtchList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+        List<AttachmentInfo> result = new ArrayList<>();
+        try {
+            result = payhistService.searchAtchList(paramMap);
+        } finally {
+            if (result != null) {
+                model.addAttribute("result", result);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "첨부파일 조회 성공");
+                logger.info("첨부파일 조회 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "첨부파일 조회 실패");
+                logger.error("첨부파일 조회 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 첨부파일 업로드
+     *
+     * @param paramMap  : 제출 정보
+     * @param fileList  : 업로드된 파일 list
+     * @param model     : modelMap
+     */
+    @RequestMapping(value = "/uploadAtch", method = RequestMethod.POST, produces = "application/text; charset=utf8")
+    public String uploadAtch(@RequestPart(value = "key") HashMap<String, Object> paramMap,
+                             @RequestPart(value = "files") List<MultipartFile> fileList,
+                             ModelMap model) {
+        List<AttachmentInfo> result = new ArrayList<>();
+        try {
+            result = payhistService.uploadAtch(paramMap, fileList);
+        } finally {
+            if (fileList.size() == result.size()) {
+                model.addAttribute("result", result);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", result.size()+"건의 첨부파일 업로드 성공");
+                logger.info(result.size()+"건의 첨부파일 업로드 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "첨부파일 업로드 실패");
+                logger.error("첨부파일 업로드 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 업로드된 첨부파일 리스트 삭제
+     *
+     * @param paramMap  : 삭제할 첨부파일 Seq List
+     * @param model     : modelMap
+     */
+    @RequestMapping(value = "/deleteAtchList", method = RequestMethod.DELETE, produces = "application/text; charset=utf8")
+    public String deleteAtchList(@RequestParam HashMap<String, Object> paramMap,
+                             ModelMap model) {
+        long result = 0;
+        try {
+            result = payhistService.deleteAtch(paramMap);
+        } finally {
+            if (result > 0) {
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "업로드된 파일 삭제 성공");
+                logger.info("업로드된 파일 삭제 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "업로드된 파일 삭제 실패");
+                logger.error("업로드된 파일 삭제 실패");
             }
         }
         return "jsonView";

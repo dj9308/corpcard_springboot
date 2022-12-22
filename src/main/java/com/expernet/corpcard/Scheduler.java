@@ -27,10 +27,8 @@ import java.util.Map;
  */
 @Component
 public class Scheduler{
-
     final String TYPE_USER = "user";
     final String TYPE_DEPT = "dept";
-
 
     /**
      * Logger
