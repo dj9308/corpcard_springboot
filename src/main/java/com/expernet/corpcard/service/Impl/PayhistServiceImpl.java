@@ -8,6 +8,7 @@ import com.expernet.corpcard.service.PayhistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +19,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -294,6 +300,53 @@ public class PayhistServiceImpl implements PayhistService {
             result = 0;
         }
         return result;
+    }
+
+    /**
+     * 첨부파일 다운로드
+     * @param paramMap  : 첨부파일 seq list
+     * @param response  : HttpServletResponse
+     */
+    @Override
+    public void downloadAtch(HashMap<String, Object> paramMap, HttpServletResponse response) throws IOException {
+        String downFileName = uploadPath+File.separator+paramMap.get("seq").toString()+File.separator
+                +paramMap.get("filePropNm").toString();
+        String orgFileName = paramMap.get("fileNm").toString();
+
+        File file = new File(downFileName);
+
+        if (!file.exists()) {
+            throw new FileNotFoundException(downFileName);
+        }
+
+        if (!file.isFile()) {
+            throw new FileNotFoundException(downFileName);
+        }
+
+        int fSize = (int) file.length();
+        if (fSize > 0) {
+            byte[] buffer = new byte[2048];
+
+            String fileName = URLEncoder.encode(orgFileName, StandardCharsets.UTF_8);
+
+            Path fileFullPath = Paths.get(downFileName);
+            response.setContentType(Files.probeContentType(fileFullPath));
+            response.setCharacterEncoding("UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=\"" + fileName + "\"");
+            response.setHeader("Content-Transfer-Encoding", "binary");
+            response.setHeader("Pragma", "no-cache");
+            response.setHeader("Expires", "0");
+
+            try (BufferedInputStream fin = new BufferedInputStream(new FileInputStream(file)); BufferedOutputStream outs = new BufferedOutputStream(response.getOutputStream())) {
+                int read = 0;
+
+                while ((read = fin.read(buffer)) != -1) {
+                    outs.write(buffer, 0, read);
+                }
+
+                outs.flush();
+            }
+        }
     }
 
     /**

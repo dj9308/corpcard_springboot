@@ -5,9 +5,12 @@ import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.UsehistSubmitInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,4 +89,11 @@ public interface PayhistService {
      * @param paramMap  : 첨부파일 seq list
      */
     long deleteAtch(HashMap<String, Object> paramMap);
+
+    /**
+     * 첨부파일 다운로드
+     * @param paramMap  : 첨부파일 seq list
+     * @param response  : HttpServletResponse
+     */
+    void downloadAtch(HashMap<String, Object> paramMap, HttpServletResponse response) throws IOException;
 }

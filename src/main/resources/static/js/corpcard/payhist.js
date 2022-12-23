@@ -673,6 +673,9 @@ const $payhist = (function () {
       chkbox.setAttribute("value", data[i].seq);
       chkbox.className += "form-check-input me-1 atch-check";
       aTag.innerText = data[i].fileNm;
+      aTag.className += "text-decoration-none"
+      aTag.setAttribute("href", "http://"+`${location.host}/payhist/downloadAtch?seq=${
+        data[i].seq}&filePropNm=${data[i].filePropNm}&fileNm=${data[i].fileNm}`);
       list.appendChild(chkbox);
       list.appendChild(aTag);
       document.querySelector("#atchList").appendChild(list);

@@ -7,6 +7,7 @@ import com.expernet.corpcard.service.SchedulerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -304,7 +305,7 @@ public class PayhistController {
      * @param paramMap  : 삭제할 첨부파일 Seq List
      * @param model     : modelMap
      */
-    @RequestMapping(value = "/deleteAtchList", method = RequestMethod.DELETE, produces = "application/text; charset=utf8")
+    @RequestMapping(value = "/deleteAtchList", method = RequestMethod.DELETE)
     public String deleteAtchList(@RequestParam HashMap<String, Object> paramMap,
                              ModelMap model) {
         long result = 0;
@@ -320,6 +321,28 @@ public class PayhistController {
                 model.addAttribute("MSG", "업로드된 파일 삭제 실패");
                 logger.error("업로드된 파일 삭제 실패");
             }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 첨부파일 다운로드
+     *
+     * @param paramMap  : 첨부파일 Info List
+     * @param response  : HttpServletResponse
+     * @param model     : modelMap
+     */
+    @RequestMapping(value = "/downloadAtch", method = RequestMethod.GET)
+    public String downloadAtch(@RequestParam HashMap<String, Object> paramMap,
+                               HttpServletResponse response, ModelMap model) {
+        try {
+            payhistService.downloadAtch(paramMap, response);
+            model.addAttribute("CODE", "SUCCESS");
+            model.addAttribute("MSG", "업로드된 파일 삭제 성공");
+            logger.info("업로드된 파일 삭제 성공");
+        } catch (IOException e) {
+            logger.error("업로드된 파일 삭제 실패");
+            throw new RuntimeException(e);
         }
         return "jsonView";
     }
