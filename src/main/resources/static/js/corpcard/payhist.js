@@ -76,11 +76,15 @@ const $payhist = (function () {
 
     //첨부파일 btn
     $("#histAtchBtn").on("click", function (event) {
-      const toastElList = [].slice.call(document.querySelectorAll('.toast'))
-      const toastList = toastElList.map(function (toastEl) {
-        return new bootstrap.Toast(toastEl)
-      });
-      toastList.forEach(toast => toast.show());
+          const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+          const toastList = toastElList.map(function (toastEl) {
+            return new bootstrap.Toast(toastEl)
+          });
+        if($("#liveToast").hasClass("show")){
+          toastList.forEach(toast => toast.hide());
+        }else{
+          toastList.forEach(toast => toast.show());
+        }
     });
 
 
@@ -232,10 +236,12 @@ const $payhist = (function () {
   * 결제 내역 조회
   */
   const selectPayhistList = function () {
-    //Form disable 처리
-    function disableForm(isDisable){
+    //Form & 첨부파일 disable 처리
+    function disableFormAndAtch(isDisable){
         $("#histForm :input").attr("disabled", isDisable);
         $("#histForm select").attr("disabled", isDisable);
+        $("#atchAddBtn").attr("disabled", isDisable);
+        $("#atchDelBtn").attr("disabled", isDisable);
     }
 
     //1.결제 내역 리스트 조회
@@ -258,13 +264,13 @@ const $payhist = (function () {
           const stateInfo = data.result.stateInfo;
           $("#stateNm").text(stateInfo.stateNm);
           if (stateInfo.stateCd === "B" || stateInfo.stateCd === "C") {
-            disableForm(true);
+            disableFormAndAtch(true);
           } else {
-            disableForm(false);
+            disableFormAndAtch(false);
           }
         } else if (data.CODE === "EMPTY") {
           const newCell = tbody.insertRow().insertCell();
-          disableForm(false);
+          disableFormAndAtch(false);
           document.querySelector("#stateNm").innerText = "제출 전";
           document.querySelector("#listTotCnt").innerText = "0";
           newCell.setAttribute('colspan', '15');
@@ -631,6 +637,7 @@ const $payhist = (function () {
     //1.기존 첨부파일 list 초기화
     $("#atchList > li").remove();
     $("#atchEmpty").css("display","");
+    $("#atchCnt").text("0");
 
     //2.해당 연월의 첨부파일 리스트 조회
     $.ajax({
@@ -663,6 +670,7 @@ const $payhist = (function () {
       return false;
     }
     $("#atchEmpty").css("display","none");
+    $("#atchCnt").text(data.length);
     const atchList = document.querySelector("#atchList");
     for(let i=0;i<data.length;i++){
       const list = document.createElement("li");
@@ -675,7 +683,7 @@ const $payhist = (function () {
       aTag.innerText = data[i].fileNm;
       aTag.className += "text-decoration-none"
       aTag.setAttribute("href", "http://"+`${location.host}/payhist/downloadAtch?seq=${
-        data[i].seq}&filePropNm=${data[i].filePropNm}&fileNm=${data[i].fileNm}`);
+        data[i].usehistSubmitInfo.seq}&filePropNm=${data[i].filePropNm}&fileNm=${data[i].fileNm}`);
       list.appendChild(chkbox);
       list.appendChild(aTag);
       document.querySelector("#atchList").appendChild(list);
@@ -692,6 +700,7 @@ const $payhist = (function () {
     }
     if($("#atchList > li").length == 0){
         $("#atchEmpty").css("display","");
+        $("#atchCnt").text("0");
     }
   }
 

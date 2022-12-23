@@ -187,7 +187,7 @@
     </div>
     <!--첨부파일 toast-->
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="liveToast" class="toast hide" role="status" aria-live="polite" aria-atomic="true" data-bs-autohide="false">
             <div class="toast-header">
                 <img th:src="@{/icons/paperclip.svg}" class="rounded me-2">
                 <strong class="me-auto">첨부파일</strong>
@@ -199,7 +199,7 @@
                     <input type="file" name="atchUpload" id="atchUpload" accept=".png, .jpg, .pdf" multiple/>
                 </label>
                 <button type="button" class="ms-2 btn btn-outline-danger btn-sm" id="atchDelBtn">삭제</button>
-                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" id="toastCloseBtn"></button>
             </div>
             <div class="toast-body">
                 <span id="atchEmpty">해당 연월의 첨부파일이 없습니다.</span>

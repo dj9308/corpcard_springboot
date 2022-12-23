@@ -336,20 +336,15 @@ public class PayhistController {
      *
      * @param paramMap  : 첨부파일 Info List
      * @param response  : HttpServletResponse
-     * @param model     : modelMap
      */
     @RequestMapping(value = "/downloadAtch", method = RequestMethod.GET)
-    public String downloadAtch(@RequestParam HashMap<String, Object> paramMap,
-                               HttpServletResponse response, ModelMap model) {
+    public void downloadAtch(@RequestParam HashMap<String, Object> paramMap, HttpServletResponse response) {
         try {
             payhistService.downloadAtch(paramMap, response);
-            model.addAttribute("CODE", "SUCCESS");
-            model.addAttribute("MSG", "업로드된 파일 삭제 성공");
             logger.info("업로드된 파일 삭제 성공");
         } catch (IOException e) {
             logger.error("업로드된 파일 삭제 실패");
             throw new RuntimeException(e);
         }
-        return "jsonView";
     }
 }
