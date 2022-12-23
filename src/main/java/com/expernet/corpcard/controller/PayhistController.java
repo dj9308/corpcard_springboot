@@ -252,16 +252,22 @@ public class PayhistController {
      */
     @RequestMapping(value = "/searchAtchList", method = RequestMethod.GET)
     public String searchAtchList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
-        List<AttachmentInfo> result = new ArrayList<>();
+        List<AttachmentInfo> result = null;
         try {
             result = payhistService.searchAtchList(paramMap);
         } finally {
             if (result != null) {
-                model.addAttribute("result", result);
-                model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", "첨부파일 조회 성공");
-                logger.info("첨부파일 조회 성공");
-            } else {
+                if(result.isEmpty()){
+                    model.addAttribute("CODE", "EMPTY");
+                    model.addAttribute("MSG", "업로드된 첨부파일 없음");
+                    logger.info("업로드된 첨부파일 없음");
+                }else{
+                    model.addAttribute("result", result);
+                    model.addAttribute("CODE", "SUCCESS");
+                    model.addAttribute("MSG", "첨부파일 조회 성공");
+                    logger.info("첨부파일 조회 성공");
+                }
+            }else {
                 model.addAttribute("CODE", "ERR");
                 model.addAttribute("MSG", "첨부파일 조회 실패");
                 logger.error("첨부파일 조회 실패");

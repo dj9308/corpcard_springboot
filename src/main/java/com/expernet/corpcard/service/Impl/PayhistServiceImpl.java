@@ -206,8 +206,14 @@ public class PayhistServiceImpl implements PayhistService {
      */
     @Override
     public List<AttachmentInfo> searchAtchList(HashMap<String, Object> paramMap) {
+        List<AttachmentInfo> result;
         UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
-        return attachmentInfoRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
+        if(submitInfo != null){
+            result = attachmentInfoRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
+        }else{
+            result = new ArrayList<>();
+        }
+        return result;
     }
 
     /**

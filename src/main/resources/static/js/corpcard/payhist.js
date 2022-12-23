@@ -643,7 +643,7 @@ const $payhist = (function () {
       },
       success: function (data) {
         if (data.CODE === "SUCCESS") {
-            paintAtchList(data.result);
+          paintAtchList(data.result);
         } else if (data.CODE === "ERR") {
           return alert("첨부파일 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
         }
