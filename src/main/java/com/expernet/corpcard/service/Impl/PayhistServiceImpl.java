@@ -244,8 +244,6 @@ public class PayhistServiceImpl implements PayhistService {
         for (MultipartFile file : fileList) {
             //1)파일 정보 db 저장
             SimpleDateFormat sdfCurrent = new SimpleDateFormat("yyyyMMddhhmmssSSS", Locale.KOREA);
-            Timestamp ts = new Timestamp(System.currentTimeMillis());
-            String filePropNm = sdfCurrent.format(ts.getTime());
             String originalFilename = file.getOriginalFilename();
             long fileSize = file.getSize();
 
@@ -253,16 +251,15 @@ public class PayhistServiceImpl implements PayhistService {
                     .usehistSubmitInfo(submitInfo)
                     .fileNm(FilenameUtils.getName(originalFilename))
                     .fileExtNm(FilenameUtils.getExtension(originalFilename))
-                    .filePropNm(filePropNm)
                     .filePath(uploadPath + File.separator + submitInfo.getSeq())
                     .uploadFn(fileSize)
                     .build();
-
-            result.add(attachmentInfoRepository.save(atchInfo));
+            AttachmentInfo savedAtchInfo = attachmentInfoRepository.save(atchInfo);
+            result.add(savedAtchInfo);
 
             //2)파일 저장
             try {
-                FileOutputStream fos = new FileOutputStream(path + File.separator + filePropNm);
+                FileOutputStream fos = new FileOutputStream(path + File.separator + savedAtchInfo.getSeq());
                 fos.write(file.getBytes());
                 fos.close();
             } catch (IOException e) {
@@ -295,7 +292,7 @@ public class PayhistServiceImpl implements PayhistService {
         for (long seq : list) {
             AttachmentInfo fileInfo = attachmentInfoRepository.findById(seq).orElse(null);
             if (fileInfo != null) {
-                File file = new File(fileInfo.getFilePath() + File.separator + fileInfo.getFilePropNm());
+                File file = new File(fileInfo.getFilePath() + File.separator + fileInfo.getSeq());
                 if (file.delete()) {
                     attachmentInfoRepository.deleteById(seq);
                     result++;
@@ -316,7 +313,7 @@ public class PayhistServiceImpl implements PayhistService {
     @Override
     public void downloadAtch(HashMap<String, Object> paramMap, HttpServletResponse response) throws IOException {
         String downFileName = uploadPath+File.separator+paramMap.get("seq").toString()+File.separator
-                +paramMap.get("filePropNm").toString();
+                +paramMap.get("fileSeq").toString();
         String orgFileName = paramMap.get("fileNm").toString();
 
         File file = new File(downFileName);

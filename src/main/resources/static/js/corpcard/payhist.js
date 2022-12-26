@@ -95,7 +95,39 @@ const $payhist = (function () {
 
     //CSV btn
     $("#histCsvBtn").on("click", function (event) {
-
+      const array = []
+      const rows = document.querySelector("#histTable").rows;
+      let cells, t;
+      //1.table row data 추출
+      for (var i=0; i < rows.length-1; i++) {
+        cells = rows[i].cells;
+        t = [];
+        for (var j=1, jLen=cells.length; j<jLen; j++) {
+          t.push(cells[j].textContent);
+        }
+        array.push(t);
+      }
+      //2.CSV 파일 생성 및 저장
+        let a = "";
+        $.each(array, function(i, row){
+            $.each(row, function(j, cell){
+                if(cell.includes(",")){
+                  cell = cell.replace(/\"/g, "\"\"");
+                }
+                a+=cell;
+                a+=",";
+            });
+            a= a.slice(0, -1);
+            a += "\r\n";
+        });
+//        const submistInfo = data.list[0].usehistSubmitInfo;
+        const downloadLink = document.createElement("a");
+        const blob = new Blob(["\ufeff"+a], { type: "text/csv;charset=utf-8" });
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = `법인카드 결제내역.csv`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
     });
 
     //제출 btn
@@ -220,7 +252,7 @@ const $payhist = (function () {
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
-            deleteAtchInfo(atchList);
+            deleteAtchInfo();
           } else {
             return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
           }
@@ -316,8 +348,8 @@ const $payhist = (function () {
       //사용 내역
       newRow.insertCell().innerHTML = rowData.useHist;
       //분류별 금액
-      for (let i = 1; i <= 10; i++) {
-        if (rowData.classInfo.seq === i) {
+      for (let j = 1; j <= 10; j++) {
+        if (rowData.classInfo.seq === j) {
           newRow.insertCell().innerHTML = $cmmn.convertToCurrency(rowData.money);
         } else {
           newRow.insertCell().innerHTML = "-";
@@ -683,7 +715,7 @@ const $payhist = (function () {
       aTag.innerText = data[i].fileNm;
       aTag.className += "text-decoration-none"
       aTag.setAttribute("href", "http://"+`${location.host}/payhist/downloadAtch?seq=${
-        data[i].usehistSubmitInfo.seq}&filePropNm=${data[i].filePropNm}&fileNm=${data[i].fileNm}`);
+        data[i].usehistSubmitInfo.seq}&fileNm=${data[i].fileNm}&fileSeq=${data[i].seq}`);
       list.appendChild(chkbox);
       list.appendChild(aTag);
       document.querySelector("#atchList").appendChild(list);
@@ -694,10 +726,12 @@ const $payhist = (function () {
    * 선택한 첨부파일 리스트 삭제
    * @param {Array} data : 삭제된 첨부파일 Seq Array
    */
-  const deleteAtchInfo = function(data){
-    for(let i = 0; i<data.length; i++){
-      $(`.atch-check[value=${data[i].seq}]`).parent("li").remove();
-    }
+  const deleteAtchInfo = function(){
+    console.dir($(".atch-check"));
+    console.dir($(".atch-check").find('input:checked'));
+    $(".atch-check:checked").each(function(index){
+            $(this).parent("li").remove();
+    });
     if($("#atchList > li").length == 0){
         $("#atchEmpty").css("display","");
         $("#atchCnt").text("0");

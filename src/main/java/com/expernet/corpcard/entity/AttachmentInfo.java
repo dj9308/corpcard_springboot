@@ -30,9 +30,6 @@ public class AttachmentInfo {
     @Column(name = "FILE_EXT_NM")
     private String fileExtNm;
 
-    @Column(name = "FILE_PROP_NM")
-    private String filePropNm;
-
     @Column(name = "FILE_PATH")
     private String filePath;
 
@@ -49,12 +46,11 @@ public class AttachmentInfo {
 
     @Builder
     public AttachmentInfo(long seq, UsehistSubmitInfo usehistSubmitInfo, String fileNm, String fileExtNm,
-                          String filePropNm, String filePath, long uploadFn) {
+                          String filePath, long uploadFn) {
         this.seq = seq;
         this.usehistSubmitInfo = usehistSubmitInfo;
         this.fileNm = fileNm;
         this.fileExtNm = fileExtNm;
-        this.filePropNm = filePropNm;
         this.filePath = filePath;
         this.uploadFn = uploadFn;
     }
