@@ -8,3 +8,5 @@
 .table-style1 th {background-color: #e9ecef; padding-left: 8px; width: 15%; border-style: solid; border-color: inherit;}
 .table-style2 {font-size: small;}
 .th-style1 {width: 80px;}
+
+main {min-height:60vh;}

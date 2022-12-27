@@ -43,7 +43,7 @@ import java.util.Map;
  * @since 2022.11.18
  */
 @Controller
-@RequestMapping(value = "/payhist", method = RequestMethod.GET)
+@RequestMapping(value = "/payhist")
 public class PayhistController {
     /**
      * payhist Service

@@ -5,85 +5,150 @@
 <body>
 <!-- navbar -->
 <div th:replace="/fragments/nav.html :: fragment-nav"></div>
-<header class="py-5">
+<header class="py-2">
     <div class="container px-lg-5">
-        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
-            <div class="m-4 m-lg-5">
-                <h1 class="display-5 fw-bold">A warm welcome!</h1>
-                <p class="fs-4">Bootstrap utility classes are used to create this jumbotron since the old component has been removed from the framework. Why create custom CSS when you can use utilities?</p>
-                <a class="btn btn-primary btn-lg" href="#!">Call to action</a>
-            </div>
+        <div class="fs-3 fw-bold mb-4">
+            <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                 viewBox="0 0 16 16">
+                <image th:href="@{/icons/clipboard2-fill.svg}"></image>
+            </svg>
+            결재
+        </div>
+        <div class="fs-5 mb-2 ms-1">
+            <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor"
+                 viewBox="0 0 16 16">
+                <image th:href="@{/icons/briefcase-fill.svg}"></image>
+            </svg>
+            결재 건 조회
+        </div>
+        <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
+            <form id="approvalForm" onsubmit="return false;">
+                <table style="width:100%;">
+                    <tr>
+                        <th class="ps-1" style="width:5%; text-align:right;">부서</th>
+                        <td style="width:15%;">
+                            <select class="form-select form-select-sm" id="deptSelect" name="dept" required>
+                                <option value="" selected>---</option>
+                            </select>
+                        </td>
+                        <th class="ps-1" style="width:3%; text-align:right;">팀</th>
+                        <td style="width:15%;">
+                            <select class="form-select form-select-sm" id="teamSelect" name="team" required>
+                                <option value="" selected>---</option>
+                            </select>
+                        </td>
+                        <th class="ps-1" style="width:5%; text-align:right;">기안자</th>
+                        <td style="width:15%;">
+                            <input type="text" name="writerNm" class="form-control form-control-sm">
+                        </td>
+                        <th class="ps-1" style="width:5%; text-align:right;">기간</th>
+                        <td style="width:20%">
+                            <input type="text" id="datepicker" class="form-control form-control-sm">
+                        </td>
+                        <td class="ps-2">
+                            <input type="submit" id="approvalSubmit" class="btn btn-secondary btn-sm" value="조회">
+                        </td>
+                        <td style="width: 20%" align="right">
+                            <input type="text" id="listSearch" class="form-control form-control-sm" placeholder="SEARCH" style="width:120px;">
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="table-responsive-xxl">
+            <table id="approveList"
+                   class="text-center table table-hover table-bordered table-sm align-middle table-style2">
+                <thead class="table-secondary">
+                <tr>
+                    <th scope="col">No.</th>
+                    <th scope="col" style="width:150px;">부서</th>
+                    <th scope="col" class="th-style1">팀</th>
+                    <th scope="col" class="th-style1">직위</th>
+                    <th scope="col" class="th-style1">기안자</th>
+                    <th scope="col" class="th-style1">기간</th>
+                    <th scope="col" class="th-style1">상태</th>
+                    <th scope="col" class="th-style1">합계(원)</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
     </div>
 </header>
 <!-- Page Content-->
-<section class="pt-4">
-    <div class="container px-lg-5">
-        <!-- Page Features-->
-        <div class="row gx-lg-5">
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-collection"></i></div>
-                        <h2 class="fs-4 fw-bold">Fresh new layout</h2>
-                        <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>
-                    </div>
+<main>
+
+    <section class="pt-4">
+        <div class="container px-lg-5">
+            <div class="mb-1 fs-4 gx-5 row">
+                <div class="col">
+                    총 <span class="fw-bold" id="listTotCnt">0</span>건이 조회되었습니다.
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-secondary" id="histAtchBtn">첨부파일</button>
+                    <button type="button" id="approvalHist" class="btn btn-primary">확인</button>
+                    <button type="button" id="rejectHist" class="btn btn-danger">반려</button>
                 </div>
             </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-cloud-download"></i></div>
-                        <h2 class="fs-4 fw-bold">Free to download</h2>
-                        <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>
-                    </div>
-                </div>
+            <div class="table-responsive-xxl">
+                <table id="histTable"
+                       class="text-center table table-hover table-bordered table-sm align-middle table-style2">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th scope="col">사용일</th>
+                        <th scope="col">카드 정보</th>
+                        <th scope="col" style="width:150px;">사용내역</th>
+                        <th scope="col" class="th-style1">접대비</th>
+                        <th scope="col" class="th-style1">여비교통비</th>
+                        <th scope="col" class="th-style1">복리후생비</th>
+                        <th scope="col" class="th-style1">출장비</th>
+                        <th scope="col" class="th-style1">소모품비</th>
+                        <th scope="col" class="th-style1">차량유지비</th>
+                        <th scope="col" class="th-style1">도서구입비</th>
+                        <th scope="col" class="th-style1">교육비</th>
+                        <th scope="col" class="th-style1">지급수수료</th>
+                        <th scope="col" class="th-style1">기타</th>
+                        <th scope="col" style="width:100px;">합계</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
             </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-card-heading"></i></div>
-                        <h2 class="fs-4 fw-bold">Jumbotron hero header</h2>
-                        <p class="mb-0">The heroic part of this template is the jumbotron hero header!</p>
-                    </div>
+        </div>
+        <!--첨부파일 toast-->
+        <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+            <div id="liveToast" class="toast hide" role="status" aria-live="polite" aria-atomic="true"
+                 data-bs-autohide="false">
+                <div class="toast-header">
+                    <img th:src="@{/icons/paperclip.svg}" class="rounded me-2">
+                    <strong class="me-auto">첨부파일</strong>
+                    <small>
+                        파일 <span id="atchCnt"></span>개
+                    </small>
+                    <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"
+                            id="toastCloseBtn"></button>
                 </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-bootstrap"></i></div>
-                        <h2 class="fs-4 fw-bold">Feature boxes</h2>
-                        <p class="mb-0">We've created some custom feature boxes using Bootstrap icons!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-code"></i></div>
-                        <h2 class="fs-4 fw-bold">Simple clean code</h2>
-                        <p class="mb-0">We keep our dependencies up to date and squash bugs as they come!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-patch-check"></i></div>
-                        <h2 class="fs-4 fw-bold">A name you trust</h2>
-                        <p class="mb-0">Start Bootstrap has been the leader in free Bootstrap templates since 2013!</p>
-                    </div>
+                <div class="toast-body">
+                    <span id="atchEmpty">해당 결재 건의 첨부파일이 없습니다.</span>
+                    <ul class="list-group" id="atchList">
+                    </ul>
                 </div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
+</main>
+<input type="hidden" th:value="${#authentication.name}" id="userId">
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
-<!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
-<script src="js/scripts.js"></script>
+<script th:src="@{/js/corpcard/approval.js}"></script>
+<script>
+    $(function () {
+        $approval.init();
+    });
+</script>
 </body>
 </html>

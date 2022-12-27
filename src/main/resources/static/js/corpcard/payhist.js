@@ -76,37 +76,17 @@ const $payhist = (function () {
 
     //첨부파일 btn
     $("#histAtchBtn").on("click", function (event) {
-      const toastElList = [].slice.call(document.querySelectorAll('.toast'))
-      const toastList = toastElList.map(function (toastEl) {
-        return new bootstrap.Toast(toastEl)
-      });
-      if ($("#liveToast").hasClass("show")) {
-        toastList.forEach(toast => toast.hide());
-      } else {
-        toastList.forEach(toast => toast.show());
-      }
+        $cmmn.initHistToast("liveToast");
     });
 
     //PDF btn
     $("#histPDFBtn").on("click", function (event) {
       //1.결제 내역 리스트 조회
-      $.ajax({
-        type: "GET",
-        url: "/payhist/searchList",
-        dataType: "json",
-        data: {
-          WRITER_ID: userId,
-          WRT_YM: wrtYm
-        },
-        success: function (data) {
-          if (data.CODE === "SUCCESS") {
-            makePDF(data.result);
-          } else if (data.CODE === "EMPTY") {
-            return alert("해당 연월의 결제 내역이 없습니다.");
-          }
-        },
-        error: function () {
-          return alert("결제 내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      selectHistList(function (data) {
+        if (data.CODE === "SUCCESS") {
+          makePDF(data.result);
+        } else if (data.CODE === "EMPTY") {
+          return alert("해당 연월의 결제 내역이 없습니다.");
         }
       });
     });
@@ -155,26 +135,6 @@ const $payhist = (function () {
           return alert("저장된 결제 내역이 없습니다.");
         }
         updateState(2, selectPayhistList);
-//        $.ajax({
-//          type: "PATCH",
-//          url: "/payhist/updateState",
-//          dataType: "json",
-//          data: {
-//            WRITER_ID: userId,
-//            WRT_YM: wrtYm,
-//            SEQ: 2,
-//          },
-//          success: function (data) {
-//            if (data.CODE === "SUCCESS") {
-//              selectPayhistList();
-//            } else if (data.CODE === "ERR") {
-//              return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-//            }
-//          },
-//          error: function () {
-//            return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-//          }
-//        });
       }
     });
 
@@ -285,9 +245,9 @@ const $payhist = (function () {
 
     //제출 취소 btn
     $("#submitCancel").on("click", function (event) {
-        if (confirm("제출을 취소하시겠습니까?")) {
-            updateState(1, selectPayhistList);
-        }
+      if (confirm("제출을 취소하시겠습니까?")) {
+        updateState(1, selectPayhistList);
+      }
     });
   }
 
@@ -306,46 +266,34 @@ const $payhist = (function () {
     }
 
     //1.결제 내역 리스트 조회
-    $.ajax({
-      type: "GET",
-      url: "/payhist/searchList",
-      dataType: "json",
-      data: {
-        WRITER_ID: userId,
-        WRT_YM: wrtYm
-      },
-      success: function (data) {
-        //1)테이블 초기화
-        $cmmn.emptyTable("histTable");
-        //2)테이블 row 생성
-        const tbody = document.querySelector("#histTable>tbody");
-        if (data.CODE === "SUCCESS") {
-          paintTable(tbody, data.result);
-          //3)제출 상태 조회 및 버튼 disable 처리
-          const stateInfo = data.result.submitInfo.stateInfo;
-          $("#stateNm").text(stateInfo.stateNm);
-          if (stateInfo.stateCd === "B") {
-            $("#submitCancel").css("display", "");
-            disableBtn(true);
-          }else if(stateInfo.stateCd === "C"){
-            $("#submitCancel").css("display", "none");
-            disableBtn(true);
-          } else {
-            $("#submitCancel").css("display", "none");
-            disableBtn(false);
-          }
-        } else if (data.CODE === "EMPTY") {
-          const newCell = tbody.insertRow().insertCell();
+    selectHistList(function (data) {
+      //1)테이블 초기화
+      $cmmn.emptyTable("histTable");
+      //2)테이블 row 생성
+      const tbody = document.querySelector("#histTable>tbody");
+      if (data.CODE === "SUCCESS") {
+        paintTable(tbody, data.result);
+        //3)제출 상태 조회 및 버튼 disable 처리
+        const stateInfo = data.result.submitInfo.stateInfo;
+        $("#stateNm").text(stateInfo.stateNm);
+        if (stateInfo.stateCd === "B") {
+          $("#submitCancel").css("display", "");
+          disableBtn(true);
+        } else if (stateInfo.stateCd === "C") {
+          $("#submitCancel").css("display", "none");
+          disableBtn(true);
+        } else {
+          $("#submitCancel").css("display", "none");
           disableBtn(false);
-          document.querySelector("#stateNm").innerText = "제출 전";
-          document.querySelector("#listTotCnt").innerText = "0";
-          newCell.setAttribute('colspan', '15');
-          newCell.classList.add("fw-bold");
-          newCell.innerText = "해당 연월의 결제 내역이 없습니다.";
         }
-      },
-      error: function () {
-        return alert("결제 내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      } else if (data.CODE === "EMPTY") {
+        const newCell = tbody.insertRow().insertCell();
+        disableBtn(false);
+        document.querySelector("#stateNm").innerText = "제출 전";
+        document.querySelector("#listTotCnt").innerText = "0";
+        newCell.setAttribute('colspan', '15');
+        newCell.classList.add("fw-bold");
+        newCell.innerText = "해당 연월의 결제 내역이 없습니다.";
       }
     });
 
@@ -354,7 +302,7 @@ const $payhist = (function () {
   }
 
   /**
-  * 결제 내역 조회
+  * 결제 내역 테이블 생성
   * @param { Object } tbody : 결제 내역 table body 태그
   * @param { JSON } data : 결제 내역 데이터
   */
@@ -795,6 +743,28 @@ const $payhist = (function () {
       },
       error: function () {
         return alert("제출 상태 변경에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
+  }
+
+  /**
+   * 결제 내역 리스트 조회 AJAX
+   * @param {function} callback : Callback function
+   */
+  const selectHistList = function (callback) {
+    $.ajax({
+      type: "GET",
+      url: "/payhist/searchList",
+      dataType: "json",
+      data: {
+        WRITER_ID: userId,
+        WRT_YM: wrtYm
+      },
+      success: function (data) {
+        callback(data);
+      },
+      error: function () {
+        return alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
       }
     });
   }

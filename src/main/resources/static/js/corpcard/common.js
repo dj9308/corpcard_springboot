@@ -109,6 +109,22 @@ const $cmmn = (function () {
         return result;
     }
 
+    /**
+    * 첨부파일 toast 이벤트
+    * @param {String} toastId : toast Id
+    */
+    const initHistToast = function(toastId){
+      const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      const toastList = toastElList.map(function (toastEl) {
+        return new bootstrap.Toast(toastEl)
+      });
+      if ($(`${toastId}`).hasClass("show")) {
+        toastList.forEach(toast => toast.hide());
+      } else {
+        toastList.forEach(toast => toast.show());
+      }
+    };
+
     return {
         isNullorEmpty: isNullorEmpty,          //null이면 true 반환
         serializeObject: serializeObject,      //form 정보를 json 형식으로 변환
@@ -116,5 +132,6 @@ const $cmmn = (function () {
         convertToCurrency: convertToCurrency,  //문자 삭제 및 쉼표 추가
         emptyTable: emptyTable,                //테이블 초기화
         formatDate: formatDate,                //Date format 설정
+        initHistToast: initHistToast,          //첨부파일 toast 이벤트
     }
 }());
