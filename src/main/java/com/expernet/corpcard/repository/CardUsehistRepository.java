@@ -14,9 +14,11 @@ import java.util.List;
 public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> {
     List<CardUsehist> findAllByUsehistSubmitInfo_Seq(long submitSeq);
 
-    @Query(value = "SELECT new Map(cu.classInfo.seq AS seq, SUM(cu.money) AS sum) FROM CardUsehist cu " +
+    @Query(value = "SELECT new Map(cu.classInfo.seq AS seq, cu.classInfo.classNm AS classNm, SUM(cu.money) AS sum) " +
+            "FROM CardUsehist cu " +
             "WHERE cu.usehistSubmitInfo.seq = :submitSeq " +
-            "GROUP BY cu.classInfo.seq")
+            "GROUP BY cu.classInfo.seq " +
+            "ORDER BY cu.classInfo.seq ASC")
     List<HashMap<String, Object>> selectSumGroupByClassSeq(@Param("submitSeq") long submitSeq);
 
     @Query(value = "SELECT SUM(money) AS sum FROM card_usehist " +

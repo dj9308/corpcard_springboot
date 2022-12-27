@@ -21,7 +21,7 @@ const $payhist = (function () {
     paintCharts();          //차트 조회
     initHistForm();         //결제 내역 Form
     initHistTable();        //결제 내역 Table
-    initAtchToast();       //첨부 파일 toast
+    initAtchToast();        //첨부 파일 toast
   }
 
   /**
@@ -76,65 +76,83 @@ const $payhist = (function () {
 
     //첨부파일 btn
     $("#histAtchBtn").on("click", function (event) {
-          const toastElList = [].slice.call(document.querySelectorAll('.toast'))
-          const toastList = toastElList.map(function (toastEl) {
-            return new bootstrap.Toast(toastEl)
-          });
-        if($("#liveToast").hasClass("show")){
-          toastList.forEach(toast => toast.hide());
-        }else{
-          toastList.forEach(toast => toast.show());
-        }
+      const toastElList = [].slice.call(document.querySelectorAll('.toast'))
+      const toastList = toastElList.map(function (toastEl) {
+        return new bootstrap.Toast(toastEl)
+      });
+      if ($("#liveToast").hasClass("show")) {
+        toastList.forEach(toast => toast.hide());
+      } else {
+        toastList.forEach(toast => toast.show());
+      }
     });
 
-
     //PDF btn
-    $("#histPdfBtn").on("click", function (event) {
-
+    $("#histPDFBtn").on("click", function (event) {
+      //1.결제 내역 리스트 조회
+      $.ajax({
+        type: "GET",
+        url: "/payhist/searchList",
+        dataType: "json",
+        data: {
+          WRITER_ID: userId,
+          WRT_YM: wrtYm
+        },
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+            makePDF(data.result);
+          } else if (data.CODE === "EMPTY") {
+            return alert("해당 연월의 결제 내역이 없습니다.");
+          }
+        },
+        error: function () {
+          return alert("결제 내역 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      });
     });
 
     //CSV btn
-    $("#histCsvBtn").on("click", function (event) {
-      const array = []
+    $("#histCSVBtn").on("click", function (event) {
+      const array = [];
       const rows = document.querySelector("#histTable").rows;
       let cells, t;
       //1.table row data 추출
-      for (var i=0; i < rows.length-1; i++) {
+      for (let i = 0; i < rows.length - 1; i++) {
         cells = rows[i].cells;
         t = [];
-        for (var j=1, jLen=cells.length; j<jLen; j++) {
+        for (let j = 1, jLen = cells.length; j < jLen; j++) {
           t.push(cells[j].textContent);
         }
         array.push(t);
       }
       //2.CSV 파일 생성 및 저장
-        let a = "";
-        $.each(array, function(i, row){
-            $.each(row, function(j, cell){
-                if(cell.includes(",")){
-                  cell = cell.replace(/\"/g, "\"\"");
-                }
-                a+=cell;
-                a+=",";
-            });
-            a= a.slice(0, -1);
-            a += "\r\n";
+      let a = "";
+      $.each(array, function (i, row) {
+        $.each(row, function (j, cell) {
+          if (cell.includes(",")) {
+            cell = cell.replace(",", "");
+          }
+          a += cell;
+          a += ",";
         });
-//        const submistInfo = data.list[0].usehistSubmitInfo;
-        const downloadLink = document.createElement("a");
-        const blob = new Blob(["\ufeff"+a], { type: "text/csv;charset=utf-8" });
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = `법인카드 결제내역.csv`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+        a = a.slice(0, -1);
+        a += "\r\n";
+      });
+      //        const submistInfo = data.list[0].usehistSubmitInfo;
+      const downloadLink = document.createElement("a");
+      const blob = new Blob(["\ufeff" + a], { type: "text/csv;charset=utf-8" });
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = `법인카드 결제내역.csv`;
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+      document.body.removeChild(downloadLink);
     });
 
     //제출 btn
     $("#submitHist").on("click", function () {
       if (confirm("제출 하시겠습니까?")) {
-        if($("histTable > tbody > tr").length === 0){
-            return alert("저장된 결제 내역이 없습니다.");
+        if ($("#histTable > tbody > tr").length === 0) {
+          return alert("저장된 결제 내역이 없습니다.");
         }
         $.ajax({
           type: "PATCH",
@@ -146,7 +164,7 @@ const $payhist = (function () {
           },
           success: function (data) {
             if (data.CODE === "SUCCESS") {
-              window.location.reload();
+              selectPayhistList();
             } else if (data.CODE === "ERR") {
               return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
             }
@@ -197,50 +215,50 @@ const $payhist = (function () {
 
     //첨부파일 toast 추가 btn
     $("#atchAddBtn").on("click", function (event) {
-        $("#atchUpload").trigger('click');
+      $("#atchUpload").trigger('click');
     });
-      $("#atchUpload").on('click', function () {
-          this.value = null;
-      });
-      $("#atchUpload").on('change', function (e) {
-        //formData 설정
-        const formData = new FormData();
-        const data = {
-          WRITER_ID: userId,
-          WRT_YM: wrtYm,
-        };
-        formData.append('key', new Blob([ JSON.stringify(data) ], {type : "application/json"}));
-        for(let i =0 ;i<this.files.length; i++){
-            formData.append("files", this.files[i]);
-        }
-        //첨부파일 업로드
-        $.ajax({
-          type:"POST",
-          url:"/payhist/uploadAtch",
-          enctype: 'multipart/form-data',
-          data:formData,
-          processData:false,
-          contentType:false,
-          success:function(data){
-            if(data.CODE ==="SUCCESS"){
-              paintAtchList(data.result);
-            }
+    $("#atchUpload").on('click', function () {
+      this.value = null;
+    });
+    $("#atchUpload").on('change', function (e) {
+      //formData 설정
+      const formData = new FormData();
+      const data = {
+        WRITER_ID: userId,
+        WRT_YM: wrtYm,
+      };
+      formData.append('key', new Blob([JSON.stringify(data)], { type: "application/json" }));
+      for (let i = 0; i < this.files.length; i++) {
+        formData.append("files", this.files[i]);
+      }
+      //첨부파일 업로드
+      $.ajax({
+        type: "POST",
+        url: "/payhist/uploadAtch",
+        enctype: 'multipart/form-data',
+        data: formData,
+        processData: false,
+        contentType: false,
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+            paintAtchList(data.result);
           }
-        });
+        }
       });
+    });
 
     //첨부파일 toast 삭제 btn
     $("#atchDelBtn").on("click", function (event) {
-        //1.체크된 row 조회
-        const atchList = [];
-        $('.atch-check').each(function (index) {
-            if ($(this).is(":checked")) {
-              atchList.push($(this).val() * 1);
-            }
-        });
-          if (atchList.length === 0) {
-            return alert("삭제하려는 첨부파일이 없습니다.");
-          }
+      //1.체크된 row 조회
+      const atchList = [];
+      $('.atch-check').each(function (index) {
+        if ($(this).is(":checked")) {
+          atchList.push($(this).val() * 1);
+        }
+      });
+      if (atchList.length === 0) {
+        return alert("삭제하려는 첨부파일이 없습니다.");
+      }
 
       //2.체크된 row list 삭제
       $.ajax({
@@ -269,11 +287,11 @@ const $payhist = (function () {
   */
   const selectPayhistList = function () {
     //Form & 첨부파일 disable 처리
-    function disableFormAndAtch(isDisable){
-        $("#histForm :input").attr("disabled", isDisable);
-        $("#histForm select").attr("disabled", isDisable);
-        $("#atchAddBtn").attr("disabled", isDisable);
-        $("#atchDelBtn").attr("disabled", isDisable);
+    function disableFormAndAtch(isDisable) {
+      $("#histForm :input").attr("disabled", isDisable);
+      $("#histForm select").attr("disabled", isDisable);
+      $("#atchAddBtn").attr("disabled", isDisable);
+      $("#atchDelBtn").attr("disabled", isDisable);
     }
 
     //1.결제 내역 리스트 조회
@@ -293,7 +311,7 @@ const $payhist = (function () {
         if (data.CODE === "SUCCESS") {
           paintTable(tbody, data.result);
           //3)제출 상태 조회 및 disable 처리
-          const stateInfo = data.result.stateInfo;
+          const stateInfo = data.result.submitInfo.stateInfo;
           $("#stateNm").text(stateInfo.stateNm);
           if (stateInfo.stateCd === "B" || stateInfo.stateCd === "C") {
             disableFormAndAtch(true);
@@ -339,10 +357,7 @@ const $payhist = (function () {
       chkbox.className += "form-check-input me-1 table-check";
       newRow.insertCell().appendChild(chkbox);
       //사용일
-      const date = new Date(rowData.useDate);
-      const month = date.getMonth() + 1;
-      const days = date.getDate();
-      newRow.insertCell().innerHTML = `${month < 10 ? `0${month}` : month}.${days < 10 ? `0${days}` : days}`;
+      newRow.insertCell().innerHTML = $cmmn.formatDate(rowData.useDate, "mm.dd");
       //카드 정보
       newRow.insertCell().innerHTML = `${rowData.cardComp} ${rowData.cardNum.split("-")[3]}`;
       //사용 내역
@@ -358,7 +373,7 @@ const $payhist = (function () {
       //합계
       newRow.insertCell().innerHTML = $cmmn.convertToCurrency(rowData.money);
       //row 이벤트 핸들러
-      if (data.stateInfo.stateCd === "A" || data.stateInfo.stateCd === "D") {
+      if (data.submitInfo.stateInfo.stateCd === "A" || data.submitInfo.stateInfo.stateCd === "D") {
         rowEvtHandler(newRow);
       }
     }
@@ -440,17 +455,12 @@ const $payhist = (function () {
         if (data.CODE === "SUCCESS") {
           //2.결제 내역 Form에 정보 삽입
           const optionList = $(`#histForm select[name=cardSelect]`).children("option");
-          const date = new Date(result.useDate);
-          const year = date.getFullYear();
-          const month = date.getMonth() + 1;
-          const days = date.getDate();
           $("#histForm input[name=seq]").val(result.seq);
           $("#histForm input[name=useHist]").val(result.useHist);
           $("#histForm input[name=money]").val($cmmn.convertToCurrency(result.money));
           $(`#histForm select[name=classSeq] option:eq(${result.classInfo.seq})`)
             .prop("selected", true);
-          $("#histForm input[name=useDate]").val(`${year}-${month < 10 ? `0${month}` : month}-${
-            days < 10 ? `0${days}` : days}`);
+          $("#histForm input[name=useDate]").val($cmmn.formatDate(result.useDate, "mm.dd"));
           for (let i = 1; i < optionList.length; i++) {
             const cardComp = optionList[i].innerText.split(" ")[0];
             const cardNum = optionList[i].innerText.split(" ")[1];
@@ -475,24 +485,12 @@ const $payhist = (function () {
   const initHistForm = function () {
     //분류 select
     const classSelect = document.querySelector("#classSelect");
-    $.ajax({
-      type: "GET",
-      url: "/base/classList",
-      success: function (data) {
-        if (data.CODE === "SUCCESS") {
-          const json = data.result;
-          for (let i in json) {
-            const option = document.createElement('option');
-            option.text = json[i].classNm;
-            option.value = json[i].seq;
-            classSelect.options.add(option);
-          }
-        } else {
-          alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-        }
-      },
-      error: function () {
-        return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+    selectClassList(true, function (json) {
+      for (let i in json) {
+        const option = document.createElement('option');
+        option.text = json[i].classNm;
+        option.value = json[i].seq;
+        classSelect.options.add(option);
       }
     });
 
@@ -539,8 +537,7 @@ const $payhist = (function () {
     const month = date.getMonth() + 1;
 
     dateInput.setAttribute('min', `${year}-${month < 10 ? `0${month}` : month}-01`);
-    dateInput.setAttribute('max', `${year}-${month < 10 ? `0${month}` : month}-${
-        new Date(year, month, 0).getDate()}`);
+    dateInput.setAttribute('max', `${year}-${month < 10 ? `0${month}` : month}-${new Date(year, month, 0).getDate()}`);
   }
 
   /**
@@ -553,7 +550,7 @@ const $payhist = (function () {
       "autoApply": true,
       "alwaysShowCalendars": true,
       "startDate": new Date(now.setMonth(now.getMonth() - 6)),
-      "endDate": new Date()
+      "endDate": now
     }, function (start, end, label) { });
 
     $('#datepicker').on('apply.daterangepicker', function (ev, picker) {
@@ -640,12 +637,10 @@ const $payhist = (function () {
    * 결제 내역 table
    */
   const initHistTable = function () {
-    const now = new Date;
-    const month = now.getMonth() + 1;
     const payhistMonth = document.querySelector("#payhistMonth");
 
     //결제 내역 현재 연월 표현
-    payhistMonth.value = `${now.getFullYear()}-${month < 10 ? `0${month}` : month}`;
+    payhistMonth.value = $cmmn.formatDate("", "YYYY-mm");
     wrtYm = payhistMonth.value;
     selectPayhistList();
 
@@ -668,7 +663,7 @@ const $payhist = (function () {
   const initAtchToast = function () {
     //1.기존 첨부파일 list 초기화
     $("#atchList > li").remove();
-    $("#atchEmpty").css("display","");
+    $("#atchEmpty").css("display", "");
     $("#atchCnt").text("0");
 
     //2.해당 연월의 첨부파일 리스트 조회
@@ -698,13 +693,13 @@ const $payhist = (function () {
    * @param {Array} data : 첨부파일 정보 Array
    */
   const paintAtchList = function (data) {
-    if($cmmn.isNullorEmpty(data)){
+    if ($cmmn.isNullorEmpty(data)) {
       return false;
     }
-    $("#atchEmpty").css("display","none");
+    $("#atchEmpty").css("display", "none");
     $("#atchCnt").text(data.length);
     const atchList = document.querySelector("#atchList");
-    for(let i=0;i<data.length;i++){
+    for (let i = 0; i < data.length; i++) {
       const list = document.createElement("li");
       const chkbox = document.createElement("input");
       const aTag = document.createElement("a");
@@ -714,8 +709,7 @@ const $payhist = (function () {
       chkbox.className += "form-check-input me-1 atch-check";
       aTag.innerText = data[i].fileNm;
       aTag.className += "text-decoration-none"
-      aTag.setAttribute("href", "http://"+`${location.host}/payhist/downloadAtch?seq=${
-        data[i].usehistSubmitInfo.seq}&fileNm=${data[i].fileNm}&fileSeq=${data[i].seq}`);
+      aTag.setAttribute("href", "http://" + `${location.host}/payhist/downloadAtch?seq=${data[i].usehistSubmitInfo.seq}&fileNm=${data[i].fileNm}&fileSeq=${data[i].seq}`);
       list.appendChild(chkbox);
       list.appendChild(aTag);
       document.querySelector("#atchList").appendChild(list);
@@ -726,16 +720,306 @@ const $payhist = (function () {
    * 선택한 첨부파일 리스트 삭제
    * @param {Array} data : 삭제된 첨부파일 Seq Array
    */
-  const deleteAtchInfo = function(){
+  const deleteAtchInfo = function () {
     console.dir($(".atch-check"));
     console.dir($(".atch-check").find('input:checked'));
-    $(".atch-check:checked").each(function(index){
-            $(this).parent("li").remove();
+    $(".atch-check:checked").each(function (index) {
+      $(this).parent("li").remove();
     });
-    if($("#atchList > li").length == 0){
-        $("#atchEmpty").css("display","");
-        $("#atchCnt").text("0");
+    if ($("#atchList > li").length == 0) {
+      $("#atchEmpty").css("display", "");
+      $("#atchCnt").text("0");
     }
+  }
+
+  /**
+   * 분류 목록 조회
+   * @param {boolean} isAsync : 비동기 여부
+   * @param {function} callback : Callback function
+   */
+  const selectClassList = function (isAsync, callback) {
+    $.ajax({
+      type: "GET",
+      url: "/base/classList",
+      async: isAsync,
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+          callback(data.result);
+        } else {
+          alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      },
+      error: function () {
+        return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
+  }
+
+  /**
+   * PDF 생성
+   * @param {JSON} data : 결제 금액 리스트 및 합계
+   */
+  const makePDF = function (data) {
+    const documentDefinition = {
+      content: [
+        {
+          text: '신용카드 결제금액 보고서',
+          style: 'title'
+        },
+        {
+          style: 'table_right',
+          table: {
+            widths: [80, 80],
+            body: [
+              [{
+                text: '기안자',
+                style: 'th'
+              },
+              {
+                text: '확인자',
+                style: 'th'
+              }],
+              [{
+                text: data.submitInfo.writerNm,
+                style: 'default'
+              },
+              {
+                text: data.submitInfo.checkerNm || '',
+                style: 'default'
+              }]
+            ],
+            alignment: "right"
+          }
+        },
+        {
+          text: '단위 : 원',
+          style: 'unit'
+        },
+        {
+          table: {
+            widths: [120, "*", 120, "*"],
+            body: [
+              [
+                {
+                  text: '년/월',
+                  style: 'th',
+                },
+                {
+                  text: data.submitInfo.wrtYm,
+                  style: 'default',
+                },
+                {
+                  text: '결재 완료 날짜',
+                  style: 'th',
+                },
+                {
+                  text: data.submitInfo.approveDate || '',
+                  style: 'default',
+                }],
+              [{
+                text: '총 액',
+                style: 'th',
+              }, {
+                text: $cmmn.convertToCurrency(data.sum),
+                style: 'money',
+                colSpan: 3,
+              }],
+            ]
+          }
+        },
+        {
+          columns: [
+            {
+              width: 'auto',
+              text: '■ 결제 내역',
+              style: "h3",
+            },
+          ],
+          // optional space between columns
+          columnGap: 10
+        },
+        {
+          table: {
+            widths: [20, 50, 80, 70, "*", 70],
+            body: [
+              [{
+                text: 'No.',
+                style: 'th',
+              },
+              {
+                text: '거래일시',
+                style: 'th',
+              },
+              {
+                text: '카드정보',
+                style: 'th',
+              },
+              {
+                text: '분류',
+                style: 'th',
+              },
+              {
+                text: '사용처',
+                style: 'th',
+              },
+              {
+                text: '금액(원)',
+                style: 'th',
+              }],
+            ],
+          }
+        },
+      ],
+      footer: function (currentPage, pageCount) {
+        return {
+          margin: 10,
+          columns: [{
+            fontSize: 9,
+            text: [{
+              text: '--------------------------------------------------------------------------' +
+                '\n',
+              margin: [0, 20]
+            },
+            {
+              text: '' + currentPage.toString() + ' of ' +
+                pageCount,
+            }
+            ],
+            alignment: 'center'
+          }]
+        };
+      },
+      styles: {
+        table_right: {
+          margin: [335, 15, 0, 15],
+        },
+        th: {
+          fontSize: 11,
+          bold: true,
+          margin: [0, 0, 0, 0],
+          alignment: 'center',
+          fillColor: '#eaeaea',
+        },
+        title: {
+          fontSize: 20,
+          bold: true,
+          margin: [0, 0, 0, 0],
+          alignment: 'center'
+        },
+        h3: {
+          fontSize: 13,
+          bold: true,
+          margin: [0, 10, 0, 2],
+        },
+        unit: {
+          fontSize: 8,
+          margin: [0, 0, 0, 0],
+          alignment: 'right',
+
+        },
+        money: {
+          fontSize: 11,
+          margin: [0, 0, 0, 0],
+          alignment: 'right'
+        },
+        default: {
+          fontSize: 11,
+          margin: [0, 0, 0, 0],
+          alignment: 'center'
+        },
+      },
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+    };
+
+    //분류별 합계
+    let sumList = [];
+    selectClassList(false, function (classList) {
+      const rowList = [];
+      let pi = 0;
+      let pj = 0;
+      while (pi < classList.length && pj < data.sumByClass.length) {
+        let list = [];
+        if (classList[pi].seq > data.sumByClass[pj].seq) {
+          pj++;
+        } else if (classList[pi].seq < data.sumByClass[pj].seq) {
+          rowList.push({
+            text: classList[pi].classNm,
+            style: 'th'
+          });
+          rowList.push({
+            text: "0",
+            style: 'money'
+          });
+          pi++;
+        } else {
+          rowList.push({
+            text: classList[pi].classNm,
+            style: 'th'
+          });
+          rowList.push({
+            text: $cmmn.convertToCurrency(data.sumByClass[pj].sum),
+            style: 'money'
+          });
+          pi++;
+          pj++;
+        }
+        if (rowList.length === 4) {
+          list = list.concat(rowList);
+          documentDefinition.content[3].table.body.push(list);
+          rowList.length = 0;
+        }
+      }
+      for (pi; pi < classList.length; pi++) {
+        let list = [];
+        rowList.push({
+          text: classList[pi].classNm,
+          style: 'th'
+        });
+        rowList.push({
+          text: "0",
+          style: 'money'
+        });
+        if (rowList.length === 4) {
+          list = list.concat(rowList);
+          documentDefinition.content[3].table.body.push(list);
+          rowList.length = 0;
+        }
+      }
+    });
+    //결제 내역
+    for (let i = 0; i < data.list.length; i++) {
+      const rowData = data.list[i];
+      const cardNum = rowData.cardNum.split("-")[3];
+      documentDefinition.content[5].table.body.push([{
+        text: (i + 1).toString(),
+        style: 'default',
+      },
+      {
+        text: $cmmn.formatDate(rowData.useDate, "mm.dd"),
+        style: 'default',
+      },
+      {
+        text: `${rowData.cardComp} ${cardNum}`,
+        style: 'default',
+      },
+      {
+        text: rowData.classInfo.classNm,
+        style: 'default',
+      },
+      {
+        text: rowData.useHist,
+        style: 'default',
+      },
+      {
+        text: $cmmn.convertToCurrency(rowData.money),
+        style: 'money',
+      }])
+    }
+
+
+    const pdf_name = 'pdf파일 만들기.pdf'; // pdf 만들 파일의 이름
+    pdfMake.createPdf(documentDefinition).download(pdf_name);
   }
 
   return {

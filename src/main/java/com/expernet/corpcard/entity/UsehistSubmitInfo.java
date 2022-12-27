@@ -18,7 +18,6 @@ public class UsehistSubmitInfo {
     @Column(name = "SEQ")
     private long seq;
 
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "STATE_SEQ")
     private StateInfo stateInfo;
@@ -38,6 +37,18 @@ public class UsehistSubmitInfo {
     @Column(name = "WRT_YM")
     private String wrtYm;
 
+    @Column(name = "CHECKER_ID")
+    private String checkerId;
+
+    @Column(name = "CHECKER_OFCDS")
+    private String checkerOfcds;
+
+    @Column(name = "CHECKER_NM")
+    private String checkerNm;
+
+    @Column(name = "APPROVE_DATE")
+    private Timestamp approveDate;
+
     @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
@@ -48,7 +59,8 @@ public class UsehistSubmitInfo {
 
     @Builder
     public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept, String writerOfcds,
-                             String writerNm, String wrtYm){
+                             String writerNm, String wrtYm, String checkerId, String checkerOfcds, String checkerNm,
+                            Timestamp approveDate){
         this.seq = seq;
         this.stateInfo = stateInfo;
         this.writerId = writerId;
@@ -56,5 +68,9 @@ public class UsehistSubmitInfo {
         this.writerOfcds = writerOfcds;
         this.writerNm = writerNm;
         this.wrtYm = wrtYm;
+        this.checkerId = checkerId;
+        this.checkerOfcds = checkerOfcds;
+        this.checkerNm = checkerNm;
+        this.approveDate = approveDate;
     }
 }

@@ -100,9 +100,9 @@ public class PayhistServiceImpl implements PayhistService {
         if (submitInfo != null) {
             List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
             if (list.size() > 0) {
-                //제출 상태
-                result.put("stateInfo", submitInfo.getStateInfo());
-                //사용내역 리스트
+                //제출 내역
+                result.put("submitInfo", submitInfo);
+                //사용 내역 리스트
                 result.put("list", list);
                 //분류별 합계
                 result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitInfo.getSeq()));
