@@ -154,25 +154,27 @@ const $payhist = (function () {
         if ($("#histTable > tbody > tr").length === 0) {
           return alert("저장된 결제 내역이 없습니다.");
         }
-        $.ajax({
-          type: "PATCH",
-          url: "/payhist/updateState",
-          dataType: "json",
-          data: {
-            WRITER_ID: userId,
-            WRT_YM: wrtYm,
-          },
-          success: function (data) {
-            if (data.CODE === "SUCCESS") {
-              selectPayhistList();
-            } else if (data.CODE === "ERR") {
-              return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-            }
-          },
-          error: function () {
-            return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-          }
-        });
+        updateState(2, selectPayhistList);
+//        $.ajax({
+//          type: "PATCH",
+//          url: "/payhist/updateState",
+//          dataType: "json",
+//          data: {
+//            WRITER_ID: userId,
+//            WRT_YM: wrtYm,
+//            SEQ: 2,
+//          },
+//          success: function (data) {
+//            if (data.CODE === "SUCCESS") {
+//              selectPayhistList();
+//            } else if (data.CODE === "ERR") {
+//              return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+//            }
+//          },
+//          error: function () {
+//            return alert("제출에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+//          }
+//        });
       }
     });
 
@@ -280,18 +282,27 @@ const $payhist = (function () {
         }
       });
     });
+
+    //제출 취소 btn
+    $("#submitCancel").on("click", function (event) {
+        if (confirm("제출을 취소하시겠습니까?")) {
+            updateState(1, selectPayhistList);
+        }
+    });
   }
 
   /**
   * 결제 내역 조회
   */
   const selectPayhistList = function () {
-    //Form & 첨부파일 disable 처리
-    function disableFormAndAtch(isDisable) {
+    //버튼 disable or hide 처리
+    function disableBtn(isDisable) {
+      isDisable ? $("#deleteRow").css("display", "none") : $("#deleteRow").css("display", "");
+      isDisable ? $("#submitHist").css("display", "none") : $("#submitHist").css("display", "");
+      isDisable ? $("#atchAddBtn").css("display", "none") : $("#atchAddBtn").css("display", "");
+      isDisable ? $("#atchDelBtn").css("display", "none") : $("#atchDelBtn").css("display", "");
       $("#histForm :input").attr("disabled", isDisable);
       $("#histForm select").attr("disabled", isDisable);
-      $("#atchAddBtn").attr("disabled", isDisable);
-      $("#atchDelBtn").attr("disabled", isDisable);
     }
 
     //1.결제 내역 리스트 조회
@@ -310,17 +321,22 @@ const $payhist = (function () {
         const tbody = document.querySelector("#histTable>tbody");
         if (data.CODE === "SUCCESS") {
           paintTable(tbody, data.result);
-          //3)제출 상태 조회 및 disable 처리
+          //3)제출 상태 조회 및 버튼 disable 처리
           const stateInfo = data.result.submitInfo.stateInfo;
           $("#stateNm").text(stateInfo.stateNm);
-          if (stateInfo.stateCd === "B" || stateInfo.stateCd === "C") {
-            disableFormAndAtch(true);
+          if (stateInfo.stateCd === "B") {
+            $("#submitCancel").css("display", "");
+            disableBtn(true);
+          }else if(stateInfo.stateCd === "C"){
+            $("#submitCancel").css("display", "none");
+            disableBtn(true);
           } else {
-            disableFormAndAtch(false);
+            $("#submitCancel").css("display", "none");
+            disableBtn(false);
           }
         } else if (data.CODE === "EMPTY") {
           const newCell = tbody.insertRow().insertCell();
-          disableFormAndAtch(false);
+          disableBtn(false);
           document.querySelector("#stateNm").innerText = "제출 전";
           document.querySelector("#listTotCnt").innerText = "0";
           newCell.setAttribute('colspan', '15');
@@ -733,7 +749,7 @@ const $payhist = (function () {
   }
 
   /**
-   * 분류 목록 조회
+   * 분류 목록 조회 AJAX
    * @param {boolean} isAsync : 비동기 여부
    * @param {function} callback : Callback function
    */
@@ -751,6 +767,34 @@ const $payhist = (function () {
       },
       error: function () {
         return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
+  }
+
+  /**
+   * 제출 상태 변경 AJAX
+   * @param {number} seq : 제출 상태 시퀀스
+   * @param {function} callback : Callback function
+   */
+  const updateState = function (seq, callback) {
+    $.ajax({
+      type: "PATCH",
+      url: "/payhist/updateState",
+      dataType: "json",
+      data: {
+        WRITER_ID: userId,
+        WRT_YM: wrtYm,
+        SEQ: seq,
+      },
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+          callback();
+        } else if (data.CODE === "ERR") {
+          return alert("제출 상태 변경에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      },
+      error: function () {
+        return alert("제출 상태 변경에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
       }
     });
   }

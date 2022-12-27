@@ -188,14 +188,15 @@ public class PayhistServiceImpl implements PayhistService {
     }
 
     /**
-     * 법인카드 결제 내역 제출
+     * 법인카드 제출 상태 변경
      *
      * @param paramMap : 제출 정보
      */
     @Override
     public Object updateStateSeq(HashMap<String, Object> paramMap) {
         UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
-        submitInfo.setStateInfo(StateInfo.builder().seq(2).build());
+        long seq = Long.parseLong(paramMap.get("SEQ").toString());
+        submitInfo.setStateInfo(StateInfo.builder().seq(seq).build());
         return usehistSubmitInfoRepository.save(submitInfo);
     }
 
