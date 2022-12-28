@@ -7,6 +7,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Entity
@@ -37,6 +39,13 @@ public class Dept {
     @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "UPPER_DEPT_CD", referencedColumnName = "DEPT_CD", insertable = false, updatable = false)
+    private Dept upper;
+
+    @OneToMany(mappedBy = "upper", fetch = FetchType.LAZY)
+    private final List<Dept> team = new ArrayList<>();
 
     @Builder
     public Dept(long seq, String deptNm, String deptCd, String upperDeptCd, String chiefTitle) {

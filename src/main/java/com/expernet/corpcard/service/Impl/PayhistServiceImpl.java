@@ -369,7 +369,7 @@ public class PayhistServiceImpl implements PayhistService {
      */
     private UsehistSubmitInfo saveSubmitInfo(HashMap<String, Object> paramMap) {
         User userInfo = userRepository.findByUserId(paramMap.get("WRITER_ID").toString());
-        Dept deptInfo = deptRepository.findByDeptCd(userInfo.getDeptCd());
+        Dept deptInfo = deptRepository.findByDeptCd(userInfo.getDept().getDeptCd());
         StateInfo stateInfo = StateInfo.builder().seq(1).build();
 
         UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()

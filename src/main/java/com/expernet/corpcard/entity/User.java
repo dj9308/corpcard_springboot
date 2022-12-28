@@ -35,8 +35,9 @@ public class User {
     @Column(name = "CHIEF_YN")
     private Character chiefYn;
 
-    @Column(name = "DEPT_CD")
-    private String deptCd;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "DEPT_CD")
+    private Dept dept;
 
     @CreationTimestamp
     @Column(name = "CREATED_AT")
@@ -47,12 +48,12 @@ public class User {
     private Timestamp updatedAt;
 
     @Builder
-    public User(long seq, String userId, String ofcds, String userNm, Character chiefYn, String deptCd) {
+    public User(long seq, String userId, String ofcds, String userNm, Character chiefYn, Dept dept) {
         this.seq = seq;
         this.userId = userId;
         this.ofcds = ofcds;
         this.userNm = userNm;
         this.chiefYn = chiefYn;
-        this.deptCd = deptCd;
+        this.dept = dept;
     }
 }

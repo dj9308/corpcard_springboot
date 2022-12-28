@@ -196,7 +196,7 @@ public class SchedulerServiceImpl implements SchedulerService {
                 User userInfo = User.builder()
                         .seq(userSeq++)
                         .userId(teammateList.get(j).get("value").toString())
-                        .deptCd(deptMap.get("value").toString())
+                        .dept(Dept.builder().deptCd(deptMap.get("value").toString()).build())
                         .userNm(label[0])
                         .ofcds(label[1])
                         .chiefYn((j == 0) ? 'Y' : 'N')

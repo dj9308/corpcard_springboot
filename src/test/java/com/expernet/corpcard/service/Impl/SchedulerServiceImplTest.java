@@ -115,7 +115,7 @@ public class SchedulerServiceImplTest {
 //                        ps.setString(2, userInfo.getUserId());
                         ps.setString(3, userInfo.getOfcds());
                         ps.setString(4, userInfo.getUserNm());
-                        ps.setString(5, userInfo.getDeptCd());
+                        ps.setString(5, userInfo.getDept().getDeptCd());
                         ps.setString(6, String.valueOf(userInfo.getChiefYn()));
                     }
 
@@ -219,7 +219,7 @@ public class SchedulerServiceImplTest {
                 User userInfo = User.builder()
                         .seq(userSeq++)
                         .userId(teammateList.get(j).get("value").toString())
-                        .deptCd(deptMap.get("value").toString())
+                        .dept(Dept.builder().deptCd(deptMap.get("value").toString()).build())
                         .userNm(label[0])
                         .ofcds(label[1])
                         .chiefYn((j == 0) ? 'Y' : 'N')
