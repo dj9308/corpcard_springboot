@@ -4,11 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 
 @Getter
 @Setter
@@ -36,7 +33,7 @@ public class User {
     private Character chiefYn;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "DEPT_CD")
+    @JoinColumn(name = "DEPT_CD", referencedColumnName = "DEPT_CD")
     private Dept dept;
 
     @CreationTimestamp

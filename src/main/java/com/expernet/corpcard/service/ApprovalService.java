@@ -2,6 +2,8 @@ package com.expernet.corpcard.service;
 
 import com.expernet.corpcard.entity.AttachmentInfo;
 import com.expernet.corpcard.entity.CardUsehist;
+import com.expernet.corpcard.entity.UsehistSubmitInfo;
+import com.expernet.corpcard.entity.User;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,8 +32,14 @@ import java.util.List;
 public interface ApprovalService {
 
     /**
-     * 결재 목록 조회
-     * @param paramMap: 사용자 정보
+     * 부서 정보 조회
+     * @param paramMap : 팀장 ID
      */
-    HashMap<String, Object> searchApprovalList(HashMap<String, Object> paramMap);
+    HashMap<String, Object> searchDeptInfo(HashMap<String, Object> paramMap);
+
+    /**
+     * 결재 건 목록 조회
+     * @param paramMap: 검색 조건
+     */
+    List<UsehistSubmitInfo> searchApprovalList(HashMap<String, Object> paramMap);
 }

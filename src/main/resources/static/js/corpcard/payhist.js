@@ -76,7 +76,7 @@ const $payhist = (function () {
 
     //첨부파일 btn
     $("#histAtchBtn").on("click", function (event) {
-        $cmmn.initHistToast("liveToast");
+      $cmmn.initHistToast("liveToast");
     });
 
     //PDF btn

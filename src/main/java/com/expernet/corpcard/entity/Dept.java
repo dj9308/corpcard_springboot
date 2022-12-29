@@ -1,6 +1,7 @@
 package com.expernet.corpcard.entity;
 
 
+import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -40,12 +41,14 @@ public class Dept {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 
+    @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "UPPER_DEPT_CD", referencedColumnName = "DEPT_CD", insertable = false, updatable = false)
     private Dept upper;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "upper", fetch = FetchType.LAZY)
-    private final List<Dept> team = new ArrayList<>();
+    private final List<Dept> lower = new ArrayList<>();
 
     @Builder
     public Dept(long seq, String deptNm, String deptCd, String upperDeptCd, String chiefTitle) {

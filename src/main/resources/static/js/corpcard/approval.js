@@ -47,55 +47,90 @@ const $approval = (function () {
    * 결재 건 검색 Form
    */
   const initSearchForm = function(){
-    //부서 select
+    /**
+     * select 생성
+     * @param {array} list : Dept list
+     * @param {Object} select : select Object
+     * @param {boolean} isFixed : 고정 여부
+     */
+    function paintSelect(list, select, isFixed){
+        for(let i =0;i<list.length;i++){
+            const option = document.createElement('option');
+            option.text = list[i].deptNm;
+            option.value = list[i].seq;
+            select.options.add(option);
+        }
+        select.options[1].selected = isFixed;
+        select.disabled = isFixed;
+    }
+
+    /**
+     * 부서 리스트 생성
+     * @param {JSON} deptInfo : 부서 json
+     * @return {array} result : 부서 리스트
+     */
+    function makeDeptList(deptInfo){
+        const lowerList = deptInfo.lower;
+        let result = [];
+        for(let i=0;i<lowerList.length;i++){
+            result = result.concat(lowerList[i].lower);
+        }
+        return result;
+    }
+
+    //부서 및 팀 select
     const deptSelect = document.querySelector("#deptSelect");
+    const teamSelect = document.querySelector("#teamSelect");
     $.ajax({
           type: "GET",
-          url: "/approval/searchDept",
+          url: "/approval/searchDeptInfo",
           data: {
             USER_ID: userId
           },
           success: function (data) {
             if (data.CODE === "SUCCESS") {
-              const json = data.result;
-              for (let i in json) {
-                const option = document.createElement('option');
-                option.text = json[i].deptNm;
-                option.value = json[i].seq;
-                deptSelect.options.add(option);
+              let deptInfo = data.result.deptInfo;
+              let teamList = deptInfo.lower;
+              let level = 0;
+              let deptList = [];
+              while(!$cmmn.isNullorEmpty(teamList)){
+                if(teamList.length !== 0){
+                  teamList = teamList[0].lower;
+                }else{
+                  teamList = null;
+                }
+                level++;
               }
+              if(level === 1){          //팀장
+                  paintSelect([data.result.upperDeptInfo], deptSelect, true);
+                  paintSelect([deptInfo], teamSelect, true);
+              }else if(level === 2){    //부서장
+                paintSelect([deptInfo], deptSelect, true);
+                paintSelect(deptInfo.lower, teamSelect, false);
+              }else if(level ==3){      //본부장
+                deptSelect.options[0].innerText = deptInfo.deptNm;
+                deptList = deptInfo.lower;
+                paintSelect(deptList, deptSelect, false);
+              }else{                    //CEO
+                deptList = makeDeptList(deptInfo);
+                paintSelect(deptList, deptSelect, false);
+              }
+
+              $("#deptSelect").on('change', function(){
+                const value = $(this).val();
+                $.each(deptList, function(idx, row){
+                    if(deptList[idx].seq == value){
+                      paintSelect(deptList[idx].lower, teamSelect, false);
+                      return false;
+                    }
+                });
+              });
             } else {
               alert("부서 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
             }
           },
           error: function () {
             return alert("부서 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
-          }
-        });
-
-    //팀 select
-    const teamSelect = document.querySelector("#teamSelect");
-    $.ajax({
-          type: "GET",
-          url: "/approval/searchTeam",
-          data: {
-            DEPT_SEQ : deptSeq;
-          },
-          success: function (data) {
-            if (data.CODE === "SUCCESS") {
-              const json = data.result;
-              for (let i in json) {
-                const option = document.createElement('option');
-                option.text = `${json[i].cardComp} ${json[i].cardNum}`;
-                option.value = json[i].seq;
-                cardSelect.options.add(option);
-              }
-            } else {
-              alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
-            }
-          },
-          error: function () {
-            return alert("분류 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
           }
         });
   }
