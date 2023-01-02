@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
@@ -24,15 +25,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
  * </pre>
  */
 @Controller
+@RequestMapping(value = "/admin")
 public class AdminController {
 	/**
 	 * Logger
 	 */
 	private static final Logger logger = LoggerFactory.getLogger(AdminController.class);
 
-	@RequestMapping("/admin")
-	public String page(Model model){
-		model.addAttribute("menu", "admin");
-		return "admin";
+	/**
+	 * 페이지 조회
+	 * @param menuType: 관리자 소메뉴
+	 * @param model: ModelMap
+	 */
+	@RequestMapping("/{menuType}")
+	public String histPage(@PathVariable("menuType") String menuType, Model model){
+		if(!menuType.equals("adminHist") &&	//결제내역 관리
+				!menuType.equals("auth") && //권한 관리
+				!menuType.equals("card")){	//카드 관리
+			return "404";
+		}else{
+			model.addAttribute("menu", menuType);
+			return menuType;
+		}
 	}
 }

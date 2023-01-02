@@ -54,13 +54,26 @@ const $approval = (function () {
      * @param {boolean} isFixed : 고정 여부
      */
     function paintSelect(list, select, isFixed){
-        for(let i =0;i<list.length;i++){
+        if(list.length === 0){
             const option = document.createElement('option');
-            option.text = list[i].deptNm;
-            option.value = list[i].seq;
+            option.text = "---";
             select.options.add(option);
+        }else{
+            if(select.id === "teamSelect" && list.length > 1){
+                const option = document.createElement('option');
+                option.text = "전체";
+                option.value = "ALL";
+                select.options.add(option);
+            }
+
+            for(let i =0;i<list.length;i++){
+                const option = document.createElement('option');
+                option.text = list[i].deptNm;
+                option.value = list[i].seq;
+                select.options.add(option);
+            }
         }
-        select.options[1].selected = isFixed;
+        select.options[0].selected = isFixed;
         select.disabled = isFixed;
     }
 
@@ -117,7 +130,14 @@ const $approval = (function () {
               }
 
               $("#deptSelect").on('change', function(){
+                const teamSelect = document.querySelector("#teamSelect");
+                const options = $(teamSelect).find('option').map(function() {return $(this).val();}).get();
                 const value = $(this).val();
+                //팀 select 초기화
+                if(options.length > 0){
+                    $(teamSelect).find('option').remove();
+                }
+
                 $.each(deptList, function(idx, row){
                     if(deptList[idx].seq == value){
                       paintSelect(deptList[idx].lower, teamSelect, false);
