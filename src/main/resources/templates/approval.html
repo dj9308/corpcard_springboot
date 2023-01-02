@@ -28,7 +28,6 @@
                         <th class="ps-1" style="width:5%; text-align:right;">부서</th>
                         <td style="width:15%;">
                             <select class="form-select form-select-sm" id="deptSelect" name="dept" required>
-                                <option value="ALL" selected>전체</option>
                             </select>
                         </td>
                         <th class="ps-1" style="width:3%; text-align:right;">팀</th>
@@ -41,14 +40,14 @@
                         <td style="width:15%;">
                             <input type="text" name="writerNm" class="form-control form-control-sm">
                         </td>
-                        <th class="ps-1" style="width:5%; text-align:right;">기간</th>
+                        <th class="ps-1" style="width:7%; text-align:right;">제출 날짜</th>
                         <td style="width:20%">
-                            <input type="text" id="datepicker" class="form-control form-control-sm">
+                            <input type="text" name="submitDate" id="datepicker" class="form-control form-control-sm">
                         </td>
                         <td class="ps-2">
                             <input type="submit" id="approvalSubmit" class="btn btn-secondary btn-sm" value="조회">
                         </td>
-                        <td style="width: 20%" align="right">
+                        <td style="width: 18%" align="right">
                             <input type="text" id="listSearch" class="form-control form-control-sm" placeholder="SEARCH" style="width:120px;">
                         </td>
                     </tr>
@@ -56,7 +55,7 @@
             </form>
         </div>
         <div class="table-responsive-xxl">
-            <table id="approveList"
+            <table id="approvalTable"
                    class="text-center table table-hover table-bordered table-sm align-middle table-style2">
                 <thead class="table-secondary">
                 <tr>

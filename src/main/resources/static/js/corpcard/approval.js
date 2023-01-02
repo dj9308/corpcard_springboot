@@ -27,7 +27,7 @@ const $approval = (function () {
   const initBtnEvt = function () {
     //결재 건 조회 btn
     $("#approvalSubmit").on("click", function(){
-
+        selectApprovalList();
     });
     //첨부파일 btn
     $("#histAtchBtn").on("click", function(){
@@ -41,6 +41,58 @@ const $approval = (function () {
     $("#rejectHist").on("click", function(){
 
     })
+  }
+
+ /**
+  * 결재 건 목록 조회
+  */
+  const selectApprovalList = function() {
+    //1. form data 생성
+    const data = $cmmn.serializeObject("approvalForm");
+    data.dept = $("#deptSelect").val();
+    data.team = $("#teamSelect").val();
+    data.userId = userId;
+    //1.결재 건 목록 조회
+    $.ajax({
+      type: "GET",
+      url: "/approval/searchList",
+      data: data,
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+          paintApprovalTable(data.result);
+        } else {
+          alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      },
+      error: function () {
+        $cmmn.emptyTable("approvalTable");
+        const tbody = document.querySelector("#approvalTable>tbody");
+        const newCell = tbody.insertRow().insertCell();
+        newCell.setAttribute('colspan', '8');
+        newCell.classList.add("fw-bold");
+        newCell.innerText = "해당 조건의 결재 건 내역이 없습니다.";
+        return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+      }
+    });
+  }
+
+ /**
+  * 결재 건 table 생성
+  * @param {JSON} data : 결재 건 list
+  */
+  const paintApprovalTable = function (data) {
+    const tbody = document.querySelector("#approvalTable>tbody");
+    //1.table 초기화
+    $cmmn.emptyTable("approvalTable");
+    //2.table row 생성
+    if($cmmn.isNullorEmpty(data)){
+      const newCell = tbody.insertRow().insertCell();
+      newCell.setAttribute('colspan', '8');
+      newCell.classList.add("fw-bold");
+      newCell.innerText = "해당 조건의 결재 건 내역이 없습니다.";
+    }else{
+
+    }
   }
 
   /**
@@ -60,21 +112,28 @@ const $approval = (function () {
             select.options.add(option);
         }else{
             if(select.id === "teamSelect" && list.length > 1){
-                const option = document.createElement('option');
-                option.text = "전체";
-                option.value = "ALL";
-                select.options.add(option);
+                paintTotalOption(select);
             }
-
             for(let i =0;i<list.length;i++){
                 const option = document.createElement('option');
                 option.text = list[i].deptNm;
-                option.value = list[i].seq;
+                option.value = list[i].deptCd;
                 select.options.add(option);
             }
         }
         select.options[0].selected = isFixed;
         select.disabled = isFixed;
+    }
+
+    /**
+     * select 생성
+     * @param {Object} select : select Object
+     */
+    function paintTotalOption(select){
+        const option = document.createElement('option');
+        option.text = "전체";
+        option.value = "ALL";
+        select.options.add(option);
     }
 
     /**
@@ -91,7 +150,7 @@ const $approval = (function () {
         return result;
     }
 
-    //부서 및 팀 select
+    //1.부서 및 팀 select
     const deptSelect = document.querySelector("#deptSelect");
     const teamSelect = document.querySelector("#teamSelect");
     $.ajax({
@@ -100,6 +159,7 @@ const $approval = (function () {
           data: {
             USER_ID: userId
           },
+          async: false,
           success: function (data) {
             if (data.CODE === "SUCCESS") {
               let deptInfo = data.result.deptInfo;
@@ -115,13 +175,17 @@ const $approval = (function () {
                 level++;
               }
               if(level === 1){          //팀장
+                  $(teamSelect).find('option').remove();
                   paintSelect([data.result.upperDeptInfo], deptSelect, true);
                   paintSelect([deptInfo], teamSelect, true);
               }else if(level === 2){    //부서장
                 paintSelect([deptInfo], deptSelect, true);
                 paintSelect(deptInfo.lower, teamSelect, false);
               }else if(level ==3){      //본부장
-                deptSelect.options[0].innerText = deptInfo.deptNm;
+                const option = document.createElement('option');
+                option.text = deptInfo.deptNm;
+                option.value = "ALL";
+                deptSelect.options.add(option);
                 deptList = deptInfo.lower;
                 paintSelect(deptList, deptSelect, false);
               }else{                    //CEO
@@ -137,9 +201,11 @@ const $approval = (function () {
                 if(options.length > 0){
                     $(teamSelect).find('option').remove();
                 }
-
+                if(value === "ALL"){
+                    paintTotalOption(teamSelect);
+                }
                 $.each(deptList, function(idx, row){
-                    if(deptList[idx].seq == value){
+                    if(deptList[idx].deptCd == value){
                       paintSelect(deptList[idx].lower, teamSelect, false);
                       return false;
                     }
@@ -153,6 +219,19 @@ const $approval = (function () {
             return alert("부서 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
           }
         });
+
+    //2.기간 date picker
+    const now = new Date;
+    $('#datepicker').daterangepicker({
+      "autoApply": true,
+      "alwaysShowCalendars": true,
+      "startDate": new Date(now.getFullYear(), now.getMonth() -1, 1),
+      "endDate": new Date(now.getFullYear(), now.getMonth(), 0)
+    }, function (start, end, label) { });
+
+
+    //3.조회 버튼 trigger
+    $("#approvalSubmit").trigger("click");
   }
 
   /**

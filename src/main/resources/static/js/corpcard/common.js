@@ -34,11 +34,15 @@ const $cmmn = (function () {
         let obj = null;
 
         if (form[0].tagName && form[0].tagName.toUpperCase() == "FORM") {
-            var arr = form.serializeArray();
+            const arr = form.serializeArray();
             if (arr) {
                 obj = {};
-                jQuery.each(arr, function () {
-                    obj[this.name] = this.value;
+                $.each(arr, function () {
+                    if(this.value === ""){
+                        return true;
+                    }else{
+                        obj[this.name] = this.value;
+                    }
                 });
             }
         }

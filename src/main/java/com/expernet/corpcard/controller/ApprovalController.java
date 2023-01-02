@@ -98,6 +98,6 @@ public class ApprovalController {
 				logger.info("결재 건 목록 조회 실패");
 			}
 		}
-		return "approval";
+		return "jsonView";
 	}
 }

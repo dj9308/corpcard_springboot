@@ -71,7 +71,7 @@ const $adminHist = (function () {
   * 차트 조회
   */
   const paintCharts = function(){
-
+    
   }
 
   return {

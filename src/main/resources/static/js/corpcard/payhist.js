@@ -513,7 +513,7 @@ const $payhist = (function () {
     $('#datepicker').daterangepicker({
       "autoApply": true,
       "alwaysShowCalendars": true,
-      "startDate": new Date(now.setMonth(now.getMonth() - 6)),
+      "startDate": new Date(new Date().setMonth(now.getMonth() - 6)),
       "endDate": now
     }, function (start, end, label) { });
 
