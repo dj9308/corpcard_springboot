@@ -35,11 +35,11 @@ const $approval = (function () {
     });
     //확인(결재 완료) btn
     $("#approvalHist").on("click", function(){
-
+        updateState(3, uptStateBtn(true));
     })
     //반려 btn
     $("#rejectHist").on("click", function(){
-
+        updateState(4, uptStateBtn(true));
     })
   }
 
@@ -430,6 +430,43 @@ const $approval = (function () {
             });
         }
   }
+
+  /**
+     * 제출 상태 변경 AJAX
+     * @param {number} seq : 제출 상태 시퀀스
+     * @param {function} callback : Callback function
+     */
+    const updateState = function (seq, callback) {
+      $.ajax({
+        type: "PATCH",
+        url: "/payhist/updateState",
+        dataType: "json",
+        data: {
+          WRITER_ID: userId,
+          WRT_YM: wrtYm,
+          SEQ: seq,
+        },
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+            callback();
+          } else if (data.CODE === "ERR") {
+            return alert("제출 상태 변경에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        },
+        error: function () {
+          return alert("제출 상태 변경에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      });
+    }
+
+    /**
+     * 확인 및 삭제 버튼 hidden 처리
+     * @params {boolean} isDisable : hidden 처리 여부
+     */
+    const uptStateBtn = function(isDisable) {
+      isDisable ? $("#approvalHist").css("display", "none") : $("#deleteRow").css("display", "");
+      isDisable ? $("#rejectHist").css("display", "none") : $("#submitHist").css("display", "");
+    }
 
     /**
      * 첨부파일 리스트 생성
