@@ -83,19 +83,25 @@ public class ApprovalController {
 	 */
 	@RequestMapping("/searchList")
 	public String searchApprovalList(@RequestParam HashMap<String, Object> paramMap, Model model){
-		List<UsehistSubmitInfo> result = null;
+		List<HashMap<String, Object>> result = null;
 		try {
 			result = approvalService.searchApprovalList(paramMap);
 		} finally {
 			if (result != null) {
-				model.addAttribute("result", result);
-				model.addAttribute("CODE", "SUCCESS");
-				model.addAttribute("MSG", "결재 건 목록 조회 성공");
-				logger.info("결재 건 목록 조회 성공");
+				if(result.size() == 0){
+					model.addAttribute("CODE", "EMPTY");
+					model.addAttribute("MSG", "결재 건 목록 없음");
+					logger.info("결재 건 목록 없음");
+				}else{
+					model.addAttribute("result", result);
+					model.addAttribute("CODE", "SUCCESS");
+					model.addAttribute("MSG", "결재 건 목록 조회 성공");
+					logger.info("결재 건 목록 조회 성공");
+				}
 			} else {
-				model.addAttribute("CODE", "EMPTY");
+				model.addAttribute("CODE", "ERR");
 				model.addAttribute("MSG", "결재 건 목록 조회 실패");
-				logger.info("결재 건 목록 조회 실패");
+				logger.error("결재 건 목록 조회 실패");
 			}
 		}
 		return "jsonView";

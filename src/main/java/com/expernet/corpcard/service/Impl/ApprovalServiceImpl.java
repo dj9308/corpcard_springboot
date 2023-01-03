@@ -1,6 +1,6 @@
 package com.expernet.corpcard.service.Impl;
 
-import com.expernet.corpcard.entity.UsehistSubmitInfo;
+import com.expernet.corpcard.dto.ApprovalSearch;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.repository.DeptRepository;
 import com.expernet.corpcard.repository.UsehistSubmitInfoRepository;
@@ -59,26 +59,43 @@ public class ApprovalServiceImpl implements ApprovalService {
      * @param paramMap: 검색 조건
      */
     @Override
-    public List<UsehistSubmitInfo> searchApprovalList(HashMap<String, Object> paramMap) {
+    public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
+        //TODO 리펙토링 필요
+        List<String> teamList = new ArrayList<>();
         List<String> deptList = new ArrayList<>();
         String userId = paramMap.get("userId").toString();
         String team = paramMap.get("team").toString();
         String upperDeptCd = paramMap.get("dept").toString();
         String[] submitDate = paramMap.get("submitDate").toString().split(" - ");
-        String startDate = submitDate[0];
-        String endDate = submitDate[1];
-        String writerNm = (paramMap.get("writerNm") != null) ? paramMap.get("writerNm").toString() : null;
 
-        //2.부서 list 생성
-        if (team.equals("ALL")) {
-            if (upperDeptCd.equals("ALL")) {
-                upperDeptCd = userRepository.findByUserId(userId).getDept().getDeptCd();
+        //1.부서 list 생성
+        User userInfo = userRepository.findByUserId(userId);
+        if(userInfo.getDept().getUpper() != null){
+            if (team.equals("ALL")) {
+                if (upperDeptCd.equals("ALL")) {
+                    upperDeptCd = userInfo.getDept().getDeptCd();
+                    deptList = deptRepository.findDeptNmByUpperCd(upperDeptCd);
+                }else{
+                    teamList = deptRepository.findDeptNmByUpperCd(upperDeptCd);
+                }
+            } else {
+                teamList.add(deptRepository.findByDeptCd(team).getDeptNm());
             }
-            deptList = deptRepository.findByUpperCd(upperDeptCd);
-        } else {
-            deptList.add(deptRepository.findByDeptCd(team).getDeptNm());
+        }else{
+            //CEO
+
         }
-        //3.결재 건 조회
-        return usehistSubmitInfoRepository.findByParams(deptList, writerNm, startDate, endDate);
+
+        //2.entity 생성
+        ApprovalSearch approvalSearch = ApprovalSearch.builder()
+                .deptList((deptList.size() == 0) ? null : deptList)
+                .teamList((teamList.size() == 0) ? null : teamList)
+                .writerNm((paramMap.get("writerNm") != null) ? paramMap.get("writerNm").toString() : null)
+                .startDate(submitDate[0])
+                .endDate(submitDate[1])
+                .build();
+
+        //3.결재 건 목록 조회
+        return usehistSubmitInfoRepository.findByParams(approvalSearch);
     }
 }

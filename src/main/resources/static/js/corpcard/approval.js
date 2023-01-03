@@ -47,12 +47,13 @@ const $approval = (function () {
   * 결재 건 목록 조회
   */
   const selectApprovalList = function() {
-    //1. form data 생성
+    //1.form data 생성
     const data = $cmmn.serializeObject("approvalForm");
     data.dept = $("#deptSelect").val();
     data.team = $("#teamSelect").val();
     data.userId = userId;
-    //1.결재 건 목록 조회
+
+    //2.결재 건 목록 조회
     $.ajax({
       type: "GET",
       url: "/approval/searchList",
@@ -60,18 +61,16 @@ const $approval = (function () {
       success: function (data) {
         if (data.CODE === "SUCCESS") {
           paintApprovalTable(data.result);
-        } else {
-          alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }else if(data.CODE === "EMPTY"){
+            paintApprovalTable();
+        }else{
+            paintApprovalTable();
+            alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
         }
       },
       error: function () {
-        $cmmn.emptyTable("approvalTable");
-        const tbody = document.querySelector("#approvalTable>tbody");
-        const newCell = tbody.insertRow().insertCell();
-        newCell.setAttribute('colspan', '8');
-        newCell.classList.add("fw-bold");
-        newCell.innerText = "해당 조건의 결재 건 내역이 없습니다.";
-        return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        paintApprovalTable();
+        alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
       }
     });
   }
@@ -91,9 +90,91 @@ const $approval = (function () {
       newCell.classList.add("fw-bold");
       newCell.innerText = "해당 조건의 결재 건 내역이 없습니다.";
     }else{
-
+        for (let i = 0; i < data.length; i++) {
+            const newRow = tbody.insertRow();
+            const input = document.createElement('input');
+            input.value = data[i].seq.toString();
+            input.type = "hidden";
+            input.name = "seq";
+            //No.
+            newRow.insertCell().innerHTML = `${input.outerHTML}${(i+1).toString()}`;
+            //부서
+            newRow.insertCell().innerHTML = data[i].writerDept;
+            //팀
+            newRow.insertCell().innerHTML = data[i].writerTeam;
+            //직위
+            newRow.insertCell().innerHTML = data[i].writerOfcds;
+            //기안자
+            newRow.insertCell().innerHTML = data[i].writerNm;
+            //제출날짜
+            newRow.insertCell().innerHTML = data[i].wrtYm;
+            //상태
+            newRow.insertCell().innerHTML = data[i].stateInfo.stateNm;
+            //합계
+            newRow.insertCell().innerHTML = $cmmn.convertToCurrency(data[i].sum);
+            //row 이벤트 핸들러
+            rowEvtHandler(newRow);
+        }
     }
   }
+
+  /**
+    * 결재 건 테이블 row event handler
+    * @param {Object} row : 결제 내역 테이블 row
+    */
+    const rowEvtHandler = function (row) {
+      $(row).on("click", function () {
+        if (!$(this).hasClass("table-active")) {
+            $("#approvalTable > tbody > tr").removeClass("table-active");
+            $(this).addClass("table-active");
+            selectPayhistList(seq);
+        }
+      });
+    }
+
+   /**
+    * 결제 내역 목록 조회
+    * @param {String} seq : 제출 내역 seq
+    */
+    const selectPayhistList = function(seq){
+        $.ajax({
+              type: "GET",
+              url: "/approval/searchPayhistList",
+              dataType: "json",
+              data: {
+                SEQ : SEQ
+              },
+              success: function (data) {
+                if(data.CODE == "SUCCESS"){
+                    paintPayhistTable(data.result);
+                }else {
+                    paintPayhistTable();
+                    alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+                }
+              },
+              error: function () {
+                return alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+              }
+            });
+
+    }
+
+    /**
+    * 결제 내역 테이블 생성
+    * @param {Array} data : 결제 내역 Array
+    */
+    const paintPayhistTable = function (data){
+        const tbody = document.querySelector("#histTable > tbody");
+        if($cmmn.isNullorEmpty(data)){
+          const newCell = tbody.insertRow().insertCell();
+          newCell.setAttribute('colspan', '14');
+          newCell.classList.add("fw-bold");
+          newCell.innerText = "해당 결재 건의 법인카드 사용 내역이 없습니다.";
+            return false;
+        }else{
+
+        }
+    }
 
   /**
    * 결재 건 검색 Form
@@ -222,11 +303,15 @@ const $approval = (function () {
 
     //2.기간 date picker
     const now = new Date;
+    const startDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() -1), 'YYYY-mm');
+    const endDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
+    $("#datepicker").val(`${startDate} - ${endDate}`);
+
     $('#datepicker').daterangepicker({
-      "autoApply": true,
+      "minViewMode": "month",
+      format: 'YYYY-MM',
+      "autoApplyClickedRange": true,
       "alwaysShowCalendars": true,
-      "startDate": new Date(now.getFullYear(), now.getMonth() -1, 1),
-      "endDate": new Date(now.getFullYear(), now.getMonth(), 0)
     }, function (start, end, label) { });
 
 
@@ -238,6 +323,8 @@ const $approval = (function () {
    * 결제내역 리스트 table
    */
   const initHistTable = function(){
+    paintPayhistTable();    //테이블 init
+
 
   }
   /**

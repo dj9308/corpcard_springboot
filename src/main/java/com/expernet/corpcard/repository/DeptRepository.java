@@ -15,5 +15,5 @@ public interface DeptRepository extends JpaRepository<Dept, Long> {
     @Query(value = "SELECT td.deptNm " +
             "FROM Dept td " +
             "WHERE td.upperDeptCd = :upperCd")
-    List<String> findByUpperCd(@Param("upperCd") String upperCd);
+    List<String> findDeptNmByUpperCd(@Param("upperCd") String upperCd);
 }

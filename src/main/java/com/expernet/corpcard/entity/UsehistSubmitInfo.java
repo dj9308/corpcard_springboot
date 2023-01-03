@@ -28,6 +28,9 @@ public class UsehistSubmitInfo {
     @Column(name = "WRITER_DEPT")
     private String writerDept;
 
+    @Column(name = "WRITER_TEAM")
+    private String writerTeam;
+
     @Column(name = "WRITER_OFCDS")
     private String writerOfcds;
 
@@ -57,14 +60,18 @@ public class UsehistSubmitInfo {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 
+    @Transient
+    private long totalMoney;
+
     @Builder
-    public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept, String writerOfcds,
-                             String writerNm, String wrtYm, String checkerId, String checkerOfcds, String checkerNm,
-                            Timestamp approveDate){
+    public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept,
+                             String writerTeam, String writerOfcds, String writerNm, String wrtYm, String checkerId,
+                             String checkerOfcds, String checkerNm, Timestamp approveDate){
         this.seq = seq;
         this.stateInfo = stateInfo;
         this.writerId = writerId;
         this.writerDept = writerDept;
+        this.writerTeam = writerTeam;
         this.writerOfcds = writerOfcds;
         this.writerNm = writerNm;
         this.wrtYm = wrtYm;

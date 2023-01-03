@@ -41,5 +41,5 @@ public interface ApprovalService {
      * 결재 건 목록 조회
      * @param paramMap: 검색 조건
      */
-    List<UsehistSubmitInfo> searchApprovalList(HashMap<String, Object> paramMap);
+    List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap);
 }
