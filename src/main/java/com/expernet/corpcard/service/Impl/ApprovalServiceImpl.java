@@ -1,7 +1,9 @@
 package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.dto.ApprovalSearch;
+import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.repository.CardUsehistRepository;
 import com.expernet.corpcard.repository.DeptRepository;
 import com.expernet.corpcard.repository.UsehistSubmitInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
@@ -36,6 +38,12 @@ public class ApprovalServiceImpl implements ApprovalService {
     private DeptRepository deptRepository;
 
     /**
+     * 부서 Repository
+     */
+    @Autowired
+    private CardUsehistRepository cardUsehistRepository;
+
+    /**
      * 부서 정보 조회
      *
      * @param paramMap: 팀장 ID
@@ -61,6 +69,7 @@ public class ApprovalServiceImpl implements ApprovalService {
     @Override
     public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
         //TODO 리펙토링 필요
+        //TODO CEO 분기점 기능 구현 필요
         List<String> teamList = new ArrayList<>();
         List<String> deptList = new ArrayList<>();
         String userId = paramMap.get("userId").toString();
@@ -97,5 +106,27 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //3.결재 건 목록 조회
         return usehistSubmitInfoRepository.findByParams(approvalSearch);
+    }
+
+    /**
+     * 법인카드 사용 내역 목록 조회
+     * @param paramMap: 검색 조건(seq)
+     */
+    @Override
+    public HashMap<String, Object> searchPayhistList(HashMap<String, Object> paramMap) {
+        HashMap<String, Object> result = new HashMap<>();
+        long seq = Long.parseLong(paramMap.get("SEQ").toString());
+
+        List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(seq);
+
+        if (list.size() > 0) {
+            //사용 내역 리스트
+            result.put("list", list);
+            //분류별 합계
+            result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(seq));
+            //총계
+            result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(seq));
+        }
+        return result;
     }
 }

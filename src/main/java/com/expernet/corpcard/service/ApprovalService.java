@@ -42,4 +42,12 @@ public interface ApprovalService {
      * @param paramMap: 검색 조건
      */
     List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap);
+
+    /**
+     * 법인카드 사용 내역 목록 조회
+     * @param paramMap: 검색 조건(seq)
+     */
+    HashMap<String, Object> searchPayhistList(HashMap<String, Object> paramMap);
+
+
 }

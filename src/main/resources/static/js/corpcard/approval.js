@@ -125,9 +125,11 @@ const $approval = (function () {
     const rowEvtHandler = function (row) {
       $(row).on("click", function () {
         if (!$(this).hasClass("table-active")) {
+            const seq = $(this).find("input[name=seq]").val();
             $("#approvalTable > tbody > tr").removeClass("table-active");
             $(this).addClass("table-active");
             selectPayhistList(seq);
+            selectAtchList(seq);
         }
       });
     }
@@ -142,7 +144,7 @@ const $approval = (function () {
               url: "/approval/searchPayhistList",
               dataType: "json",
               data: {
-                SEQ : SEQ
+                SEQ : seq
               },
               success: function (data) {
                 if(data.CODE == "SUCCESS"){
@@ -165,6 +167,9 @@ const $approval = (function () {
     */
     const paintPayhistTable = function (data){
         const tbody = document.querySelector("#histTable > tbody");
+
+        $cmmn.emptyTable("histTable");  //테이블 초기화
+
         if($cmmn.isNullorEmpty(data)){
           const newCell = tbody.insertRow().insertCell();
           newCell.setAttribute('colspan', '14');
@@ -172,8 +177,77 @@ const $approval = (function () {
           newCell.innerText = "해당 결재 건의 법인카드 사용 내역이 없습니다.";
             return false;
         }else{
+        //1.총 건수 설정
+                      document.querySelector("#listTotCnt").innerText = data.list.length;
 
+                      //2.결제 내역 row 생성
+                      for (let i = 0; i < data.list.length; i++) {
+                        const rowData = data.list[i];
+                        const newRow = tbody.insertRow();
+                        //사용일
+                        newRow.insertCell().innerHTML = $cmmn.formatDate(rowData.useDate, "mm.dd");
+                        //카드 정보
+                        newRow.insertCell().innerHTML = `${rowData.cardComp} ${rowData.cardNum.split("-")[3]}`;
+                        //사용 내역
+                        newRow.insertCell().innerHTML = rowData.useHist;
+                        //분류별 금액
+                        for (let j = 1; j <= 10; j++) {
+                          if (rowData.classInfo.seq === j) {
+                            newRow.insertCell().innerHTML = $cmmn.convertToCurrency(rowData.money);
+                          } else {
+                            newRow.insertCell().innerHTML = "-";
+                          }
+                        }
+                        //합계
+                        newRow.insertCell().innerHTML = $cmmn.convertToCurrency(rowData.money);
+                      }
+
+                      //3.총계 row 생성
+                      const newRow = tbody.insertRow();
+                      const totalCell = newRow.insertCell();
+                      newRow.classList.add("fw-bold");
+                      totalCell.setAttribute('colspan', '3');
+                      totalCell.innerHTML = "합계";
+                      //분류별 합계
+                      for (let i = 1; i <= 10; i++) {
+                        const newCell = newRow.insertCell();
+                        for (let j in data.sumByClass) {
+                          if (data.sumByClass[j].seq === i) {
+                            newCell.innerHTML = $cmmn.convertToCurrency(data.sumByClass[j].sum);
+                            break;
+                          } else {
+                            newCell.innerHTML = "-";
+                          }
+                        }
+                      }
+                      //총계
+                      newRow.insertCell().innerHTML = $cmmn.convertToCurrency(data.sum);
         }
+    }
+
+  /**
+   * 첨부파일 리스트 조회
+   * @param {String} seq : 제출 내역 seq
+   */
+    const selectAtchList = function(seq){
+        $.ajax({
+          type: "GET",
+          url: "/payhist/searchAtchList",
+          dataType: "json",
+          data: {
+            SEQ : seq
+          },
+          success: function (data) {
+            if (data.CODE === "SUCCESS") {
+              paintAtchList(data.result);
+            } else if (data.CODE === "ERR") {
+              return alert("첨부파일 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+            }
+          },
+          error: function () {
+            return alert("첨부파일 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        });
     }
 
   /**
@@ -331,10 +405,7 @@ const $approval = (function () {
    * 첨부 파일 toast
    */
   const initAtchToast = function(data){
-        //1.기존 첨부파일 list 초기화
-        $("#atchList > li").remove();
-        $("#atchEmpty").css("display", "");
-        $("#atchCnt").text("0");
+
 
         //2.선택한 결재 건의 첨부파일 리스트 조회
         if(!$cmmn.isNullorEmpty(data)){
@@ -365,6 +436,11 @@ const $approval = (function () {
      * @param {Array} data : 첨부파일 정보 Array
      */
     const paintAtchList = function (data) {
+        //1.기존 첨부파일 list 초기화
+        $("#atchList > li").remove();
+        $("#atchEmpty").css("display", "");
+        $("#atchCnt").text("0");
+
       if ($cmmn.isNullorEmpty(data)) {
         return false;
       }
@@ -373,16 +449,11 @@ const $approval = (function () {
       const atchList = document.querySelector("#atchList");
       for (let i = 0; i < data.length; i++) {
         const list = document.createElement("li");
-        const chkbox = document.createElement("input");
         const aTag = document.createElement("a");
         list.className += "list-group-item";
-        chkbox.setAttribute("type", "checkbox");
-        chkbox.setAttribute("value", data[i].seq);
-        chkbox.className += "form-check-input me-1 atch-check";
         aTag.innerText = data[i].fileNm;
         aTag.className += "text-decoration-none"
         aTag.setAttribute("href", "http://" + `${location.host}/payhist/downloadAtch?seq=${data[i].usehistSubmitInfo.seq}&fileNm=${data[i].fileNm}&fileSeq=${data[i].seq}`);
-        list.appendChild(chkbox);
         list.appendChild(aTag);
         document.querySelector("#atchList").appendChild(list);
       }

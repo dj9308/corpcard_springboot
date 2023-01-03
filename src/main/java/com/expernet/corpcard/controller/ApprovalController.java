@@ -1,5 +1,6 @@
 package com.expernet.corpcard.controller;
 
+import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.UsehistSubmitInfo;
 import com.expernet.corpcard.service.ApprovalService;
 import jakarta.annotation.Resource;
@@ -102,6 +103,31 @@ public class ApprovalController {
 				model.addAttribute("CODE", "ERR");
 				model.addAttribute("MSG", "결재 건 목록 조회 실패");
 				logger.error("결재 건 목록 조회 실패");
+			}
+		}
+		return "jsonView";
+	}
+
+	/**
+	 * 법인카드 사용 내역 목록 조회
+	 * @param paramMap: 검색 조건(seq)
+	 * @param model: modelMap
+	 */
+	@RequestMapping("/searchPayhistList")
+	public String searchPayhistList(@RequestParam HashMap<String, Object> paramMap, Model model){
+		HashMap<String, Object> result = null;
+		try {
+			result = approvalService.searchPayhistList(paramMap);
+		} finally {
+			if (result != null && result.get("list") != null) {
+				model.addAttribute("result", result);
+				model.addAttribute("CODE", "SUCCESS");
+				model.addAttribute("MSG", "결제내역 조회 성공.");
+				logger.info("결제내역 조회 성공.");
+			} else {
+				model.addAttribute("CODE", "EMPTY");
+				model.addAttribute("MSG", "결제내역 없음");
+				logger.info("결제내역 없음");
 			}
 		}
 		return "jsonView";
