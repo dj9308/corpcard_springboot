@@ -252,17 +252,16 @@
         </div>
     </div>
 </section>
-<input type="hidden" th:value="${#authentication.name}" id="userId">
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
 <!-- Core theme JS-->
+<script th:replace="/fragments/script.html :: fragment-script"></script>
 <script th:src="@{/js/corpcard/adminHist.js}"></script>
 <script>
     $(function () {
         $adminHist.init();
     });
-
 </script>
 </body>
 </html>
