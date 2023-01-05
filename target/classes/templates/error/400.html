@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="/fragments/header.html :: fragment-header">
+    </head>
+    <body>
+    <div class="d-flex align-items-center justify-content-center vh-100">
+        <div class="text-center">
+            <h1 class="display-1 fw-bold">400</h1>
+            <p class="fs-3"> </p>
+            <p class="lead">
+                잘못된 요청으로 인해 해당 페이지가 작동하지 않습니다.
+            </p>
+            <a th:href="@{/payhist}" class="btn btn-primary">Go Home</a>
+        </div>
+    </div>
+    </body>
+</html>

@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+    <Properties>
+        <Property name="logNm">Spring Log4j2</Property>
+        <Property name="layoutPattern">%d %5p [%c] %m%n</Property>
+    </Properties>
+    <Appenders>
+        <Console name="Console_Appender" target="SYSTEM_OUT">
+            <PatternLayout pattern="${layoutPattern}"/>
+        </Console>
+        <RollingFile name="File_Appender" fileName="C:/Users/dj930/logs/${logNm}.log"
+                     filePattern="C:/Users/dj930/logs/%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${layoutPattern}"/>
+            <Policies>
+                <TimeBasedTriggeringPolicy interval="1" modulate="true" />
+            </Policies>
+            <DefaultRolloverStrategy max="10" fileIndex="min"/>
+        </RollingFile>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO" additivity="false">
+            <AppenderRef ref="Console_Appender"/>
+            <AppenderRef ref="File_Appender"/>
+        </Root>
+
+        <!-- Spring -->
+        <Logger name="org.springframework" level="INFO" additivity="false">
+            <AppenderRef ref="Console_Appender"/>
+            <AppenderRef ref="File_Appender"/>
+        </Logger>
+
+        <!-- corpcard -->
+        <Logger name="com.expernet.corpcard" level="INFO" additivity="false">
+            <AppenderRef ref="Console_Appender"/>
+            <AppenderRef ref="File_Appender"/>
+        </Logger>
+
+        <!-- sql -->
+        <logger name="jdbc.audit" additivity="false" level="WARN">
+            <AppenderRef ref="Console_Appender"/>
+        </logger>
+
+        <logger name="jdbc.sqltiming" additivity="false" level="WARN">
+            <AppenderRef ref="Console_Appender"/>
+        </logger>
+
+        <logger name="jdbc.resultset" additivity="false" level="WARN">
+            <AppenderRef ref="Console_Appender"/>
+        </logger>
+
+        <logger name="jdbc.connection" additivity="false" level="WARN">
+            <AppenderRef ref="Console_Appender"/>
+        </logger>
+
+        <logger name="jdbc.sqlonly" additivity="false" level="INFO">
+            <AppenderRef ref="Console_Appender" />
+        </logger>
+
+    </Loggers>
+</Configuration>

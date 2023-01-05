@@ -1,0 +1,12 @@
+/* color */
+.svg-red {filter: invert(10%) sepia(47%) saturate(7279%) hue-rotate(355deg) brightness(96%) contrast(113%);}
+.btn-gray {border-color: #6c757d; color: black;}
+.btn-gray:hover {background: #e7e7e7;}
+.bg-grey {background-color: #dee2e6;}
+
+/* table */
+.table-style1 th {background-color: #e9ecef; padding-left: 8px; width: 15%; border-style: solid; border-color: inherit;}
+.table-style2 {font-size: small;}
+.th-style1 {width: 80px;}
+
+main {min-height:60vh;}
