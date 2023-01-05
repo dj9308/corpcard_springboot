@@ -86,8 +86,8 @@
                 </div>
                 <div class="col text-end">
                     <button class="btn btn-secondary" id="histAtchBtn">첨부파일</button>
-                    <button type="button" id="approvalHist" class="btn btn-primary">확인</button>
-                    <button type="button" id="rejectHist" class="btn btn-danger">반려</button>
+                    <button type="button" id="approvalHist" class="btn btn-primary" style="display:none;">확인</button>
+                    <button type="button" id="rejectHist" class="btn btn-danger" style="display:none;">반려</button>
                 </div>
             </div>
             <div class="table-responsive-xxl">
@@ -109,6 +109,8 @@
                         <th scope="col" class="th-style1">지급수수료</th>
                         <th scope="col" class="th-style1">기타</th>
                         <th scope="col" style="width:100px;">합계</th>
+                        <th scope="col" style="display:none">seq</th>
+                        <th scope="col" style="display:none">상태 code</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -138,11 +140,11 @@
         </div>
     </section>
 </main>
-<input type="hidden" th:value="${#authentication.name}" id="userId">
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
 <!-- Core theme JS-->
+<script th:replace="/fragments/script.html :: fragment-script"></script>
 <script th:src="@{/js/corpcard/approval.js}"></script>
 <script>
     $(function () {
