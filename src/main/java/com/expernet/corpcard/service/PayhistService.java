@@ -2,18 +2,14 @@ package com.expernet.corpcard.service;
 
 import com.expernet.corpcard.entity.AttachmentInfo;
 import com.expernet.corpcard.entity.CardUsehist;
-import com.expernet.corpcard.entity.UsehistSubmitInfo;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -33,6 +29,15 @@ import java.util.Map;
  * </pre>
  */
 public interface PayhistService {
+
+    /**
+     * 월별 총계 조회
+     *
+     * @param startYm   : 시작 연월
+     * @param endYm     : 종료 연월
+     * @param principal : 사용자 정보(ID)
+     */
+    List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, Principal principal);
 
     /**
      * 법인카드 결제 내역 목록 조회

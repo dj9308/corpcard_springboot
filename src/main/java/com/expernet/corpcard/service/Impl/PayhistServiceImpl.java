@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -85,6 +86,21 @@ public class PayhistServiceImpl implements PayhistService {
      * Logger
      */
     private static final Logger logger = LoggerFactory.getLogger(PayhistServiceImpl.class);
+
+    /**
+     * 월별 총계 조회
+     *
+     * @param startYm   : 시작 연월
+     * @param endYm     : 종료 연월
+     * @param principal : 사용자 정보(ID)
+     */
+    @Override
+    public List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, Principal principal) {
+        //1.사용자 정보 조회
+        User userInfo = userRepository.findByUserId(principal.getName());
+        //2.월별 총계 조회
+        return cardUsehistRepository.selectSumGroupByWrtYm(userInfo.getUserId(), startYm, endYm);
+    }
 
     /**
      * 법인카드 사용내역 조회
@@ -207,17 +223,17 @@ public class PayhistServiceImpl implements PayhistService {
     public List<AttachmentInfo> searchAtchList(HashMap<String, Object> paramMap) {
         List<AttachmentInfo> result;
         long seq = -1;
-        if(paramMap.get("SEQ") != null){
+        if (paramMap.get("SEQ") != null) {
             seq = Long.parseLong(paramMap.get("SEQ").toString());
-        }else{
+        } else {
             UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
-            if(submitInfo != null){
+            if (submitInfo != null) {
                 seq = submitInfo.getSeq();
             }
         }
-        if(seq != -1){
+        if (seq != -1) {
             result = attachmentInfoRepository.findAllByUsehistSubmitInfo_Seq(seq);
-        }else{
+        } else {
             result = new ArrayList<>();
         }
         return result;
@@ -314,13 +330,14 @@ public class PayhistServiceImpl implements PayhistService {
 
     /**
      * 첨부파일 다운로드
-     * @param paramMap  : 첨부파일 seq list
-     * @param response  : HttpServletResponse
+     *
+     * @param paramMap : 첨부파일 seq list
+     * @param response : HttpServletResponse
      */
     @Override
     public void downloadAtch(HashMap<String, Object> paramMap, HttpServletResponse response) throws IOException {
-        String downFileName = uploadPath+File.separator+paramMap.get("seq").toString()+File.separator
-                +paramMap.get("fileSeq").toString();
+        String downFileName = uploadPath + File.separator + paramMap.get("seq").toString() + File.separator
+                + paramMap.get("fileSeq").toString();
         String orgFileName = paramMap.get("fileNm").toString();
 
         File file = new File(downFileName);

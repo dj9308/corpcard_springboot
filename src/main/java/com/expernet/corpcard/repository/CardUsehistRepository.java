@@ -24,4 +24,16 @@ public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> 
     @Query(value = "SELECT SUM(money) AS sum FROM card_usehist " +
             "WHERE submit_seq  = :submitSeq", nativeQuery = true)
     long selectTotalSumBySubmitSeq(@Param("submitSeq") long submitSeq);
+
+    @Query(value = "SELECT new Map(cu.usehistSubmitInfo.seq AS seq, cu.usehistSubmitInfo.wrtYm AS wrtYm, " +
+            "sum(cu.money) AS sum) " +
+            "FROM CardUsehist cu " +
+            "WHERE cu.usehistSubmitInfo.user.userId = :userId " +
+            "AND cu.usehistSubmitInfo.wrtYm BETWEEN :startYm AND :endYm " +
+            "AND cu.usehistSubmitInfo.stateInfo.stateCd = 'C' " +
+            "GROUP BY cu.usehistSubmitInfo.wrtYm " +
+            "ORDER BY cu.usehistSubmitInfo.wrtYm ASC")
+    List<HashMap<String, Object>> selectSumGroupByWrtYm(@Param("userId") String userId,
+                                                        @Param("startYm") String startYm,
+                                                        @Param("endYm") String endYm);
 }

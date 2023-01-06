@@ -60,8 +60,9 @@ public class UsehistSubmitInfo {
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 
-    @Transient
-    private long totalMoney;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "WRITER_ID", referencedColumnName = "USER_ID", insertable = false, updatable = false)
+    private User user;
 
     @Builder
     public UsehistSubmitInfo(long seq, StateInfo stateInfo, String writerId, String writerDept,

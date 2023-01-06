@@ -11,6 +11,7 @@ const $payhist = (function () {
 
   const userId = document.querySelector('#userId').value;   // 사용자 ID
   let wrtYm                                                 // 작성연월
+  let barChartSeqList = [];
 
   /**
    * init
@@ -83,7 +84,7 @@ const $payhist = (function () {
     //PDF btn
     $("#histPDFBtn").on("click", function (event) {
       //1.결제 내역 리스트 조회
-      selectHistList(function (data) {
+      selectHistList(wrtYm, function (data) {
         if (data.CODE === "SUCCESS") {
           makePDF(data.result);
         } else if (data.CODE === "EMPTY") {
@@ -132,7 +133,7 @@ const $payhist = (function () {
     //제출 btn
     $("#submitHist").on("click", function () {
       if (confirm("제출 하시겠습니까?")) {
-        selectHistList(function (data) {
+        selectHistList(wrtYm, function (data) {
           if (data.CODE === "EMPTY") {
             return alert("해당 연월의 결제 내역이 없습니다.");
           }
@@ -279,6 +280,7 @@ const $payhist = (function () {
       $("#stateNm").text("결재 전");
       $("#submitCancel").css("display", "none");
       disableBtn(false);
+      return false;
     } else {
       $("#stateNm").text(stateInfo.stateNm);
     }
@@ -304,7 +306,7 @@ const $payhist = (function () {
   */
   const selectPayhistList = function () {
     //1.결제 내역 리스트 조회
-    selectHistList(function (data) {
+    selectHistList(wrtYm, function (data) {
       //1)테이블 초기화
       $cmmn.emptyTable("histTable");
       if (data.CODE === "SUCCESS") {
@@ -539,9 +541,9 @@ const $payhist = (function () {
    */
   const initStatsDatePicker = function () {
     const now = new Date;
-    const startDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 6), 'YYYY-mm');
-    const endDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
-    $("#datepicker").val(`${startDate} - ${endDate}`);
+    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 6), 'YYYY-mm');
+    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
+    $("#datepicker").val(`${startYm} - ${endYm}`);
 
     $('#datepicker').daterangepicker({
       "minViewMode": "month",
@@ -551,39 +553,132 @@ const $payhist = (function () {
     }, function (start, end, label) { });
 
     $('#datepicker').on('apply.daterangepicker', function (ev, picker) {
-      const startDate = picker.startDate.format('YYYY-MM-DD');
-      const endDate = picker.endDate.format('YYYY-MM-DD');
-      paintCharts();
+      const startYm = $cmmn.formatDate(picker.startDate, "YYYY-mm");
+      const endYm = $cmmn.formatDate(picker.endDate, "YYYY-mm");
+      paintCharts(startYm, endYm);
     });
   }
 
   /**
    * 차트 조회
+   * @param {String} startYm : 검색 기간 첫 월
+   * @param {String} endYm : 검색 기간 마지막 월
    */
-  const paintCharts = function () {
+  const paintCharts = function (startYm, endYm) {
+    function addData(wrtYm, money, seq) {
+      wrtYmList.push(wrtYm);
+      sumList.push(money);
+      barChartSeqList.push(endYm);
+    }
+    if ($cmmn.isNullorEmpty(startYm) || $cmmn.isNullorEmpty(endYm)) {
+      const now = new Date;
+      startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 6), 'YYYY-mm');
+      endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
+    }
+
+    const wrtYmList = [];
+    const sumList = [];
+    let dataList = [];
+
+    //1.월별 총계 조회
+    $.ajax({
+      type: "GET",
+      url: "/payhist/searchTotalSumList",
+      dataType: "json",
+      async: false,
+      data: {
+        startYm: startYm,
+        endYm: endYm,
+      },
+      success: function (data) {
+        if (data.CODE === "SUCCESS") {
+          dataList = data.result;
+        }
+      },
+    });
+
+    let i = 0;
+    while (startYm <= endYm && i < dataList.length) {
+      if (startYm < dataList[i].wrtYm) {
+        addData(startYm, 0, '');
+        startYm = $cmmn.formatDate(new Date(new Date(startYm).getFullYear(),
+          new Date(startYm).getMonth() + 1), 'YYYY-mm');
+      } else if (startYm > dataList[i].wrtYm) {
+        i++;
+      } else {
+        addData(dataList[i].wrtYm, dataList[i].sum, dataList[i].seq);
+        startYm = $cmmn.formatDate(new Date(new Date(startYm).getFullYear(),
+          new Date(startYm).getMonth() + 1), 'YYYY-mm');
+        i++;
+      }
+    }
+
+    while (i < dataList.length) {
+      addData(dataList[i].wrtYm, dataList[i].sum, dataList[i].seq);
+      i++;
+    }
+
+    while (startYm <= endYm) {
+      addData(startYm, 0, '');
+      startYm = $cmmn.formatDate(new Date(new Date(startYm).getFullYear(),
+        new Date(startYm).getMonth() + 1), 'YYYY-mm');
+    }
+
     const totalSum = document.querySelector('#totalSum');
     const monthSum = document.querySelector('#monthSum');
-    const barChartDom = document.querySelector('#chart-bar');
-    const pieChartDom = document.querySelector('#chart-pie');
+    const barChartDom = document.querySelector('#chartBar');
     const barOption = {
       xAxis: {
         type: 'category',
-        data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+        data: wrtYmList
       },
       yAxis: {
         type: 'value'
       },
       series: [
         {
-          data: [120, 200, 150, 80, 70, 110, 130],
-          type: 'bar'
-        }
+          data: sumList,
+          type: 'bar',
+          showBackground: true,
+          backgroundStyle: {
+            color: 'rgba(180, 180, 180, 0.2)'
+          },
+          label: {
+            show: true,
+            position: 'top'
+          },
+        },
       ]
     };
+    initChartAnimation(barChartDom, barOption);
+    selectHistList(endYm, function(data){
+        paintPieChart(endYm, data);
+    });
+  }
+
+  /**
+   * pie 차트 생성
+   * @param {String} wrtYm : 작성 연월
+   * @param {JSON} data : 결제 내역 조회 결과
+   */
+  const paintPieChart = function (wrtYm, data) {
+    const dataList = [];
+    let result = data.result;
+
+    if(data.CODE === "SUCCESS"){
+        for(let i =0; i< result.sumByClass.length;i++){
+            const object = {};
+            object.value = result.sumByClass[i].sum;
+            object.name = result.sumByClass[i].classNm;
+            dataList.push(object);
+        }
+    }
+
+    const pieChartDom = document.querySelector('#chartPie');
     const pieOption = {
       title: {
-        text: 'Referer of a Website',
-        subtext: 'Fake Data',
+        text: '분류별 합계',
+        subtext: wrtYm,
         left: 'center'
       },
       tooltip: {
@@ -595,16 +690,10 @@ const $payhist = (function () {
       },
       series: [
         {
-          name: 'Access From',
+          name: '분류별 합계',
           type: 'pie',
           radius: '50%',
-          data: [
-            { value: 1048, name: 'Search Engine' },
-            { value: 735, name: 'Direct' },
-            { value: 580, name: 'Email' },
-            { value: 484, name: 'Union Ads' },
-            { value: 300, name: 'Video Ads' }
-          ],
+          data: dataList,
           emphasis: {
             itemStyle: {
               shadowBlur: 10,
@@ -616,7 +705,6 @@ const $payhist = (function () {
       ]
     };
 
-    initChartAnimation(barChartDom, barOption);
     initChartAnimation(pieChartDom, pieOption);
   }
 
@@ -628,7 +716,16 @@ const $payhist = (function () {
     echarts.dispose(chartDom);
     myChart = echarts.init(chartDom);
     option && myChart.setOption(option);
+
+    if (chartDom.id === "chartBar") {
+      myChart.on('click', function (params) {
+        selectHistList(params.name, function(data){
+            paintPieChart(params.name, data);
+        });
+      });
+    }
   }
+
 
   /**
    * 결제 내역 table
@@ -780,16 +877,17 @@ const $payhist = (function () {
 
   /**
    * 결제 내역 리스트 조회 AJAX
+   * @param {String} yearMonth : 작성연월
    * @param {function} callback : Callback function
    */
-  const selectHistList = function (callback) {
+  const selectHistList = function (yearMonth, callback) {
     $.ajax({
       type: "GET",
       url: "/payhist/searchList",
       dataType: "json",
       data: {
         WRITER_ID: userId,
-        WRT_YM: wrtYm
+        WRT_YM: yearMonth
       },
       success: function (data) {
         callback(data);

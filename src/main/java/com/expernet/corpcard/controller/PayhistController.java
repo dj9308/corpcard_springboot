@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,11 +17,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.IOException;
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -66,20 +69,34 @@ public class PayhistController {
     }
 
     /**
-     * 월별 통계 조회
+     * 월별 총계 조회
      *
-     * @param dataList : 기간(년월)
+     * @param startYm : 시작 연월
+     * @param endYm : 종료 연월
+     * @param principal : 사용자 정보
      * @param model    : modelMap
-     */
-    @RequestMapping(value = "/staticInfo", method = RequestMethod.GET)
-    public String searchStaticInfo(@RequestParam List<HashMap<String, Object>> dataList, ModelMap model) {
-        int result = 0;
+     */ 
+    @Validated
+    @RequestMapping(value = "/searchTotalSumList", method = RequestMethod.GET)
+    public String searchTotalSumList(
+            @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "startYm") String startYm,
+            @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "endYm") String endYm,
+            Principal principal, ModelMap model) {
+        List<HashMap<String, Object>> result = new ArrayList<>();
         try {
-
+            result = payhistService.searchTotalSumList(startYm, endYm, principal);
         } finally {
-
+            if (result.size() > 0) {
+                model.addAttribute("result", result);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제내역 조회 성공");
+                logger.info("결제내역 조회 성공");
+            } else {
+                model.addAttribute("CODE", "EMPTY");
+                model.addAttribute("MSG", "결제내역 조회 실패");
+                logger.info("결제내역 조회 실패");
+            }
         }
-
         return "jsonView";
     }
 
