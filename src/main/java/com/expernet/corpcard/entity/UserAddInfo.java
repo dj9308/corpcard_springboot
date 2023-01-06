@@ -1,16 +1,19 @@
 package com.expernet.corpcard.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 
 @Getter
+@Setter
 @Entity
 @Table(name = "USER_ADD_INFO")
 @NoArgsConstructor
@@ -20,15 +23,15 @@ public class UserAddInfo {
     @Column(name = "SEQ")
     private long seq;
 
-    @JsonIgnore
-    @OneToOne(fetch = FetchType.EAGER)
+    @JsonBackReference
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name ="USER_ID", referencedColumnName = "USER_ID")
     private User user;
 
     @Column(name = "USER_PASSWD")
     private String userPasswd;
 
-    @Column(name = "ADMIN_YN",columnDefinition = "char")
+    @Column(name = "ADMIN_YN", columnDefinition = "char")
     private String adminYn;
 
     @CreationTimestamp

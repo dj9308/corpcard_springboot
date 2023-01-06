@@ -11,7 +11,8 @@ import java.util.List;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     User findByUserId(String userId);
-
+    List<User> findAllByUserAddInfo_AdminYn(String adminYn);
+    List<User> findAllByUserIdIn(List<String> userIdList);
     @Query(value = "SELECT * FROM tb_user tu WHERE tu.USER_ID NOT IN (SELECT USER_ID FROM user_add_info uai)",
             nativeQuery = true)
     List<User> findAllByUserIdNotInAddInfoQuery();

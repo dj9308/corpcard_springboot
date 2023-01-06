@@ -20,7 +20,7 @@ public class User {
     @Column(name = "USER_ID")
     private String userId;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY )
     private UserAddInfo userAddInfo;
 
     @Column(name = "OFCDS")

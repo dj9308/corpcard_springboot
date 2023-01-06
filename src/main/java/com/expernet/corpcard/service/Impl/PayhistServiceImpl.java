@@ -176,8 +176,7 @@ public class PayhistServiceImpl implements PayhistService {
         long result = 0;
         List<Long> list;
         try {
-            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {
-            });
+            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {});
         } catch (JsonProcessingException e) {
             return 0;
         }

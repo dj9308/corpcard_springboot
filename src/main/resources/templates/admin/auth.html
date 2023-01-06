@@ -5,90 +5,124 @@
 <body>
 <!-- navbar -->
 <div th:replace="/fragments/nav.html :: fragment-nav"></div>
-<header class="py-5">
+<header class="py-2">
     <div class="container px-lg-5">
-        <div class="p-4 p-lg-5 bg-light rounded-3 text-center">
-            <div class="m-4 m-lg-5">
-                <h1 class="display-5 fw-bold">A warm welcome!</h1>
-                <p class="fs-4">Bootstrap utility classes are used to create this jumbotron since the old component has been removed from the framework. Why create custom CSS when you can use utilities?</p>
-                <a class="btn btn-primary btn-lg" href="#!">Call to action</a>
-            </div>
+        <div class="fs-3 fw-bold mb-4">
+            <svg class="mb-2" xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                 viewBox="0 0 16 16">
+                <image th:href="@{/icons/clipboard2-fill.svg}"></image>
+            </svg>
+            권한 관리
+        </div>
+        <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
+            <table style="width:100%;">
+                <tr>
+                    <td style="width: 18%" align="right">
+                        <input type="text" id="listSearch" class="form-control form-control-sm" placeholder="SEARCH"
+                               style="width:120px;">
+                    </td>
+                </tr>
+            </table>
         </div>
     </div>
 </header>
 <!-- Page Content-->
-<section class="pt-4">
-    <div class="container px-lg-5">
-        <!-- Page Features-->
-        <div class="row gx-lg-5">
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-collection"></i></div>
-                        <h2 class="fs-4 fw-bold">Fresh new layout</h2>
-                        <p class="mb-0">With Bootstrap 5, we've created a fresh new layout for this template!</p>
-                    </div>
+<main>
+    <section class="pt-1">
+        <div class="container px-lg-5">
+            <div class="mb-1 fs-4 gx-5 row">
+                <div class="col">
+                    총 <span class="fw-bold" id="listTotCnt">0</span>건이 조회되었습니다.
+                </div>
+                <div class="col text-end">
+                    <button type="button" id="addAuth" class="btn btn-secondary"
+                            data-bs-toggle="modal" data-bs-target="#addManagerModal">추가</button>
+                    <button type="button" id="deleteAuth" class="btn btn-secondary">삭제</button>
                 </div>
             </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-cloud-download"></i></div>
-                        <h2 class="fs-4 fw-bold">Free to download</h2>
-                        <p class="mb-0">As always, Start Bootstrap has a powerful collectin of free templates.</p>
-                    </div>
+            <div class="table-responsive-xxl">
+                <table id="authTable"
+                       class="text-center table table-bordered align-middle">
+                    <thead class="table-secondary">
+                    <tr>
+                        <th scope="col" style="width:5%;">
+                            <input class="form-check-input me-1" type="checkbox" id="checkAll">
+                        </th>
+                        <th scope="col" style="width:11%;">No.</th>
+                        <th scope="col" style="width:21%;">부서</th>
+                        <th scope="col" style="width:21%;">팀</th>
+                        <th scope="col" style="width:21%;">직급</th>
+                        <th scope="col" style="width:21%;">이름</th>
+                        <th scope="col" style="display:none">userId</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</main>
+<!-- Modal -->
+<div class="modal fade" id="addManagerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">관리자 추가</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
+                    <table style="width:100%;">
+                        <tr>
+                            <td style="width: 18%">
+                                <input type="text" id="addSearch" class="form-control form-control-sm"
+                                       placeholder="SEARCH" style="width:120px;">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="fs-6 mb-2 ms-1">
+                    <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor"
+                         viewBox="0 0 16 16">
+                        <image th:href="@{/icons/briefcase-fill.svg}"></image>
+                    </svg>
+                    기간별 통계
+                </div>
+                <div class="table-responsive-xxl">
+                    <table id="addManagerTable"
+                           class="text-center table table-bordered align-middle">
+                        <thead class="table-secondary">
+                        <tr>
+                            <th scope="col" style="width:21%;">부서</th>
+                            <th scope="col" style="width:21%;">팀</th>
+                            <th scope="col" style="width:21%;">직급</th>
+                            <th scope="col" style="width:21%;">이름</th>
+                            <th scope="col" style="display:none">userId</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-card-heading"></i></div>
-                        <h2 class="fs-4 fw-bold">Jumbotron hero header</h2>
-                        <p class="mb-0">The heroic part of this template is the jumbotron hero header!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-bootstrap"></i></div>
-                        <h2 class="fs-4 fw-bold">Feature boxes</h2>
-                        <p class="mb-0">We've created some custom feature boxes using Bootstrap icons!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-code"></i></div>
-                        <h2 class="fs-4 fw-bold">Simple clean code</h2>
-                        <p class="mb-0">We keep our dependencies up to date and squash bugs as they come!</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-6 col-xxl-4 mb-5">
-                <div class="card bg-light border-0 h-100">
-                    <div class="card-body text-center p-4 p-lg-5 pt-0 pt-lg-0">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4"><i class="bi bi-patch-check"></i></div>
-                        <h2 class="fs-4 fw-bold">A name you trust</h2>
-                        <p class="mb-0">Start Bootstrap has been the leader in free Bootstrap templates since 2013!</p>
-                    </div>
-                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary">추가</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>
-</section>
+</div>
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
-<!-- Bootstrap core JS-->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Core theme JS-->
 <script th:replace="/fragments/script.html :: fragment-script"></script>
-<script src="js/scripts.js"></script>
+<script th:src="@{/js/corpcard/admin/auth.js}"></script>
 <script>
-
-console.log(window.location.href);
+    $(function () {
+        $auth.init();
+    });
 </script>
 </body>
 </html>

@@ -32,7 +32,9 @@ import java.util.List;
 @Controller
 @RequestMapping(value = "/approval")
 public class ApprovalController {
-
+	/**
+	 * 결재 Service
+	 */
 	@Resource(name = "ApprovalService")
 	private ApprovalService approvalService;
 

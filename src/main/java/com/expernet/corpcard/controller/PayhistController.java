@@ -49,7 +49,7 @@ import java.util.Map;
 @RequestMapping(value = "/payhist")
 public class PayhistController {
     /**
-     * payhist Service
+     * 결제 내역 Service
      */
     @Resource(name = "PayhistService")
     private PayhistService payhistService;

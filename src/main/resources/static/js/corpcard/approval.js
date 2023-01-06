@@ -18,7 +18,7 @@ const $approval = (function () {
   const init = function () {
     initBtnEvt();           //버튼 이벤트
     initSearchForm();       //결재 건 검색 Form
-    initHistTable();        //결제내역 리스트 table
+    paintPayhistTable();    //결제내역 table 생성
     initAtchToast();        //첨부 파일 toast
   }
 
@@ -409,14 +409,6 @@ const $approval = (function () {
     $("#approvalSubmit").trigger("click");
   }
 
-  /**
-   * 결제내역 리스트 table
-   */
-  const initHistTable = function(){
-    paintPayhistTable();    //테이블 init
-
-
-  }
   /**
    * 첨부 파일 toast
    */
