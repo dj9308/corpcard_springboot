@@ -579,6 +579,7 @@ const $payhist = (function () {
     const wrtYmList = [];
     const sumList = [];
     let dataList = [];
+    let totalSum = 0;
 
     //1.월별 총계 조회
     $.ajax({
@@ -593,6 +594,10 @@ const $payhist = (function () {
       success: function (data) {
         if (data.CODE === "SUCCESS") {
           dataList = data.result;
+
+          for(let i =0 ;i<data.result.length;i++){
+              totalSum+=dataList[i].sum;
+          }
         }
       },
     });
@@ -624,8 +629,6 @@ const $payhist = (function () {
         new Date(startYm).getMonth() + 1), 'YYYY-mm');
     }
 
-    const totalSum = document.querySelector('#totalSum');
-    const monthSum = document.querySelector('#monthSum');
     const barChartDom = document.querySelector('#chartBar');
     const barOption = {
       xAxis: {
@@ -654,14 +657,16 @@ const $payhist = (function () {
     selectHistList(endYm, function(data){
         paintPieChart(endYm, data);
     });
+
+    document.querySelector('#totalSum').innerText = `${$cmmn.convertToCurrency(totalSum)}원`
   }
 
   /**
    * pie 차트 생성
-   * @param {String} wrtYm : 작성 연월
+   * @param {String} yearMonth : 작성 연월
    * @param {JSON} data : 결제 내역 조회 결과
    */
-  const paintPieChart = function (wrtYm, data) {
+  const paintPieChart = function (yearMonth, data) {
     const dataList = [];
     let result = data.result;
 
@@ -678,7 +683,7 @@ const $payhist = (function () {
     const pieOption = {
       title: {
         text: '분류별 합계',
-        subtext: wrtYm,
+        subtext: yearMonth,
         left: 'center'
       },
       tooltip: {
@@ -706,6 +711,8 @@ const $payhist = (function () {
     };
 
     initChartAnimation(pieChartDom, pieOption);
+    document.querySelector("#curYm").innerText = `${yearMonth.split("-")[0]}년 ${yearMonth.split("-")[1]}월`;
+    document.querySelector("#curYmSum").innerText = `${$cmmn.convertToCurrency(result.sum)}원`;
   }
 
   /**

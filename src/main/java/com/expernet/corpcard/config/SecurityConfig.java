@@ -83,7 +83,7 @@ public class SecurityConfig {
                                 .requestMatchers("/login", "/common/**", "/fragments/**").permitAll()
                                 .requestMatchers("/css/**", "/js/**", "/font/**", "/icons/**").permitAll()
                                 .requestMatchers("/approval").hasRole("CHIEF")
-                                .requestMatchers("/admin").hasRole("ADMIN")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
                                 .anyRequest().authenticated();
                     } catch (Exception e) {
                         throw new RuntimeException(e);

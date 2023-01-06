@@ -82,6 +82,7 @@ public class PayhistController {
             @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "startYm") String startYm,
             @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "endYm") String endYm,
             Principal principal, ModelMap model) {
+        //TODO 총 합계 조회 DB에서 계산하도록 변경 필요
         List<HashMap<String, Object>> result = new ArrayList<>();
         try {
             result = payhistService.searchTotalSumList(startYm, endYm, principal);

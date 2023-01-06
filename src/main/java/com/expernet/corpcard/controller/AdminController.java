@@ -39,13 +39,13 @@ public class AdminController {
 	 */
 	@RequestMapping("/{menuType}")
 	public String histPage(@PathVariable("menuType") String menuType, Model model){
-		if(!menuType.equals("adminHist") &&	//결제내역 관리
+		if(!menuType.equals("hist") &&	//결제내역 관리
 				!menuType.equals("auth") && //권한 관리
 				!menuType.equals("card")){	//카드 관리
 			return "404";
 		}else{
 			model.addAttribute("menu", menuType);
-			return menuType;
+			return "admin/"+menuType;
 		}
 	}
 }
