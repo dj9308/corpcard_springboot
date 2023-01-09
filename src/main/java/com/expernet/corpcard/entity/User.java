@@ -1,5 +1,6 @@
 package com.expernet.corpcard.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,7 +21,8 @@ public class User {
     @Column(name = "USER_ID")
     private String userId;
 
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY )
+    @JsonManagedReference
+    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
     private UserAddInfo userAddInfo;
 
     @Column(name = "OFCDS")

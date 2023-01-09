@@ -21,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+import static org.junit.Assert.assertNotNull;
+
 @Transactional
 @RequiredArgsConstructor
 @Service("AdminService")
@@ -37,9 +39,15 @@ public class AdminServiceImpl implements AdminService {
     @Autowired
     private UserAddInfoRepository userAddInfoRepository;
 
+    /**
+     * 관리자 권한 조회
+     * @param paramMap : 사용자 정보
+     */
     @Override
-    public List<UserDTO> searchManagerList() {
-        List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn("Y");
+    public List<UserDTO> searchManagerList(HashMap<String, Object> paramMap) {
+        //TODO JPA FETCH 전략 확인 및 조회 속도 개선 필요
+        String adminYn = paramMap.get("adminYn").toString();
+        List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn(adminYn);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(userEntityList, new TypeToken<List<UserDTO>>() {}.getType());
@@ -60,11 +68,15 @@ public class AdminServiceImpl implements AdminService {
             return null;
         }
 
-        List<UserAddInfo> addInfos = userAddInfoRepository.findAllByUser_UserIdIn(userIdList);
+        List<User> userInfoList = userRepository.findAllByUserIdIn(userIdList);
+        List<UserAddInfo> addInfoList = new ArrayList<>();
 
-        for(UserAddInfo info : addInfos){
+        for(User user : userInfoList){
+            UserAddInfo info = user.getUserAddInfo();
             info.setAdminYn(adminYn);
+            addInfoList.add(info);
         }
-        return userAddInfoRepository.saveAll(addInfos);
+
+        return userAddInfoRepository.saveAll(addInfoList);
     }
 }

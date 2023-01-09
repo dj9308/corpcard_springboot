@@ -1,9 +1,7 @@
 package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.dto.UserDTO;
-import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.AdminService;
-import com.expernet.corpcard.service.ApprovalService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,10 +68,10 @@ public class AdminController {
 	 * @param model: modelMap
 	 */
 	@RequestMapping("/searchManagerList")
-	public String searchApprovalList(Model model){
+	public String searchApprovalList(@RequestParam HashMap<String, Object> paramMap, Model model){
 		List<UserDTO> result = null;
 		try {
-			result = adminService.searchManagerList();
+			result = adminService.searchManagerList(paramMap);
 		} finally {
 			if (result != null) {
 				if(result.size() == 0){

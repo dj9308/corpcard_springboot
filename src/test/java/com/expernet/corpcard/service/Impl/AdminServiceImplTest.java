@@ -48,28 +48,20 @@ public class AdminServiceImplTest {
 
     @Test
     public void updateAuth() {
-        String adminYn = "N";
+        String adminYn = "Y";
         List<String> userIdList = new ArrayList<>();
         userIdList.add("3");
         userIdList.add("405");
 
-        List<UserAddInfo> addInfos = userAddInfoRepository.findAllByUser_UserIdIn(userIdList);
-        List<UserAddInfo> test = userAddInfoRepository.findAll();
+        List<User> test = userRepository.findAllByUserIdIn(userIdList);
+        List<UserAddInfo> addInfos = new ArrayList<>();
 
-        for(UserAddInfo info : addInfos){
-            info.setAdminYn(adminYn);
+        for(User user : test){
+            UserAddInfo info = user.getUserAddInfo();
+            info.setAdminYn("Y");
+            addInfos.add(info);
         }
         Object result = userAddInfoRepository.saveAll(addInfos);
-
-
-//        List<User> addInfos = userRepository.findAllByUserIdIn(userIdList);
-//
-//        for(User info : addInfos){
-//            info.setUserAddInfo(UserAddInfo.builder()
-//                    .user(User.builder().userId(info.getUserId()).build())
-//                    .adminYn("N").build());
-//        }
-//        Object result = userRepository.saveAll(addInfos);
         assertNotNull(result);
     }
 }

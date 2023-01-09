@@ -65,7 +65,7 @@
 </main>
 <!-- Modal -->
 <div class="modal fade" id="addManagerModal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="modalLabel">관리자 추가</h5>
@@ -91,7 +91,7 @@
                 </div>
                 <div class="table-responsive-xxl">
                     <table id="addManagerTable"
-                           class="text-center table table-bordered align-middle">
+                           class="text-center table table-hover table-bordered align-middle">
                         <thead class="table-secondary">
                         <tr>
                             <th scope="col" style="width:21%;">부서</th>
@@ -107,8 +107,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary">추가</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                <button type="button" id="modalAddBtn" class="btn btn-primary">추가</button>
+                <button type="button" id="modalCloseBtn" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
             </div>
         </div>
     </div>

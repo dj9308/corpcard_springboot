@@ -24,7 +24,7 @@ public class UserAddInfo {
     private long seq;
 
     @JsonBackReference
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name ="USER_ID", referencedColumnName = "USER_ID")
     private User user;
 

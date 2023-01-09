@@ -28,7 +28,7 @@ public interface AdminService {
     /**
      * 관리자 목록 조회
      */
-    List<UserDTO> searchManagerList();
+    List<UserDTO> searchManagerList(HashMap<String, Object> paramMap);
 
     /**
      * 관리자 권한 변경

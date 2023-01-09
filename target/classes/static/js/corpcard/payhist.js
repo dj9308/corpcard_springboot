@@ -595,8 +595,8 @@ const $payhist = (function () {
         if (data.CODE === "SUCCESS") {
           dataList = data.result;
 
-          for(let i =0 ;i<data.result.length;i++){
-              totalSum+=dataList[i].sum;
+          for (let i = 0; i < data.result.length; i++) {
+            totalSum += dataList[i].sum;
           }
         }
       },
@@ -654,8 +654,8 @@ const $payhist = (function () {
       ]
     };
     initChartAnimation(barChartDom, barOption);
-    selectHistList(endYm, function(data){
-        paintPieChart(endYm, data);
+    selectHistList(endYm, function (data) {
+      paintPieChart(endYm, data);
     });
 
     document.querySelector('#totalSum').innerText = `${$cmmn.convertToCurrency(totalSum)}원`
@@ -670,13 +670,13 @@ const $payhist = (function () {
     const dataList = [];
     let result = data.result;
 
-    if(data.CODE === "SUCCESS"){
-        for(let i =0; i< result.sumByClass.length;i++){
-            const object = {};
-            object.value = result.sumByClass[i].sum;
-            object.name = result.sumByClass[i].classNm;
-            dataList.push(object);
-        }
+    if (data.CODE === "SUCCESS") {
+      for (let i = 0; i < result.sumByClass.length; i++) {
+        const object = {};
+        object.value = result.sumByClass[i].sum;
+        object.name = result.sumByClass[i].classNm;
+        dataList.push(object);
+      }
     }
 
     const pieChartDom = document.querySelector('#chartPie');
@@ -726,8 +726,8 @@ const $payhist = (function () {
 
     if (chartDom.id === "chartBar") {
       myChart.on('click', function (params) {
-        selectHistList(params.name, function(data){
-            paintPieChart(params.name, data);
+        selectHistList(params.name, function (data) {
+          paintPieChart(params.name, data);
         });
       });
     }
