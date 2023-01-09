@@ -17,7 +17,6 @@ const $auth = (function () {
   const init = function () {
     initBtnEvt();           //버튼 이벤트
     initAuthTable();        //권한 테이블 설정
-
   }
 
   /**
@@ -27,10 +26,11 @@ const $auth = (function () {
     //search input
     $("#listSearch").on('keyup', function () {
       $("#authTable > tbody > tr").hide();
-      var value = $(this).val().toLowerCase();
+      const value = $(this).val().toLowerCase();
       $("#authTable > tbody > tr").filter(function () {
         return $(this).text().toLowerCase().indexOf(value) > -1;
       }).show();
+      document.querySelector("#listTotCnt").innerText = $("#authTable > tbody > tr:visible").length;
     });
 
     //추가 버튼
@@ -45,7 +45,7 @@ const $auth = (function () {
         //1.체크된 row 조회
         const idList = [];
         $('.table-check').each(function (index) {
-          if ($(this).is(":checked")) {
+          if ($(this).is(":checked") && $(this).is(":visible")) {
             idList.push($(this).parent().parent().find("td:eq(6)").text());
           }
         });
@@ -55,13 +55,14 @@ const $auth = (function () {
         //2.관리자 권한 삭제
         updateAuth(idList, "N", selectManagerList);
         $("#checkAll").prop('checked', false);
+        $(".table-check").prop('checked', false);
       }
     });
 
     //관리자 추가 모달 Search Input
     $("#addSearch").on('keyup', function () {
       $("#addManagerTable > tbody > tr").hide();
-      var value = $(this).val().toLowerCase();
+      const value = $(this).val().toLowerCase();
       $("#addManagerTable > tbody > tr").filter(function () {
         return $(this).text().toLowerCase().indexOf(value) > -1;
       }).show();
@@ -161,7 +162,8 @@ const $auth = (function () {
         //No.
         newRow.insertCell().innerHTML = (i + 1).toString();
         //부서
-        newRow.insertCell().innerHTML = rowData.dept.upper.deptNm;
+        newRow.insertCell().innerHTML = $cmmn.isNullorEmpty(rowData.dept.upper) ?
+          '' : rowData.dept.upper.deptNm;
         //팀
         newRow.insertCell().innerHTML = rowData.dept.deptNm;
         //직급
