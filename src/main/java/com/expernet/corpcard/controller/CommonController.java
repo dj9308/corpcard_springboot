@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -106,14 +107,18 @@ public class CommonController {
 
     /**
      * 카드 목록 조회
-     *
+     * @param paramMap : 사용자 정보
      * @param model : modelMap
      */
     @RequestMapping("/cardList")
-    public String searchCardList(Model model) {
+    public String searchCardList(@RequestParam HashMap<String, Object> paramMap, Model model) {
         List<CardInfo> cardList = new ArrayList<>();
         try {
-            cardList = commonService.searchCardList();
+            cardList = commonService.searchCardList(paramMap);
+        } catch (ParseException e) {
+            model.addAttribute("CODE", "ERR");
+            model.addAttribute("MSG", "카드 목록 조회 실패");
+            logger.error("카드 목록 조회 실패");
         } finally {
             if (cardList != null) {
                 model.addAttribute("result", cardList);

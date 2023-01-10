@@ -1,8 +1,12 @@
 package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.entity.CardInfo;
+import com.expernet.corpcard.entity.CardReceiptent;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.entity.UserAddInfo;
+import com.expernet.corpcard.repository.CardInfoRepository;
+import com.expernet.corpcard.repository.CardReceiptentRepository;
 import com.expernet.corpcard.repository.UserAddInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -36,6 +40,10 @@ public class AdminServiceImplTest {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CardReceiptentRepository cardReceiptentRepository;
+    @Autowired
+    private CardInfoRepository cardInfoRepository;
 
     @Test
     public void searchManagerList() {
@@ -63,5 +71,28 @@ public class AdminServiceImplTest {
         }
         Object result = userAddInfoRepository.saveAll(addInfos);
         assertNotNull(result);
+    }
+
+    @Test
+    public void insertReceiptent() {
+        long seq = 3;
+        User userinfo = User.builder()
+                .seq(69)
+                .userId("405")
+                .ofcds("연구원")
+                .userNm("설동재")
+                .chiefYn('N')
+                .build();
+        CardInfo cardInfo = CardInfo.builder()
+                .seq(14)
+                .build();
+
+        CardReceiptent test = CardReceiptent.builder()
+                .user(userinfo)
+                .cardInfo(cardInfo)
+                .build();
+
+        CardInfo ee = cardInfoRepository.findById(seq).orElse(null);
+        assertNotNull(ee);
     }
 }

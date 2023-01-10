@@ -1,6 +1,9 @@
 package com.expernet.corpcard.service;
 
+import com.expernet.corpcard.dto.CardDTO;
 import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.entity.CardInfo;
+import com.expernet.corpcard.entity.CardReceiptent;
 import com.expernet.corpcard.entity.User;
 
 import java.util.HashMap;
@@ -24,7 +27,6 @@ import java.util.List;
  * </pre>
  */
 public interface AdminService {
-
     /**
      * 관리자 목록 조회
      */
@@ -36,4 +38,25 @@ public interface AdminService {
      */
     Object updateAuth(HashMap<String, Object> paramMap);
 
+    /**
+     * 카드 목록 조회
+     */
+    List<CardInfo> searchCardList();
+
+    /**
+     * 카드 정보 삭제
+     * @param paramMap : 카드 정보
+     */
+    long deleteCardInfo(HashMap<String, Object> paramMap);
+
+    /**
+     * 카드 정보 저장 or 수정
+     * @param cardInfo : 카드 정보
+     */
+    CardInfo saveCardInfo(CardDTO cardInfo);
+
+    /**
+     * 사용자 전체 목록 조회
+     */
+    List<UserDTO> searchUserList();
 }

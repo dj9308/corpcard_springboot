@@ -10,6 +10,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -77,10 +82,25 @@ public class CommonServiceImpl implements CommonService {
 
     /**
      * 카드 목록 조회
+     *
+     * @param paramMap : 사용자 정보
      */
     @Override
-    public List<CardInfo> searchCardList() {
-        return cardInfoRepository.findAll();
+    public List<CardInfo> searchCardList(HashMap<String, Object> paramMap) throws ParseException {
+        String userId = paramMap.get("userId").toString();
+        String wrtYm = paramMap.get("wrtYm").toString();
+        //날짜 범위 설정
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+        Date parsedDate = dateFormat.parse(wrtYm);
+        calendar.setTime(parsedDate);
+        calendar.set(Calendar.DAY_OF_MONTH,1);
+        Timestamp startDate = new Timestamp(calendar.getTimeInMillis());
+
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+        Timestamp endDate = new Timestamp(calendar.getTimeInMillis());
+
+        return cardInfoRepository.findAllByUserIdAndReceivedAt(userId, startDate, endDate);
     }
 
     /**
@@ -112,7 +132,7 @@ public class CommonServiceImpl implements CommonService {
                 submitInfo.setCheckerOfcds(checkerInfo.getOfcds());
             }
             //결재 완료일 삽입
-            if(stateDTO.getStateCd().equals("C")){
+            if (stateDTO.getStateCd().equals("C")) {
                 submitInfo.setApproveDate(new Timestamp(System.currentTimeMillis()));
             }
             //상태 seq 삽입

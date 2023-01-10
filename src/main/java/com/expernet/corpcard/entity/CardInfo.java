@@ -1,11 +1,14 @@
 package com.expernet.corpcard.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -31,6 +34,11 @@ public class CardInfo {
     @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "cardInfo", fetch = FetchType.LAZY)
+    private List<CardReceiptent> cardReceiptents = new ArrayList<>();
+
 
     @Builder
     public CardInfo(long seq, String cardComp, String cardNum){

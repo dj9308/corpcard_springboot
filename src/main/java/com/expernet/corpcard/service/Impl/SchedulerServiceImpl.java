@@ -296,7 +296,7 @@ public class SchedulerServiceImpl implements SchedulerService {
         if (toSaveUserAddList != null) {
             try{
                 for (User user : toSaveUserAddList) {
-                    //TODO 비밀번호 설정 방식 협의 필요
+                    //TODO 비밀번호 설정 방식 재고 필요
                     String password = passwordEncoder.encode(user.getUserId()+user.getUserId());
 
                     UserAddInfo userAddInfo = UserAddInfo.builder()

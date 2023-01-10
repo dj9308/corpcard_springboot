@@ -492,26 +492,7 @@ const $payhist = (function () {
 
     //카드 select
     const cardSelect = document.querySelector("#cardSelect");
-    $.ajax({
-      type: "GET",
-      url: "/common/cardList",
-      success: function (data) {
-        if (data.CODE === "SUCCESS") {
-          const json = data.result;
-          for (let i in json) {
-            const option = document.createElement('option');
-            option.text = `${json[i].cardComp} ${json[i].cardNum}`;
-            option.value = json[i].seq;
-            cardSelect.options.add(option);
-          }
-        } else {
-          alert("카드 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
-        }
-      },
-      error: function () {
-        return alert("카드 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
-      }
-    });
+    selectCardList();
 
     //사용일시 선택 제한
     setLimitHistDate();
@@ -750,6 +731,7 @@ const $payhist = (function () {
       wrtYm = this.value;
       selectPayhistList();
       initAtchToast();
+      selectCardList(wrtYm);
     });
 
     //체크박스 전체 설정
@@ -903,6 +885,44 @@ const $payhist = (function () {
         return alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
       }
     });
+  }
+
+    /**
+     * 해당연월 수령한 카드 리스트 조회 AJAX
+     * @param {String} yearMonth : 작성연월
+     */
+  const selectCardList = function(yearMonth){
+    if($cmmn.isNullorEmpty(yearMonth)){
+        yearMonth = $cmmn.formatDate("", "YYYY-mm");
+    }
+
+    $.ajax({
+        type: "GET",
+        url: "/common/cardList",
+        data: {
+          userId : userId,
+          wrtYm: yearMonth,
+        },
+        success: function (data) {
+          if (data.CODE === "SUCCESS") {
+            const cardSelect = document.querySelector("#cardSelect");
+            const json = data.result;
+            $("#cardSelect option").not("option:first").remove();
+
+            for (let i in json) {
+              const option = document.createElement('option');
+              option.text = `${json[i].cardComp} ${json[i].cardNum}`;
+              option.value = json[i].seq;
+              cardSelect.options.add(option);
+            }
+          } else {
+            alert("카드 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        },
+        error: function () {
+          return alert("카드 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+        }
+      });
   }
 
   /**

@@ -1,5 +1,6 @@
 package com.expernet.corpcard.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -18,25 +19,26 @@ public class CardReceiptent {
     @Column(name = "SEQ")
     private long seq;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CARD_SEQ")
     private CardInfo cardInfo;
 
-    @Column(name = "USER_ID")
-    private String userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USER_ID", referencedColumnName = "USER_ID")
+    private User user;
 
     @CreationTimestamp
     @Column(name = "RECEIVED_AT")
     private Timestamp receivedAt;
 
-    @UpdateTimestamp
     @Column(name = "RETURNED_AT")
     private Timestamp returnedAt;
 
     @Builder
-    public CardReceiptent(long seq, CardInfo cardInfo, String userId){
+    public CardReceiptent(long seq, CardInfo cardInfo, User user){
         this.seq = seq;
         this.cardInfo = cardInfo;
-        this.userId = userId;
+        this.user = user;
     }
 }
