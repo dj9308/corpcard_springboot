@@ -92,14 +92,11 @@ public class PayhistServiceImpl implements PayhistService {
      *
      * @param startYm   : 시작 연월
      * @param endYm     : 종료 연월
-     * @param principal : 사용자 정보(ID)
+     * @param userId : 사용자 ID
      */
     @Override
-    public List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, Principal principal) {
-        //1.사용자 정보 조회
-        User userInfo = userRepository.findByUserId(principal.getName());
-        //2.월별 총계 조회
-        return cardUsehistRepository.selectSumGroupByWrtYm(userInfo.getUserId(), startYm, endYm);
+    public List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, String userId) {
+        return cardUsehistRepository.selectSumGroupByUserId(userId, startYm, endYm);
     }
 
     /**
@@ -111,17 +108,21 @@ public class PayhistServiceImpl implements PayhistService {
     public HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap) {
         HashMap<String, Object> result = new HashMap<>();
         UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+
         if (submitInfo != null) {
-            List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq());
+            List<CardUsehist> list = cardUsehistRepository.
+                    findAllBySeqAndClassCd(submitInfo.getSeq(), paramMap.get("CLASS_CD").toString());
             if (list.size() > 0) {
                 //제출 내역
                 result.put("submitInfo", submitInfo);
                 //사용 내역 리스트
                 result.put("list", list);
                 //분류별 합계
-                result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitInfo.getSeq()));
+                result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitInfo.getSeq(),
+                        paramMap.get("CLASS_CD").toString()));
                 //총계
-                result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(submitInfo.getSeq()));
+                result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(submitInfo.getSeq(),
+                        paramMap.get("CLASS_CD").toString()));
             }
         }
         return result;

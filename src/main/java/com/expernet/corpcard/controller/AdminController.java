@@ -4,6 +4,7 @@ import com.expernet.corpcard.dto.CardDTO;
 import com.expernet.corpcard.dto.UserDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.CardReceiptent;
+import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.AdminService;
 import jakarta.annotation.Resource;
@@ -218,6 +219,31 @@ public class AdminController {
 				model.addAttribute("CODE", "ERR");
 				model.addAttribute("MSG", "사용자 목록 조회 실패");
 				logger.error("사용자 목록 조회 실패");
+			}
+		}
+		return "jsonView";
+	}
+
+	/**
+	 * 결제 내역 조회
+	 * @param wrtYm: 작성연월
+	 * @param model: modelMap
+	 */
+	@RequestMapping(value = "/searchPayList", method = RequestMethod.GET)
+	public String searchPayList(@RequestParam(value = "wrtYm") String wrtYm, Model model){
+		HashMap<String, Object> result = null;
+		try {
+			result = adminService.searchPayList(wrtYm);
+		} finally {
+			if (result != null) {
+				model.addAttribute("result", result);
+				model.addAttribute("CODE", "SUCCESS");
+				model.addAttribute("MSG", "결제 내역 조회 성공");
+				logger.info("결제 내역 조회 성공");
+			} else {
+				model.addAttribute("CODE", "ERR");
+				model.addAttribute("MSG", "결제 내역 조회 실패");
+				logger.error("결제 내역 조회 실패");
 			}
 		}
 		return "jsonView";

@@ -35,9 +35,9 @@ public interface PayhistService {
      *
      * @param startYm   : 시작 연월
      * @param endYm     : 종료 연월
-     * @param principal : 사용자 정보(ID)
+     * @param userId : 사용자 ID
      */
-    List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, Principal principal);
+    List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, String userId);
 
     /**
      * 법인카드 결제 내역 목록 조회

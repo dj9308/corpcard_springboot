@@ -571,6 +571,7 @@ const $payhist = (function () {
       data: {
         startYm: startYm,
         endYm: endYm,
+        userId: userId
       },
       success: function (data) {
         if (data.CODE === "SUCCESS") {
@@ -875,6 +876,7 @@ const $payhist = (function () {
       url: "/payhist/searchList",
       dataType: "json",
       data: {
+        CLASS_CD : 'C',
         WRITER_ID: userId,
         WRT_YM: yearMonth
       },

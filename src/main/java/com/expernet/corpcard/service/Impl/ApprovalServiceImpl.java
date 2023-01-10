@@ -119,13 +119,14 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(seq);
 
+
         if (list.size() > 0) {
             //사용 내역 리스트
             result.put("list", list);
             //분류별 합계
-            result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(seq));
+            result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(seq, null));
             //총계
-            result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(seq));
+            result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(seq, null));
         }
         return result;
     }

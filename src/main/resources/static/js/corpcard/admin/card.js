@@ -41,8 +41,8 @@ const $card = (function () {
       $("#receiptentSeq").val("");
       $("#receiptentId").val("");
       $("#cardSeq").val("");
-      $("#modalLabel").val("카드 정보 변경");
-      $("#modalAddBtn").val("변경");
+      $("#modalLabel").text("카드 정보 추가");
+      $("#modalAddBtn").text("추가");
 
       searchUserList(paintUserTable);
     });
@@ -197,8 +197,8 @@ const $card = (function () {
                 $("#receiptentSeq").val($(this).find("td:eq(6)").text());
                 $("#cardSeq").val($(this).find("td:eq(7)").text());
                 $("#addSearch").val("");
-                $("#modalLabel").val("카드 정보 변경");
-                $("#modalAddBtn").val("변경");
+                $("#modalLabel").text("카드 정보 변경");
+                $("#modalAddBtn").text("변경");
 
                 const modal = new bootstrap.Modal(document.querySelector('#addManagerModal'), {
                   keyboard: false

@@ -4,6 +4,7 @@ import com.expernet.corpcard.dto.CardDTO;
 import com.expernet.corpcard.dto.UserDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.CardReceiptent;
+import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.User;
 
 import java.util.HashMap;
@@ -59,4 +60,10 @@ public interface AdminService {
      * 사용자 전체 목록 조회
      */
     List<UserDTO> searchUserList();
+
+    /**
+     * 결제 내역 조회
+     * @param wrtYm: 작성연월
+     */
+    HashMap<String, Object> searchPayList(String wrtYm);
 }

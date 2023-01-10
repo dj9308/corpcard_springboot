@@ -52,6 +52,13 @@ public class AdminServiceImpl implements AdminService {
     private final CardReceiptentRepository cardReceiptentRepository;
 
     /**
+     * 제출 정보 Repository
+     */
+    @Autowired
+    private final CardUsehistRepository cardUsehistRepository;
+    private final UsehistSubmitInfoRepository usehistSubmitInfoRepository;
+
+    /**
      * 관리자 권한 조회
      *
      * @param paramMap : 사용자 정보
@@ -187,6 +194,32 @@ public class AdminServiceImpl implements AdminService {
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
         return modelMapper.map(userList, new TypeToken<List<UserDTO>>() {
         }.getType());
+    }
+
+    /**
+     * 결제 내역 조회
+     * @param wrtYm: 작성연월
+     */
+    @Override
+    public HashMap<String, Object> searchPayList(String wrtYm) {
+        HashMap<String, Object> result = new HashMap<>();
+        List<UsehistSubmitInfo> submitInfos = usehistSubmitInfoRepository.findByWrtYm(wrtYm);
+        List<Long> seqList = new ArrayList<>();
+
+        for(UsehistSubmitInfo submitInfo : submitInfos){
+            seqList.add(submitInfo.getSeq());
+        }
+
+        List<CardUsehist> list = cardUsehistRepository.findAllByUserhistSubmitInfo_SeqIn(seqList);
+        if(list.size()>0){
+            //사용 내역 리스트
+            result.put("list", list);
+            //분류별 합계
+            result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeqIn(seqList));
+            //팀별 합계
+            result.put("sumByTeam", cardUsehistRepository.selectSumDeptBySubmitSeqIn(seqList));
+        }
+        return result;
     }
 
     /**

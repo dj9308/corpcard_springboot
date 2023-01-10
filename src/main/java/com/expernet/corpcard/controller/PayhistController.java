@@ -5,6 +5,7 @@ import com.expernet.corpcard.service.CommonService;
 import com.expernet.corpcard.service.PayhistService;
 import com.expernet.corpcard.service.SchedulerService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -73,7 +74,7 @@ public class PayhistController {
      *
      * @param startYm : 시작 연월
      * @param endYm : 종료 연월
-     * @param principal : 사용자 정보
+     * @param userId : 사용자 ID
      * @param model    : modelMap
      */ 
     @Validated
@@ -81,11 +82,11 @@ public class PayhistController {
     public String searchTotalSumList(
             @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "startYm") String startYm,
             @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "endYm") String endYm,
-            Principal principal, ModelMap model) {
+            @Nullable @RequestParam(value = "userId") String userId, ModelMap model) {
         //TODO 총 합계 조회 DB에서 계산하도록 변경 필요
         List<HashMap<String, Object>> result = new ArrayList<>();
         try {
-            result = payhistService.searchTotalSumList(startYm, endYm, principal);
+            result = payhistService.searchTotalSumList(startYm, endYm, userId);
         } finally {
             if (result.size() > 0) {
                 model.addAttribute("result", result);

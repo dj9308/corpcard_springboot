@@ -12,7 +12,7 @@
                  viewBox="0 0 16 16">
                 <image th:href="@{/icons/clipboard2-fill.svg}"></image>
             </svg>
-            내역 조회
+            내역 관리
         </div>
         <div class="fs-5 mb-2 ms-1">
             <svg class="mb-1" xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor"
@@ -39,18 +39,15 @@
         <div class="p-lg-3 mb-2 bg-grey rounded-3 text-center">
             <div class="row gx-lg-2">
                 <div class="p-1 col">
-                    <div class="card bg-light border-0 h-100 bg-white chart" style="height:300px" id="monthBar">
-                        test
+                    <div class="card bg-light border-0 h-100 bg-white chart" style="height:350px" id="monthChart">
                     </div>
                 </div>
                 <div class="p-1 col">
-                    <div class="card bg-light border-0 h-100 bg-white" style="height:300px" id="deptPie">
-                        test2
+                    <div class="card bg-light border-0 h-100 bg-white" style="height:350px" id="teamChart">
                     </div>
                 </div>
                 <div class="p-1 col">
-                    <div class="card bg-light border-0 h-100 bg-white chart" style="height:300px" id="classPie">
-                        test3
+                    <div class="card bg-light border-0 h-100 bg-white chart" style="height:350px" id="classChart">
                     </div>
                 </div>
             </div>
@@ -257,7 +254,7 @@
 </footer>
 <!-- Core theme JS-->
 <script th:replace="/fragments/script.html :: fragment-script"></script>
-<script th:src="@{/js/corpcard/adminHist.js}"></script>
+<script th:src="@{/js/corpcard/admin/hist.js}"></script>
 <script>
     $(function () {
         $adminHist.init();
