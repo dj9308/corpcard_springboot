@@ -43,7 +43,7 @@ public interface PayhistService {
      * 법인카드 결제 내역 목록 조회
      * @param paramMap: 제출 seq
      */
-    HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap);
+    HashMap<String, Object> searchCardUsehistList(HashMap<String, String> paramMap);
 
     /**
      * 법인카드 결제 내역 딘일 정보 조회

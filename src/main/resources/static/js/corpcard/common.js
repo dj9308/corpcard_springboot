@@ -151,6 +151,29 @@ const $cmmn = (function () {
                     });
     }
 
+     /**
+       * 분류 목록 조회 AJAX
+       * @param {boolean} isAsync : 비동기 여부
+       * @param {function} callback : Callback function
+       */
+      const selectClassList = function (isAsync, callback) {
+        $.ajax({
+          type: "GET",
+          url: "/common/classList",
+          async: isAsync,
+          success: function (data) {
+            if (data.CODE === "SUCCESS") {
+              callback(data.result);
+            } else {
+              alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+            }
+          },
+          error: function () {
+            return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          }
+        });
+      }
+
     return {
         isNullorEmpty: isNullorEmpty,          //null이면 true 반환
         serializeObject: serializeObject,      //form 정보를 json 형식으로 변환
@@ -160,5 +183,6 @@ const $cmmn = (function () {
         formatDate: formatDate,                //Date format 설정
         initHistToast: initHistToast,          //첨부파일 toast 이벤트
         paintUserInfo: paintUserInfo,          //navbar에 사용자 정보 출력
+        selectClassList:selectClassList,       //분류 목록 조회
     }
 }());

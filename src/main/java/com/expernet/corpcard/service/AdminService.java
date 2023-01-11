@@ -2,10 +2,7 @@ package com.expernet.corpcard.service;
 
 import com.expernet.corpcard.dto.CardDTO;
 import com.expernet.corpcard.dto.UserDTO;
-import com.expernet.corpcard.entity.CardInfo;
-import com.expernet.corpcard.entity.CardReceiptent;
-import com.expernet.corpcard.entity.CardUsehist;
-import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.entity.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -66,4 +63,15 @@ public interface AdminService {
      * @param wrtYm: 작성연월
      */
     HashMap<String, Object> searchPayList(String wrtYm);
+
+    /**
+     * 부서 조회
+     */
+    Dept searchTopDeptInfo();
+
+    /**
+     * 결재 건 목록 조회
+     * @param paramMap : 검색 조건
+     */
+    List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap);
 }

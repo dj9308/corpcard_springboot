@@ -31,7 +31,6 @@
                     <td style="width: 45%;"></td>
                     <th class="pe-3 fs-3 fw-bold" style="width:10%;" align="right">합계 :</th>
                     <td align="right" class="fs-3 fw-bold" id="chartSum">
-                        xxx,xxx원
                     </td>
                 </tr>
             </table>
@@ -87,7 +86,7 @@
                         </td>
                         <th class="ps-1" style="width:5%; text-align:right;">기간</th>
                         <td style="width:20%">
-                            <input type="text" id="datepicker" class="form-control form-control-sm">
+                            <input type="text" name="submitDate" id="datepicker" class="form-control form-control-sm">
                         </td>
                         <td class="ps-2">
                             <input type="submit" id="histSubmit" class="btn btn-secondary btn-sm" value="조회">
@@ -98,6 +97,26 @@
                     </tr>
                 </table>
             </form>
+        </div>
+        <div class="table-responsive-xxl">
+            <table id="approvalTable" style="width:100%"
+                   class="text-center table table-hover table-bordered table-sm align-middle">
+                <thead class="table-secondary">
+                <tr>
+                    <th scope="col" style="width:10%;">No.</th>
+                    <th scope="col" style="width:25%;">부서</th>
+                    <th scope="col" style="width:15%;">팀</th>
+                    <th scope="col" style="width:10%;">직위</th>
+                    <th scope="col" style="width:10%;">기안자</th>
+                    <th scope="col" style="width:15%;">제출 날짜</th>
+                    <th scope="col" style="width:15%;">합계(원)</th>
+                    <th scope="col" style="display:none;">submit seq</th>
+                    <th scope="col" style="display:none;">기안자 ID</th>
+                </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
         </div>
         <form id="histForm" onsubmit="return false;">
             <table class="mb-1 table table-sm table-bordered align-middle table-style1">
@@ -167,7 +186,7 @@
         </form>
         <div class="mb-1 fs-4 gx-5 row">
             <div class="col">
-                총 <span class="fw-bold" id="listTotCnt"></span>건이 조회되었습니다. - <span class="fw-bold" id="stateNm"></span>
+                총 <span class="fw-bold" id="listTotCnt"></span>건이 조회되었습니다.
             </div>
             <div class="col text-end">
                 <button class="btn btn-secondary" id="histAtchBtn">첨부파일</button>
@@ -222,28 +241,8 @@
                         id="toastCloseBtn"></button>
             </div>
             <div class="toast-body">
-                <span id="atchEmpty">해당 연월의 첨부파일이 없습니다.</span>
+                <span id="atchEmpty">해당 결재 건의 첨부파일이 없습니다.</span>
                 <ul class="list-group" id="atchList">
-                    <li class="list-group-item">
-                        <input class="form-check-input me-1 atch-check" type="checkbox" value="">
-                        First checkbox
-                    </li>
-                    <li class="list-group-item">
-                        <input class="form-check-input me-1" type="checkbox" value="">
-                        Second checkbox
-                    </li>
-                    <li class="list-group-item">
-                        <input class="form-check-input me-1" type="checkbox" value="">
-                        Third checkbox
-                    </li>
-                    <li class="list-group-item">
-                        <input class="form-check-input me-1" type="checkbox" value="">
-                        Fourth checkbox
-                    </li>
-                    <li class="list-group-item">
-                        <input class="form-check-input me-1" type="checkbox" value="">
-                        Fifth checkbox
-                    </li>
                 </ul>
             </div>
         </div>

@@ -14,15 +14,18 @@ import java.util.List;
 public interface UsehistSubmitInfoRepository extends JpaRepository<UsehistSubmitInfo, Long> {
     UsehistSubmitInfo findByWriterIdAndWrtYm(String writerId, String wrtYm);
 
+    List<UsehistSubmitInfo> findByWrtYm(String wrtYm);
+
     UsehistSubmitInfo findBySeq(long seq);
 
     //TODO return HashMap to DTO
     @Query(value = "SELECT new Map(usi.seq AS seq, usi.stateInfo AS stateInfo, usi.writerDept AS writerDept, " +
             "usi.writerTeam AS writerTeam, usi.writerOfcds AS writerOfcds, usi.writerNm AS writerNm, " +
-            "usi.wrtYm AS wrtYm, SUM(cu.money) AS sum) " +
+            "usi.wrtYm AS wrtYm, usi.user.userId AS userId, SUM(cu.money) AS sum) " +
             "FROM UsehistSubmitInfo usi LEFT JOIN CardUsehist cu ON usi.seq = cu.usehistSubmitInfo.seq " +
             "WHERE (:#{#approvalSearch.teamList} is null or usi.writerTeam IN (:#{#approvalSearch.teamList})) " +
-            "AND (:#{#approvalSearch.deptList} is null or usi.writerNm IN (:#{#approvalSearch.deptList})) " +
+            "AND (:#{#approvalSearch.deptList} is null or usi.writerTeam IN (:#{#approvalSearch.deptList})) " +
+            "AND (:#{#approvalSearch.stateCd} is null or usi.stateInfo.stateCd = :#{#approvalSearch.stateCd}) " +
             "AND (:#{#approvalSearch.writerNm} is null or usi.writerNm = :#{#approvalSearch.writerNm}) " +
             "AND usi.wrtYm BETWEEN :#{#approvalSearch.startDate} AND :#{#approvalSearch.endDate} " +
             "GROUP BY usi.seq " +

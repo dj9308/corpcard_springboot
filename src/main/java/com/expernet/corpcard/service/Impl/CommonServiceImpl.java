@@ -12,10 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
@@ -86,21 +83,27 @@ public class CommonServiceImpl implements CommonService {
      * @param paramMap : 사용자 정보
      */
     @Override
-    public List<CardInfo> searchCardList(HashMap<String, Object> paramMap) throws ParseException {
-        String userId = paramMap.get("userId").toString();
-        String wrtYm = paramMap.get("wrtYm").toString();
-        //날짜 범위 설정
-        Calendar calendar = Calendar.getInstance();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
-        Date parsedDate = dateFormat.parse(wrtYm);
-        calendar.setTime(parsedDate);
-        calendar.set(Calendar.DAY_OF_MONTH,1);
-        Timestamp startDate = new Timestamp(calendar.getTimeInMillis());
+    public List<CardInfo> searchCardList(HashMap<String, String> paramMap) throws ParseException {
+        List<CardInfo> result = new ArrayList<>();
+        String userId = paramMap.getOrDefault("userId", null);
+        String wrtYm = paramMap.getOrDefault("wrtYm", null);
+        if(userId != null){
+            //날짜 범위 설정
+            Calendar calendar = Calendar.getInstance();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+            Date parsedDate = dateFormat.parse(wrtYm);
+            calendar.setTime(parsedDate);
+            calendar.set(Calendar.DAY_OF_MONTH,1);
+            Timestamp startDate = new Timestamp(calendar.getTimeInMillis());
 
-        calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-        Timestamp endDate = new Timestamp(calendar.getTimeInMillis());
+            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
+            Timestamp endDate = new Timestamp(calendar.getTimeInMillis());
 
-        return cardInfoRepository.findAllByUserIdAndReceivedAt(userId, startDate, endDate);
+            result = cardInfoRepository.findAllByUserIdAndReceivedAt(userId, startDate, endDate);
+        }else{
+            result = cardInfoRepository.findAll();
+        }
+        return result;
     }
 
     /**

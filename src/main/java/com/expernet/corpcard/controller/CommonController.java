@@ -107,11 +107,12 @@ public class CommonController {
 
     /**
      * 카드 목록 조회
+     *
      * @param paramMap : 사용자 정보
-     * @param model : modelMap
+     * @param model    : modelMap
      */
     @RequestMapping("/cardList")
-    public String searchCardList(@RequestParam HashMap<String, Object> paramMap, Model model) {
+    public String searchCardList(@RequestParam HashMap<String, String> paramMap, Model model) {
         List<CardInfo> cardList = new ArrayList<>();
         try {
             cardList = commonService.searchCardList(paramMap);

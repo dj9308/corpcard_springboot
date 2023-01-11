@@ -3,9 +3,7 @@ package com.expernet.corpcard.controller;
 import com.expernet.corpcard.dto.CardDTO;
 import com.expernet.corpcard.dto.UserDTO;
 import com.expernet.corpcard.entity.CardInfo;
-import com.expernet.corpcard.entity.CardReceiptent;
-import com.expernet.corpcard.entity.CardUsehist;
-import com.expernet.corpcard.entity.User;
+import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.service.AdminService;
 import jakarta.annotation.Resource;
 import org.slf4j.Logger;
@@ -23,7 +21,6 @@ import java.util.List;
  * @author (주)엑스퍼넷 설동재
  * @since 2022.11.18
  * @version 1.0
- * @see
  *
  * <pre>
  * == 개정이력(Modification Information) ==
@@ -31,7 +28,6 @@ import java.util.List;
  * 수정일 		수정자	수정내용
  * ----------	----	------------------
  * 2022.11.18	설동재	최초 생성
- *
  * </pre>
  */
 @Controller
@@ -71,7 +67,7 @@ public class AdminController {
 	 * @param model: modelMap
 	 */
 	@RequestMapping("/searchManagerList")
-	public String searchApprovalList(@RequestParam HashMap<String, Object> paramMap, Model model){
+	public String searchManagerList(@RequestParam HashMap<String, Object> paramMap, Model model){
 		List<UserDTO> result = null;
 		try {
 			result = adminService.searchManagerList(paramMap);
@@ -244,6 +240,55 @@ public class AdminController {
 				model.addAttribute("CODE", "ERR");
 				model.addAttribute("MSG", "결제 내역 조회 실패");
 				logger.error("결제 내역 조회 실패");
+			}
+		}
+		return "jsonView";
+	}
+
+	/**
+	 * 부서 조회
+	 * @param model: modelMap
+	 */
+	@RequestMapping(value = "/searchTopDeptInfo", method = RequestMethod.GET)
+	public String searchTopDeptInfo(Model model){
+		Dept result = null;
+		try {
+			result = adminService.searchTopDeptInfo();
+		} finally {
+			if (result != null) {
+				model.addAttribute("result", result);
+				model.addAttribute("CODE", "SUCCESS");
+				model.addAttribute("MSG", "부서 정보 조회 성공");
+				logger.info("부서 정보 조회 성공");
+			} else {
+				model.addAttribute("CODE", "ERR");
+				model.addAttribute("MSG", "부서 정보 조회 실패");
+				logger.error("부서 정보 조회 실패");
+			}
+		}
+		return "jsonView";
+	}
+
+	/**
+	 * 결재 건 목록 조회
+	 * @param paramMap: 검색 조건
+	 * @param model: modelMap
+	 */
+	@RequestMapping(value = "/searchApprovalList", method = RequestMethod.GET)
+	public String searchApprovalList(@RequestParam HashMap<String, Object> paramMap, Model model){
+		List<HashMap<String, Object>> result = null;
+		try {
+			result = adminService.searchApprovalList(paramMap);
+		} finally {
+			if (result != null) {
+				model.addAttribute("result", result);
+				model.addAttribute("CODE", "SUCCESS");
+				model.addAttribute("MSG", "검색 건 목록 조회 성공");
+				logger.info("검색 건 목록 조회 성공");
+			} else {
+				model.addAttribute("CODE", "ERR");
+				model.addAttribute("MSG", "검색 건 목록 조회 실패");
+				logger.error("검색 건 목록 조회 실패");
 			}
 		}
 		return "jsonView";

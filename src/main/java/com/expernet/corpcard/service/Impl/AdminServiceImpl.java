@@ -52,11 +52,20 @@ public class AdminServiceImpl implements AdminService {
     private final CardReceiptentRepository cardReceiptentRepository;
 
     /**
-     * 제출 정보 Repository
+     * 결제 내역 Repository
      */
     @Autowired
     private final CardUsehistRepository cardUsehistRepository;
+
+    /**
+     * 제출 정보 Repository
+     */
     private final UsehistSubmitInfoRepository usehistSubmitInfoRepository;
+
+    /**
+     * 부서 Repository
+     */
+    private final DeptRepository deptRepository;
 
     /**
      * 관리자 권한 조회
@@ -157,26 +166,26 @@ public class AdminServiceImpl implements AdminService {
                 .build();
 
         result = cardInfoRepository.saveAndFlush(cardInfo);
-        List<CardReceiptent> receiptents  = cardReceiptentRepository.findAllByCardInfo_Seq(cardDTO.getCardSeq());
+        List<CardReceiptent> receiptents = cardReceiptentRepository.findAllByCardInfo_Seq(cardDTO.getCardSeq());
         //2.카드 수령인 저장 or 수정(반납)
-        if(!receiptents.isEmpty()){
-            CardReceiptent receiptent = receiptents.get(receiptents.size()-1);
+        if (!receiptents.isEmpty()) {
+            CardReceiptent receiptent = receiptents.get(receiptents.size() - 1);
             if (receiptent.getReturnedAt() != null) {
-                if(cardDTO.getUserId() != null){
+                if (cardDTO.getUserId() != null) {
                     saveReceiptentByParams(cardDTO, result);
                 }
             } else {
                 if (cardDTO.getUserId() == null) {
                     receiptent.setReturnedAt(new Timestamp(System.currentTimeMillis()));
                     cardReceiptentRepository.save(receiptent);
-                }else if(!cardDTO.getUserId().equals(receiptent.getUser().getUserId())){
+                } else if (!cardDTO.getUserId().equals(receiptent.getUser().getUserId())) {
                     receiptent.setReturnedAt(new Timestamp(System.currentTimeMillis()));
                     cardReceiptentRepository.save(receiptent);
                     saveReceiptentByParams(cardDTO, result);
                 }
             }
-        }else{
-            if(cardDTO.getUserId() != null){
+        } else {
+            if (cardDTO.getUserId() != null) {
                 saveReceiptentByParams(cardDTO, result);
             }
         }
@@ -198,6 +207,7 @@ public class AdminServiceImpl implements AdminService {
 
     /**
      * 결제 내역 조회
+     *
      * @param wrtYm: 작성연월
      */
     @Override
@@ -206,12 +216,12 @@ public class AdminServiceImpl implements AdminService {
         List<UsehistSubmitInfo> submitInfos = usehistSubmitInfoRepository.findByWrtYm(wrtYm);
         List<Long> seqList = new ArrayList<>();
 
-        for(UsehistSubmitInfo submitInfo : submitInfos){
+        for (UsehistSubmitInfo submitInfo : submitInfos) {
             seqList.add(submitInfo.getSeq());
         }
 
         List<CardUsehist> list = cardUsehistRepository.findAllByUserhistSubmitInfo_SeqIn(seqList);
-        if(list.size()>0){
+        if (list.size() > 0) {
             //사용 내역 리스트
             result.put("list", list);
             //분류별 합계
@@ -223,14 +233,78 @@ public class AdminServiceImpl implements AdminService {
     }
 
     /**
-     * 카드 수령인 정보 저장
+     * 최상위 부서 조회
      */
-    private void saveReceiptentByParams(CardDTO cardDTO, CardInfo cardInfo){
+    @Override
+    public Dept searchTopDeptInfo() {
+        List<Dept> deptList = deptRepository.findAllByUpper_deptCd(null);
+        return deptList.get(0);
+    }
+
+    /**
+     * 결재 건 목록 조회
+     *
+     * @param paramMap : 검색 조건
+     */
+    @Override
+    public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
+        List<String> teamList = new ArrayList<>();
+        String teamCd = paramMap.get("team").toString();
+        String deptCd = paramMap.get("dept").toString();
+        String[] submitDate = paramMap.get("submitDate").toString().split(" - ");
+
+        if (!deptCd.equals("ALL")) {
+            if (teamCd.equals("ALL")) { //팀 전체
+                Dept deptInfo = deptRepository.findByDeptCd(deptCd);
+                List<Dept> subDeptList = deptInfo.getLower();
+                searchSubDeptNm(teamList, subDeptList);
+            } else {
+                Dept teamInfo = deptRepository.findByDeptCd(teamCd);
+                teamList.add(teamInfo.getDeptNm());
+            }
+        }
+
+        //2.entity 생성
+        ApprovalSearch approvalSearch = ApprovalSearch.builder()
+                .stateCd("C")
+                .teamList((teamList.size() == 0) ? null : teamList)
+                .writerNm((paramMap.get("writerNm") != null) ? paramMap.get("writerNm").toString() : null)
+                .startDate(submitDate[0])
+                .endDate(submitDate[1])
+                .build();
+
+        //3.결재 건 목록 조회
+        return usehistSubmitInfoRepository.findByParams(approvalSearch);
+    }
+
+    /**
+     * 카드 수령인 정보 저장
+     *
+     * @param cardDTO  : 카드 DTO
+     * @param cardInfo : 카드 정보
+     */
+    private void saveReceiptentByParams(CardDTO cardDTO, CardInfo cardInfo) {
         User userInfo = userRepository.findByUserId(cardDTO.getUserId());
         CardReceiptent cardReceiptent = CardReceiptent.builder()
                 .cardInfo(cardInfo)
                 .user(userInfo)
                 .build();
         cardReceiptentRepository.save(cardReceiptent);
+    }
+
+    /**
+     * 하위 부서 코드 조회
+     *
+     * @param subDeptList : 하위 부서 정보
+     */
+    private void searchSubDeptNm(List<String> result, List<Dept> subDeptList) {
+        if (subDeptList.size() != 0) {
+            for (Dept dept : subDeptList) {
+                result.add(dept.getDeptNm());
+                if (dept.getLower().size() != 0) {
+                    searchSubDeptNm(result, dept.getLower());
+                }
+            }
+        }
     }
 }

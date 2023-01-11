@@ -109,7 +109,7 @@ public class PayhistController {
      * @param model    : modelMap
      */
     @RequestMapping(value = "/searchList", method = RequestMethod.GET)
-    public String searchPayhistList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+    public String searchPayhistList(@RequestParam HashMap<String, String> paramMap, ModelMap model) {
         HashMap<String, Object> result = null;
         try {
             result = payhistService.searchCardUsehistList(paramMap);

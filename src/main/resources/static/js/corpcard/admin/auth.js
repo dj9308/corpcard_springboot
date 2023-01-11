@@ -69,17 +69,17 @@ const $auth = (function () {
     });
 
     //관리자 추가 모달 추가 btn
-    $("#modalAddBtn").on("click", function(){
-        const userId = $("#addManagerTable > tbody > tr.table-active").find("td:eq(4)").text();
-        if(!$cmmn.isNullorEmpty(userId)){
-            //관리자 권한 추가
-            updateAuth(userId, "Y", function(){
-                $("#modalCloseBtn").trigger("click");
-                selectManagerList();
-            });
-        }else{
-            return alert("권한을 추가할 사용자를 선택하십시오.");
-        }
+    $("#modalAddBtn").on("click", function () {
+      const userId = $("#addManagerTable > tbody > tr.table-active").find("td:eq(4)").text();
+      if (!$cmmn.isNullorEmpty(userId)) {
+        //관리자 권한 추가
+        updateAuth(userId, "Y", function () {
+          $("#modalCloseBtn").trigger("click");
+          selectManagerList();
+        });
+      } else {
+        return alert("권한을 추가할 사용자를 선택하십시오.");
+      }
     });
   }
 

@@ -36,11 +36,15 @@ const $approval = (function () {
     });
     //확인(결재 완료) btn
     $("#approvalHist").on("click", function(){
-        updateState("C", uptStateBtn(true));
+        if(confirm("해당 결재 건을 완료 처리하겠습니까?")){
+            updateState("C", uptStateBtn(true));
+        }
     })
     //반려 btn
     $("#rejectHist").on("click", function(){
-        updateState("D", uptStateBtn(true));
+        if(confirm("해당 결재 건을 반려 처리하겠습니까?")){
+            updateState("D", uptStateBtn(true));
+        }
     })
   }
 
@@ -404,7 +408,6 @@ const $approval = (function () {
       "alwaysShowCalendars": true,
     }, function (start, end, label) { });
 
-
     //3.조회 버튼 trigger
     $("#approvalSubmit").trigger("click");
   }
@@ -455,6 +458,7 @@ const $approval = (function () {
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
+            $("#approvalSubmit").trigger("click");
             callback();
           } else if (data.CODE === "ERR") {
             return alert("제출 상태 변경에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");

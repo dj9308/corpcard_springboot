@@ -90,9 +90,9 @@ public class PayhistServiceImpl implements PayhistService {
     /**
      * 월별 총계 조회
      *
-     * @param startYm   : 시작 연월
-     * @param endYm     : 종료 연월
-     * @param userId : 사용자 ID
+     * @param startYm : 시작 연월
+     * @param endYm   : 종료 연월
+     * @param userId  : 사용자 ID
      */
     @Override
     public List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, String userId) {
@@ -105,13 +105,16 @@ public class PayhistServiceImpl implements PayhistService {
      * @param paramMap: 제출 seq
      */
     @Override
-    public HashMap<String, Object> searchCardUsehistList(HashMap<String, Object> paramMap) {
+    public HashMap<String, Object> searchCardUsehistList(HashMap<String, String> paramMap) {
         HashMap<String, Object> result = new HashMap<>();
-        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+        String writerId = paramMap.get("WRITER_ID");
+        String wrtYm = paramMap.get("WRT_YM");
+        UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
+        String classCd = paramMap.getOrDefault("CLASS_CD", null);
 
         if (submitInfo != null) {
             List<CardUsehist> list = cardUsehistRepository.
-                    findAllBySeqAndClassCd(submitInfo.getSeq(), paramMap.get("CLASS_CD").toString());
+                    findAllBySeqAndClassCd(submitInfo.getSeq(), classCd);
             if (list.size() > 0) {
                 //제출 내역
                 result.put("submitInfo", submitInfo);
@@ -119,10 +122,10 @@ public class PayhistServiceImpl implements PayhistService {
                 result.put("list", list);
                 //분류별 합계
                 result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitInfo.getSeq(),
-                        paramMap.get("CLASS_CD").toString()));
+                        classCd));
                 //총계
                 result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(submitInfo.getSeq(),
-                        paramMap.get("CLASS_CD").toString()));
+                        classCd));
             }
         }
         return result;
@@ -177,7 +180,8 @@ public class PayhistServiceImpl implements PayhistService {
         long result = 0;
         List<Long> list;
         try {
-            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {});
+            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {
+            });
         } catch (JsonProcessingException e) {
             return 0;
         }
@@ -266,7 +270,6 @@ public class PayhistServiceImpl implements PayhistService {
         }
         for (MultipartFile file : fileList) {
             //1)파일 정보 db 저장
-            SimpleDateFormat sdfCurrent = new SimpleDateFormat("yyyyMMddhhmmssSSS", Locale.KOREA);
             String originalFilename = file.getOriginalFilename();
             long fileSize = file.getSize();
 

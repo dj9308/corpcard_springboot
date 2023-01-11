@@ -43,7 +43,7 @@ public interface CommonService {
      * 카드 목록 조회
      * @param paramMap : 사용자 정보
      */
-    List<CardInfo> searchCardList(HashMap<String, Object> paramMap) throws ParseException;
+    List<CardInfo> searchCardList(HashMap<String, String> paramMap) throws ParseException;
 
     /**
      * 제출 정보 상태 수정

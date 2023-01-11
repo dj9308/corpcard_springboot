@@ -10,6 +10,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ApprovalSearch {
+    String stateCd;
     List<String> deptList;
     List<String> teamList;
     String writerNm;
@@ -17,13 +18,13 @@ public class ApprovalSearch {
     String endDate;
 
     @Builder
-    public ApprovalSearch(List<String> deptList, List<String> teamList, String writerNm,
+    public ApprovalSearch(String stateCd, List<String> deptList, List<String> teamList, String writerNm,
                           String startDate, String endDate){
+        this.stateCd = stateCd;
         this.deptList = deptList;
         this.teamList = teamList;
         this.writerNm = writerNm;
         this.startDate = startDate;
         this.endDate = endDate;
-
     }
 }
