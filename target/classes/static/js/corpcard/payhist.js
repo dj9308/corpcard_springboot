@@ -84,7 +84,7 @@ const $payhist = (function () {
     //PDF btn
     $("#histPDFBtn").on("click", function (event) {
       //1.결제 내역 리스트 조회
-      selectHistList(wrtYm, function (data) {
+      selectHistList(wrtYm, "", function (data) {
         if (data.CODE === "SUCCESS") {
           makePDF(data.result);
         } else if (data.CODE === "EMPTY") {
@@ -133,7 +133,7 @@ const $payhist = (function () {
     //제출 btn
     $("#submitHist").on("click", function () {
       if (confirm("제출 하시겠습니까?")) {
-        selectHistList(wrtYm, function (data) {
+        selectHistList(wrtYm, "", function (data) {
           if (data.CODE === "EMPTY") {
             return alert("해당 연월의 결제 내역이 없습니다.");
           }
@@ -146,7 +146,7 @@ const $payhist = (function () {
     });
 
     //Table row 삭제 btn
-    document.querySelector("#deleteRow").addEventListener("click", function (e) {
+    $("#deleteRow").on("click", function (e) {
       //1.체크된 row 조회
       const seqList = [];
       $('.table-check').each(function (index) {
@@ -306,7 +306,7 @@ const $payhist = (function () {
   */
   const selectPayhistList = function () {
     //1.결제 내역 리스트 조회
-    selectHistList(wrtYm, function (data) {
+    selectHistList(wrtYm, "", function (data) {
       //1)테이블 초기화
       $cmmn.emptyTable("histTable");
       if (data.CODE === "SUCCESS") {
@@ -481,7 +481,7 @@ const $payhist = (function () {
   const initHistForm = function () {
     //분류 select
     const classSelect = document.querySelector("#classSelect");
-    selectClassList(true, function (json) {
+    $cmmn.selectClassList(true, function (json) {
       for (let i in json) {
         const option = document.createElement('option');
         option.text = json[i].classNm;
@@ -636,7 +636,7 @@ const $payhist = (function () {
       ]
     };
     initChartAnimation(barChartDom, barOption);
-    selectHistList(endYm, function (data) {
+    selectHistList(endYm, "C", function (data) {
       paintPieChart(endYm, data);
     });
 
@@ -694,7 +694,8 @@ const $payhist = (function () {
 
     initChartAnimation(pieChartDom, pieOption);
     document.querySelector("#curYm").innerText = `${yearMonth.split("-")[0]}년 ${yearMonth.split("-")[1]}월`;
-    document.querySelector("#curYmSum").innerText = `${$cmmn.convertToCurrency(result.sum)}원`;
+    document.querySelector("#curYmSum").innerText = `${$cmmn.isNullorEmpty(result) ? "0" :
+        $cmmn.convertToCurrency(result.sum)} 원`;
   }
 
   /**
@@ -708,7 +709,7 @@ const $payhist = (function () {
 
     if (chartDom.id === "chartBar") {
       myChart.on('click', function (params) {
-        selectHistList(params.name, function (data) {
+        selectHistList(params.name, "C",function (data) {
           paintPieChart(params.name, data);
         });
       });
@@ -815,29 +816,6 @@ const $payhist = (function () {
   }
 
   /**
-   * 분류 목록 조회 AJAX
-   * @param {boolean} isAsync : 비동기 여부
-   * @param {function} callback : Callback function
-   */
-  const selectClassList = function (isAsync, callback) {
-    $.ajax({
-      type: "GET",
-      url: "/common/classList",
-      async: isAsync,
-      success: function (data) {
-        if (data.CODE === "SUCCESS") {
-          callback(data.result);
-        } else {
-          alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-        }
-      },
-      error: function () {
-        return alert("분류 목록 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
-      }
-    });
-  }
-
-  /**
    * 제출 상태 변경 AJAX
    * @param {number} stateCd : 상태 code
    * @param {function} callback : Callback function
@@ -868,18 +846,24 @@ const $payhist = (function () {
   /**
    * 결제 내역 리스트 조회 AJAX
    * @param {String} yearMonth : 작성연월
+   * @param {String} classCd : 제출 code
    * @param {function} callback : Callback function
    */
-  const selectHistList = function (yearMonth, callback) {
+  const selectHistList = function (yearMonth, classCd ,callback) {
+    const data = {
+        WRITER_ID: userId,
+        WRT_YM: yearMonth
+    };
+
+    if(!$cmmn.isNullorEmpty(classCd)){
+        data.CLASS_CD = classCd;
+    }
+
     $.ajax({
       type: "GET",
       url: "/payhist/searchList",
       dataType: "json",
-      data: {
-        CLASS_CD : 'C',
-        WRITER_ID: userId,
-        WRT_YM: yearMonth
-      },
+      data: data,
       success: function (data) {
         callback(data);
       },
@@ -1106,7 +1090,7 @@ const $payhist = (function () {
 
     //분류별 합계
     let sumList = [];
-    selectClassList(false, function (classList) {
+    $cmmn.selectClassList(false, function (classList) {
       const rowList = [];
       let pi = 0;
       let pj = 0;

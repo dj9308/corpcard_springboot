@@ -18,7 +18,7 @@ const $adminHist = (function () {
     initBtnEvt();           //버튼 이벤트
     initStatsDatePicker();  //기간별 통계 date picker
     paintCharts();          //차트 생성
-    initSearchForm();  /*  */     //사용 내역 검색 Form
+    initSearchForm();       //사용 내역 검색 Form
     initHistForm();         //결제 내역 Form
     initHistTable();        //결제 내역 table
   }
@@ -146,6 +146,7 @@ const $adminHist = (function () {
     $("#atchAddBtn").on("click", function (event) {
       $("#atchUpload").trigger('click');
     });
+
     $("#atchUpload").on('click', function () {
       this.value = null;
     });

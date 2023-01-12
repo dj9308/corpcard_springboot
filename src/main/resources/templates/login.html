@@ -25,7 +25,8 @@
                                 <div class="mb-2 w-100">
                                     <label class="text-muted" for="userPasswd">비밀번호</label>
                                 </div>
-                                <input id="userPasswd" type="password" class="form-control" name="userPasswd" aria-describedby="validationFeedback" required>
+                                <input id="userPasswd" type="password" class="form-control" name="userPasswd" aria-describedby="validationFeedback"
+                                       autocomplete="off" required>
                                 <div th:if="${errorMsg != null}" th:text="${errorMsg}" id="validationFeedback" class="invalid-feedback">
                                 </div>
                             </div>
@@ -53,7 +54,12 @@
         </div>
     </div>
 </section>
-
+<script th:replace="/fragments/script.html :: fragment-script"></script>
 <script type="text/javascript" th:src="@{/js/corpcard/login.js}"></script>
+<script>
+    $(function () {
+        $login.init();
+    });
+</script>
 </body>
 </html>

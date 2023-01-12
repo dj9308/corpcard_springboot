@@ -1,7 +1,5 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.service.LoginService;
-import jakarta.annotation.Resource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -30,12 +28,6 @@ public class LoginController {
      * Logger
      */
     private static final Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-    /**
-     * 로그인 Service
-     */
-    @Resource(name = "LoginService")
-    private LoginService loginService;
 
     /**
      * 로그인 페이지 이동

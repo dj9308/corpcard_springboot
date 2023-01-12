@@ -73,13 +73,12 @@ public class SecurityConfig {
      */
     @Bean
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
-        //global
-        http
+        http    //global
                 .csrf().disable()
                 .userDetailsService(loginService)
                 .authorizeHttpRequests((auth) -> {
                     try {
-                        auth
+                        auth    //권한에 따른 접근 제한
                                 .requestMatchers("/login", "/common/**", "/fragments/**").permitAll()
                                 .requestMatchers("/css/**", "/js/**", "/font/**", "/icons/**").permitAll()
                                 .requestMatchers("/approval").hasRole("CHIEF")
