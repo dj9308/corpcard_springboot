@@ -2,7 +2,6 @@ package com.expernet.corpcard.service.Impl;
 
 
 import com.expernet.corpcard.dto.CommonDTO;
-import com.expernet.corpcard.dto.StateDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.CommonService;
@@ -117,7 +116,7 @@ public class CommonServiceImpl implements CommonService {
      * @param stateDTO : 제출 정보 및 수정할 상태 정보
      */
     @Override
-    public Object updateState(StateDTO stateDTO) {
+    public Object updateState(CommonDTO.UpdateState stateDTO) {
         Object result = null;
         UsehistSubmitInfo submitInfo = null;
         StateInfo stateInfo = null;

@@ -48,7 +48,7 @@ public interface CommonService {
 
     /**
      * 제출 정보 상태 수정
-     * @param stateDTO : 제출 정보 및 수정할 상태 정보
+     * @param commonDTO : 제출 정보 및 수정할 상태 정보
      */
-    Object updateState(StateDTO stateDTO);
+    Object updateState(CommonDTO.UpdateState commonDTO);
 }

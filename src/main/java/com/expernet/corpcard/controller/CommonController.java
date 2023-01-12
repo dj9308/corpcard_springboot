@@ -1,30 +1,23 @@
 package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.dto.CommonDTO;
-import com.expernet.corpcard.dto.StateDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.CommonService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -140,14 +133,14 @@ public class CommonController {
     /**
      * 제출 정보 상태 수정
      *
-     * @param stateDTO : 제출 정보 및 수정할 상태 정보
+     * @param commonDTO : 제출 정보 및 수정할 상태 정보
      * @param model    : modelMap
      */
     @RequestMapping(value = "/updateState", method = RequestMethod.PATCH)
-    public String updateState(@Valid StateDTO stateDTO, ModelMap model) {
+    public String updateState(@Valid CommonDTO.UpdateState commonDTO, ModelMap model) {
         Object result = null;
         try {
-            result = commonService.updateState(stateDTO);
+            result = commonService.updateState(commonDTO);
         } finally {
             if (result != null) {
                 model.addAttribute("result", result);
