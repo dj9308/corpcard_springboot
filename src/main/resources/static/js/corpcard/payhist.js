@@ -11,7 +11,6 @@ const $payhist = (function () {
 
   const userId = document.querySelector('#userId').value;   // 사용자 ID
   let wrtYm                                                 // 작성연월
-  let barChartSeqList = [];
 
   /**
    * init
@@ -61,6 +60,9 @@ const $payhist = (function () {
         success: function (data) {
           if (data.CODE === "SUCCESS") {
             selectPayhistList();
+            if($("#histUpdate").is(":visible")){
+                changeForm("save");
+            }
           } else if (data.CODE === "ERR") {
             console.log(data.MSG);
           }
@@ -120,7 +122,6 @@ const $payhist = (function () {
         a = a.slice(0, -1);
         a += "\r\n";
       });
-      //        const submistInfo = data.list[0].usehistSubmitInfo;
       const downloadLink = document.createElement("a");
       const blob = new Blob(["\ufeff" + a], { type: "text/csv;charset=utf-8" });
       downloadLink.href = URL.createObjectURL(blob);
@@ -139,6 +140,7 @@ const $payhist = (function () {
           }
           updateState("B", function (data) {
             changeTagStyle(data.stateInfo);
+            changeForm("save");
             alert("제출이 완료되었습니다.");
           });
         })
@@ -170,6 +172,7 @@ const $payhist = (function () {
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
+            changeForm("save");
             selectPayhistList();
           } else {
             return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
@@ -549,7 +552,6 @@ const $payhist = (function () {
     function addData(wrtYm, money, seq) {
       wrtYmList.push(wrtYm);
       sumList.push(money);
-      barChartSeqList.push(endYm);
     }
     if ($cmmn.isNullorEmpty(startYm) || $cmmn.isNullorEmpty(endYm)) {
       const now = new Date;
@@ -734,6 +736,7 @@ const $payhist = (function () {
       selectPayhistList();
       initAtchToast();
       selectCardList(wrtYm);
+      changeForm("save");
     });
 
     //체크박스 전체 설정
@@ -873,42 +876,32 @@ const $payhist = (function () {
     });
   }
 
-    /**
-     * 해당연월 수령한 카드 리스트 조회 AJAX
-     * @param {String} yearMonth : 작성연월
-     */
+ /**
+  * 해당연월 수령한 카드 목록 조회
+  * @param {String} yearMonth : 작성연월
+  */
   const selectCardList = function(yearMonth){
     if($cmmn.isNullorEmpty(yearMonth)){
         yearMonth = $cmmn.formatDate("", "YYYY-mm");
     }
 
-    $.ajax({
-        type: "GET",
-        url: "/common/cardList",
-        data: {
-          userId : userId,
-          wrtYm: yearMonth,
-        },
-        success: function (data) {
-          if (data.CODE === "SUCCESS") {
-            const cardSelect = document.querySelector("#cardSelect");
-            const json = data.result;
-            $("#cardSelect option").not("option:first").remove();
+    const data = {
+      userId : userId,
+      wrtYm: yearMonth,
+    }
 
-            for (let i in json) {
-              const option = document.createElement('option');
-              option.text = `${json[i].cardComp} ${json[i].cardNum}`;
-              option.value = json[i].seq;
-              cardSelect.options.add(option);
-            }
-          } else {
-            alert("카드 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
-          }
-        },
-        error: function () {
-          return alert("카드 목록 조회에 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
+    //카드 목록 조회
+    $cmmn.selectCardList(data, function(list){
+        const cardSelect = document.querySelector("#cardSelect");
+        $("#cardSelect option").not("option:first").remove();
+
+        for (let i in list) {
+          const option = document.createElement('option');
+          option.text = `${list[i].cardComp} ${list[i].cardNum}`;
+          option.value = list[i].seq;
+          cardSelect.options.add(option);
         }
-      });
+    });
   }
 
   /**

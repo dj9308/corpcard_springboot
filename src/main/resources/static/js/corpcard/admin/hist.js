@@ -994,8 +994,6 @@ const $adminHist = (function () {
    * 결제 내역 table
    */
   const initHistTable = function () {
-    const payhistMonth = document.querySelector("#payhistMonth");
-
     // 결제 내역 빈 페이지 생성
     paintPayhistTable();
 

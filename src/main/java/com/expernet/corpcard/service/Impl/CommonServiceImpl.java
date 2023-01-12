@@ -1,6 +1,7 @@
 package com.expernet.corpcard.service.Impl;
 
 
+import com.expernet.corpcard.dto.CommonDTO;
 import com.expernet.corpcard.dto.StateDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
@@ -56,6 +57,10 @@ public class CommonServiceImpl implements CommonService {
      */
     @Autowired
     private UsehistSubmitInfoRepository usehistSubmitInfoRepository;
+
+    /**
+     * 상태 정보 Repository
+     */
     @Autowired
     private StateInfoRepository stateInfoRepository;
 
@@ -80,15 +85,15 @@ public class CommonServiceImpl implements CommonService {
     /**
      * 카드 목록 조회
      *
-     * @param paramMap : 사용자 정보
+     * @param commonDTO : 사용자 정보
      */
     @Override
-    public List<CardInfo> searchCardList(HashMap<String, String> paramMap) throws ParseException {
-        List<CardInfo> result = new ArrayList<>();
-        String userId = paramMap.getOrDefault("userId", null);
-        String wrtYm = paramMap.getOrDefault("wrtYm", null);
+    public List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) throws ParseException {
+        List<CardInfo> result;
+        String userId = commonDTO.getUserId();
+        String wrtYm = commonDTO.getWrtYm();
         if(userId != null){
-            //날짜 범위 설정
+            //해당 월의 첫날 & 마지막 날 설정
             Calendar calendar = Calendar.getInstance();
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
             Date parsedDate = dateFormat.parse(wrtYm);

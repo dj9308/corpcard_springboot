@@ -1,6 +1,7 @@
 package com.expernet.corpcard.service;
 
 
+import com.expernet.corpcard.dto.CommonDTO;
 import com.expernet.corpcard.dto.StateDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.ClassInfo;
@@ -41,9 +42,9 @@ public interface CommonService {
 
     /**
      * 카드 목록 조회
-     * @param paramMap : 사용자 정보
+     * @param commonDTO : 검색 조건(사용자 정보)
      */
-    List<CardInfo> searchCardList(HashMap<String, String> paramMap) throws ParseException;
+    List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) throws ParseException;
 
     /**
      * 제출 정보 상태 수정

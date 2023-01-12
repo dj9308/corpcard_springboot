@@ -1,5 +1,6 @@
 package com.expernet.corpcard.controller;
 
+import com.expernet.corpcard.dto.CommonDTO;
 import com.expernet.corpcard.dto.StateDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.ClassInfo;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -27,7 +29,7 @@ import java.util.List;
 
 /**
  * OJT 프로젝트 – 법인카드 내역 결재 시스템
- * Base Controller Class
+ * Common Controller Class
  *
  * @author (주)엑스퍼넷 설동재
  * @version 1.0
@@ -36,10 +38,10 @@ import java.util.List;
  *
  * 수정일 		수정자	수정내용
  * ----------	----	------------------
- * 2022.11.08	설동재	최초 생성
+ * 2022.12.00	설동재	최초 생성
  *
  * </pre>
- * @since 2022.11.08
+ * @since 2022.12.00
  */
 @Controller
 @RequestMapping(value = "/common")
@@ -81,7 +83,7 @@ public class CommonController {
     }
 
     /**
-     * 분류 목록 조회
+     * 전체 분류 목록 조회
      *
      * @param model : modelMap
      */
@@ -108,14 +110,14 @@ public class CommonController {
     /**
      * 카드 목록 조회
      *
-     * @param paramMap : 사용자 정보
+     * @param commonDTO : 검색 조건
      * @param model    : modelMap
      */
-    @RequestMapping("/cardList")
-    public String searchCardList(@RequestParam HashMap<String, String> paramMap, Model model) {
+    @RequestMapping(value = "/cardList", method = RequestMethod.GET)
+    public String searchCardList(@Valid CommonDTO.SearchCardList commonDTO, Model model) {
         List<CardInfo> cardList = new ArrayList<>();
         try {
-            cardList = commonService.searchCardList(paramMap);
+            cardList = commonService.searchCardList(commonDTO);
         } catch (ParseException e) {
             model.addAttribute("CODE", "ERR");
             model.addAttribute("MSG", "카드 목록 조회 실패");

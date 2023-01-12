@@ -29,7 +29,8 @@
                         <span class="input-group-text" id="basic-addon1">
                             <img th:src="@{/icons/calendar.svg}" />
                         </span>
-                        <input type="text" id="datepicker" class="form-control" aria-describedby="basic-addon1" style="width:250px">
+                        <input type="text" id="datepicker" class="form-control" aria-describedby="basic-addon1"
+                               style="width:250px; background-color:#ffffff; " readonly>
                     </td>
                 </tr>
             </table>
@@ -238,6 +239,9 @@
 <!-- Footer-->
 <footer th:replace="/fragments/footer.html :: fragment-footer">
 </footer>
+<!-- pdfmake -->
+<script th:src="@{/js/libs/pdfmake-0.2.7/pdfmake.min.js}"></script>
+<script th:src="@{/js/libs/pdfmake-0.2.7/vfs_fonts.js}"></script>
 <!-- Core theme JS-->
 <script th:replace="/fragments/script.html :: fragment-script"></script>
 <script th:src="@{/js/corpcard/payhist.js}"></script>
