@@ -114,11 +114,13 @@ const $payhist = (function () {
       let a = "";
       $.each(array, function (i, row) {
         $.each(row, function (j, cell) {
+          if(j === 1) {
+            cell = `=\"${cell}\"`;
+          }
           if (j !== 2 && cell.includes(",")) {
             cell = cell.replace(",", "");
           }
-          const cellValue =`=\"${cell}\"`;
-          a += cellValue;
+          a += cell;
           a += ",";
         });
         a = a.slice(0, -1);
@@ -560,7 +562,7 @@ const $payhist = (function () {
     //1.월별 총계 조회
     $.ajax({
       type: "GET",
-      url: "/payhist/searchTotalSumList",
+      url: "/common/searchTotalSumList",
       dataType: "json",
       async: false,
       data: {

@@ -1,6 +1,7 @@
 package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
@@ -12,12 +13,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import java.security.Principal;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -125,6 +128,32 @@ public class CommonController {
                 model.addAttribute("CODE", "ERR");
                 model.addAttribute("MSG", "카드 목록 조회 실패");
                 logger.error("카드 목록 조회 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 월별 총계 조회
+     * @param params : 검색 조건
+     * @param model        : modelMap
+     */
+    @Validated
+    @RequestMapping(value = "/searchTotalSumList", method = RequestMethod.GET)
+    public String searchTotalSumList(@Valid SearchTotalSumListDTO.request params, ModelMap model) {
+        List<SearchTotalSumListDTO> result = new ArrayList<>();
+        try {
+            result = commonService.searchTotalSumList(params);
+        } finally {
+            if (result.size() > 0) {
+                model.addAttribute("result", result);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제내역 조회 성공");
+                logger.info("결제내역 조회 성공");
+            } else {
+                model.addAttribute("CODE", "EMPTY");
+                model.addAttribute("MSG", "결제내역 조회 실패");
+                logger.info("결제내역 조회 실패");
             }
         }
         return "jsonView";

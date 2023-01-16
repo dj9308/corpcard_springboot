@@ -1,4 +1,4 @@
-package com.expernet.corpcard.dto;
+package com.expernet.corpcard.dto.payhist;
 
 
 import jakarta.annotation.Nullable;

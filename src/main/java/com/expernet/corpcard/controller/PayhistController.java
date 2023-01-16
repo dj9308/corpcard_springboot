@@ -1,6 +1,6 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.dto.PayhistDTO;
+import com.expernet.corpcard.dto.payhist.PayhistDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.service.PayhistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -58,33 +57,6 @@ public class PayhistController {
     public String payhistView(Model model) {
         model.addAttribute("menu", "payhist");
         return "payhist";
-    }
-
-    /**
-     * 월별 총계 조회
-     * @param payhistDTO : 검색 조건
-     * @param model        : modelMap
-     */
-    @Validated
-    @RequestMapping(value = "/searchTotalSumList", method = RequestMethod.GET)
-    public String searchTotalSumList(@Valid PayhistDTO.searchTotalSumListReq payhistDTO, ModelMap model) {
-        //TODO 총 합계 조회 DB에서 계산하도록 변경 필요
-        List<HashMap<String, Object>> result = new ArrayList<>();
-        try {
-            result = payhistService.searchTotalSumList(payhistDTO);
-        } finally {
-            if (result.size() > 0) {
-                model.addAttribute("result", result);
-                model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", "결제내역 조회 성공");
-                logger.info("결제내역 조회 성공");
-            } else {
-                model.addAttribute("CODE", "EMPTY");
-                model.addAttribute("MSG", "결제내역 조회 실패");
-                logger.info("결제내역 조회 실패");
-            }
-        }
-        return "jsonView";
     }
 
     /**

@@ -1,7 +1,7 @@
 package com.expernet.corpcard.service.Impl;
 
 
-import com.expernet.corpcard.dto.PayhistDTO;
+import com.expernet.corpcard.dto.payhist.PayhistDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.PayhistService;
@@ -89,17 +89,6 @@ public class PayhistServiceImpl implements PayhistService {
      * Logger
      */
     private static final Logger logger = LoggerFactory.getLogger(PayhistServiceImpl.class);
-
-    /**
-     * 월별 총계 조회
-     *
-     * @param payhistDTO : 검색 조건
-     */
-    @Override
-    public List<HashMap<String, Object>> searchTotalSumList(PayhistDTO.searchTotalSumListReq payhistDTO) {
-        return cardUsehistRepository.selectSumGroupByUserId(payhistDTO.getUserId(), payhistDTO.getStartYm(),
-                payhistDTO.getEndYm());
-    }
 
     /**
      * 법인카드 사용내역 조회

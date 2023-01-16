@@ -2,6 +2,7 @@ package com.expernet.corpcard.service.Impl;
 
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.CommonService;
@@ -62,6 +63,12 @@ public class CommonServiceImpl implements CommonService {
      */
     @Autowired
     private StateInfoRepository stateInfoRepository;
+    
+    /**
+     * 결제 내역 정보 Repository
+     */
+    @Autowired
+    private CardUsehistRepository cardUsehistRepository;
 
     /**
      * 사용자 정보 조회
@@ -108,6 +115,17 @@ public class CommonServiceImpl implements CommonService {
             result = cardInfoRepository.findAll();
         }
         return result;
+    }
+
+    /**
+     * 월별 총계 조회
+     *
+     * @param payhistDTO : 검색 조건
+     */
+    @Override
+    public List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.request payhistDTO) {
+        return cardUsehistRepository.selectSumGroupByUserId(payhistDTO.getUserId(), payhistDTO.getStartYm(),
+                payhistDTO.getEndYm());
     }
 
     /**

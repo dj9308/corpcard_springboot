@@ -2,11 +2,13 @@ package com.expernet.corpcard.service;
 
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 
 import java.text.ParseException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -43,6 +45,13 @@ public interface CommonService {
      * @param commonDTO : 검색 조건(사용자 정보)
      */
     List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) throws ParseException;
+
+    /**
+     * 월별 총계 조회
+     *
+     * @param payhistDTO   : 검색 조건
+     */
+    List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.request payhistDTO);
 
     /**
      * 제출 정보 상태 수정

@@ -581,7 +581,7 @@ const $adminHist = (function () {
     //1.월별 총계 조회
     $.ajax({
       type: "GET",
-      url: "/payhist/searchTotalSumList",
+      url: "/common/searchTotalSumList",
       dataType: "json",
       async: false,
       data: {
