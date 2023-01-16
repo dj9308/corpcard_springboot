@@ -73,7 +73,6 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public List<UserDTO.Response> searchManagerList(HashMap<String, Object> paramMap) {
-        //TODO JPA FETCH 전략 확인 및 조회 속도 개선 필요
         String adminYn = paramMap.get("adminYn").toString();
         List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn(adminYn);
         ModelMapper modelMapper = new ModelMapper();

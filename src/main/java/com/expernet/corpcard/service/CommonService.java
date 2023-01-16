@@ -2,8 +2,10 @@ package com.expernet.corpcard.service;
 
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
 import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.CardInfo;
+import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 
@@ -52,6 +54,12 @@ public interface CommonService {
      * @param payhistDTO   : 검색 조건
      */
     List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.request payhistDTO);
+
+    /**
+     * 법인카드 결제 내역 딘일 정보 조회
+     * @param seq: 결제 내역 seq
+     */
+    SearchPayhistInfoDTO searchCardUsehistInfo(long seq);
 
     /**
      * 제출 정보 상태 수정

@@ -1,13 +1,16 @@
 package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
 import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.CardInfo;
+import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.CommonService;
 import jakarta.annotation.Resource;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -16,6 +19,7 @@ import org.springframework.ui.ModelMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.text.ParseException;
@@ -146,6 +150,33 @@ public class CommonController {
             result = commonService.searchTotalSumList(params);
         } finally {
             if (result.size() > 0) {
+                model.addAttribute("result", result);
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제내역 조회 성공");
+                logger.info("결제내역 조회 성공");
+            } else {
+                model.addAttribute("CODE", "EMPTY");
+                model.addAttribute("MSG", "결제내역 조회 실패");
+                logger.info("결제내역 조회 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
+     * 결제 내역 단일 정보 조회
+     *
+     * @param seq : 결제 내역 seq
+     * @param model    : modelMap
+     */
+    @Validated
+    @RequestMapping(value = "/searchInfo", method = RequestMethod.GET)
+    public String searchPayhistInfo(@NotNull @RequestParam(value = "seq") long seq, ModelMap model) {
+        SearchPayhistInfoDTO result = null;
+        try {
+            result = commonService.searchCardUsehistInfo(seq);
+        } finally {
+            if (result != null) {
                 model.addAttribute("result", result);
                 model.addAttribute("CODE", "SUCCESS");
                 model.addAttribute("MSG", "결제내역 조회 성공");

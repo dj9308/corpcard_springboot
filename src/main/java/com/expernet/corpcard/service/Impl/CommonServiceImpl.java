@@ -2,10 +2,15 @@ package com.expernet.corpcard.service.Impl;
 
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
 import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.CommonService;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -126,6 +131,28 @@ public class CommonServiceImpl implements CommonService {
     public List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.request payhistDTO) {
         return cardUsehistRepository.selectSumGroupByUserId(payhistDTO.getUserId(), payhistDTO.getStartYm(),
                 payhistDTO.getEndYm());
+    }
+
+    /**
+     * 법인카드 결제 내역 딘일 정보 조회
+     * @param seq: 결제 내역 seq
+     */
+    @Override
+    public SearchPayhistInfoDTO searchCardUsehistInfo(long seq) {
+        SearchPayhistInfoDTO result = null;
+        CardUsehist usehist = cardUsehistRepository.findById(seq).orElse(null);
+        if(usehist != null){
+            result = SearchPayhistInfoDTO.builder()
+                    .seq(usehist.getSeq())
+                    .classInfo(SearchPayhistInfoDTO.ClassInfo.builder().seq(usehist.getClassInfo().getSeq()).build())
+                    .useHist(usehist.getUseHist())
+                    .cardComp(usehist.getCardComp())
+                    .cardNum(usehist.getCardNum())
+                    .useDate(usehist.getUseDate())
+                    .money(usehist.getMoney())
+                    .build();
+        }
+        return result;
     }
 
     /**

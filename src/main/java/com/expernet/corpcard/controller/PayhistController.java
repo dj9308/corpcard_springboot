@@ -86,32 +86,6 @@ public class PayhistController {
     }
 
     /**
-     * 결제 내역 단일 정보 조회
-     *
-     * @param paramMap : 결제 내역 seq
-     * @param model    : modelMap
-     */
-    @RequestMapping(value = "/searchInfo", method = RequestMethod.GET)
-    public String searchPayhistInfo(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
-        CardUsehist result = null;
-        try {
-            result = payhistService.searchCardUsehistInfo(paramMap);
-        } finally {
-            if (result != null) {
-                model.addAttribute("result", result);
-                model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", "결제내역 조회 성공");
-                logger.info("결제내역 조회 성공");
-            } else {
-                model.addAttribute("CODE", "EMPTY");
-                model.addAttribute("MSG", "결제내역 조회 실패");
-                logger.info("결제내역 조회 실패");
-            }
-        }
-        return "jsonView";
-    }
-
-    /**
      * 결제 내역 저장
      *
      * @param cardUsehist : 결제 내역 정보
