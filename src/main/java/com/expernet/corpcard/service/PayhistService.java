@@ -1,6 +1,7 @@
 package com.expernet.corpcard.service;
 
 import com.expernet.corpcard.dto.payhist.PayhistDTO;
+import com.expernet.corpcard.dto.payhist.SearchPayhistListDTO;
 import com.expernet.corpcard.entity.AttachmentInfo;
 import com.expernet.corpcard.entity.CardUsehist;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -32,9 +33,9 @@ public interface PayhistService {
 
     /**
      * 법인카드 결제 내역 목록 조회
-     * @param searchListReq: 제출 정보
+     * @param params: 제출 정보
      */
-    HashMap<String, Object> searchCardUsehistList(PayhistDTO.searchListReq searchListReq);
+    HashMap<String, Object> searchCardUsehistList(SearchPayhistListDTO.request params);
 
     /**
      * 법인카드 결제 내역 딘일 정보 조회

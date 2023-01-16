@@ -1,6 +1,7 @@
 package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.dto.payhist.PayhistDTO;
+import com.expernet.corpcard.dto.payhist.SearchPayhistListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.service.PayhistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -62,20 +63,20 @@ public class PayhistController {
     /**
      * 결제 내역 목록 조회
      *
-     * @param searchListReq : 작성연월
+     * @param params : 검색 조건
      * @param model    : modelMap
      */
     @RequestMapping(value = "/searchList", method = RequestMethod.GET)
-    public String searchPayhistList(@Valid PayhistDTO.searchListReq searchListReq, ModelMap model) {
+    public String searchPayhistList(@Valid SearchPayhistListDTO.request params, ModelMap model) {
         HashMap<String, Object> result = null;
         try {
-            result = payhistService.searchCardUsehistList(searchListReq);
+            result = payhistService.searchCardUsehistList(params);
         } finally {
             if (result != null && result.get("list") != null) {
                 model.addAttribute("result", result);
                 model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", searchListReq.getWrtYm() + "의 결제내역 조회 성공");
-                logger.info(searchListReq.getWrtYm() + "의 결제내역 조회 성공.");
+                model.addAttribute("MSG", params.getWrtYm() + "의 결제내역 조회 성공");
+                logger.info(params.getWrtYm() + "의 결제내역 조회 성공.");
             } else {
                 model.addAttribute("CODE", "EMPTY");
                 model.addAttribute("MSG", "결제내역 없음");

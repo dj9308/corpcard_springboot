@@ -68,7 +68,6 @@ public class ApprovalServiceImpl implements ApprovalService {
      */
     @Override
     public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
-        //TODO 리펙토링 필요
         //TODO CEO 분기점 기능 구현 필요
         List<String> teamList = new ArrayList<>();
         List<String> deptList = new ArrayList<>();

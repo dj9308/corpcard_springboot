@@ -112,7 +112,7 @@ const $approval = (function () {
             //상태
             newRow.insertCell().innerHTML = data[i].stateInfo.stateNm;
             //합계
-            newRow.insertCell().innerHTML = $cmmn.convertToCurrency(data[i].sum);
+            newRow.insertCell().innerHTML = $cmmn.isNullorEmpty(data[i].sum) ? '-' : $cmmn.convertToCurrency(data[i].sum);
             //seq
             const seqCell = newRow.insertCell();
             seqCell.innerHTML = data[i].seq.toString();
@@ -135,7 +135,6 @@ const $approval = (function () {
       $(row).on("click", function () {
         if (!$(this).hasClass("table-active")) {
             //사용 내역 조회
-            console.dir($(this).find("td:eq(8)").text());
             submitSeq = $(this).find("td:eq(8)").text();
             $("#approvalTable > tbody > tr").removeClass("table-active");
             $(this).addClass("table-active");
@@ -172,7 +171,6 @@ const $approval = (function () {
                     paintPayhistTable(data.result);
                 }else {
                     paintPayhistTable();
-                    alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
                 }
               },
               error: function () {
@@ -281,11 +279,9 @@ const $approval = (function () {
      */
     function paintSelect(list, select, isFixed){
         if(list.length === 0){
-            const option = document.createElement('option');
-            option.text = "---";
-            select.options.add(option);
+            paintTotalOption(select);
         }else{
-            if(select.id === "teamSelect" && list.length > 1){
+            if(select.id === "teamSelect"){
                 paintTotalOption(select);
             }
             for(let i =0;i<list.length;i++){
@@ -353,6 +349,7 @@ const $approval = (function () {
                   paintSelect([data.result.upperDeptInfo], deptSelect, true);
                   paintSelect([deptInfo], teamSelect, true);
               }else if(level === 2){    //부서장
+                $(teamSelect).find('option').remove();
                 paintSelect([deptInfo], deptSelect, true);
                 paintSelect(deptInfo.lower, teamSelect, false);
               }else if(level ==3){      //본부장
@@ -396,7 +393,7 @@ const $approval = (function () {
 
     //2.기간 date picker
     const now = new Date;
-    const startDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() -1), 'YYYY-mm');
+    const startDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() -3), 'YYYY-mm');
     const endDate = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
     $("#datepicker").val(`${startDate} - ${endDate}`);
 
@@ -409,6 +406,16 @@ const $approval = (function () {
 
     //3.조회 버튼 trigger
     $("#approvalSubmit").trigger("click");
+
+    //Search Input 이벤트
+    $("#listSearch").on('keyup', function () {
+      $("#approvalTable > tbody > tr").hide();
+      const value = $(this).val().toLowerCase();
+      $("#approvalTable > tbody > tr").filter(function () {
+        return $(this).text().toLowerCase().indexOf(value) > -1;
+      }).show();
+      document.querySelector("#listTotCnt").innerText = $("#approvalTable > tbody > tr:visible").length;
+    });
   }
 
   /**

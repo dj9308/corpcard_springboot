@@ -2,6 +2,7 @@ package com.expernet.corpcard.service.Impl;
 
 
 import com.expernet.corpcard.dto.payhist.PayhistDTO;
+import com.expernet.corpcard.dto.payhist.SearchPayhistListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.PayhistService;
@@ -93,14 +94,14 @@ public class PayhistServiceImpl implements PayhistService {
     /**
      * 법인카드 사용내역 조회
      *
-     * @param searchListReq: 제출 정보
+     * @param params: 제출 정보
      */
     @Override
-    public HashMap<String, Object> searchCardUsehistList(PayhistDTO.searchListReq searchListReq) {
+    public HashMap<String, Object> searchCardUsehistList(SearchPayhistListDTO.request params) {
         HashMap<String, Object> result = new HashMap<>();
-        String writerId = searchListReq.getUserId();
-        String wrtYm = searchListReq.getWrtYm();
-        String classCd = searchListReq.getClassCd();
+        String writerId = params.getUserId();
+        String wrtYm = params.getWrtYm();
+        String classCd = params.getClassCd();
 
         UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
 
