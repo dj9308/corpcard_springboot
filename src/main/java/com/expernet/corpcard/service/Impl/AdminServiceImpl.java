@@ -1,12 +1,11 @@
 package com.expernet.corpcard.service.Impl;
 
+import com.expernet.corpcard.dto.AdminDTO;
 import com.expernet.corpcard.dto.ApprovalSearch;
-import com.expernet.corpcard.dto.CardDTO;
 import com.expernet.corpcard.dto.UserDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.AdminService;
-import com.expernet.corpcard.service.ApprovalService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,13 +72,13 @@ public class AdminServiceImpl implements AdminService {
      * @param paramMap : 사용자 정보
      */
     @Override
-    public List<UserDTO> searchManagerList(HashMap<String, Object> paramMap) {
+    public List<UserDTO.Response> searchManagerList(HashMap<String, Object> paramMap) {
         //TODO JPA FETCH 전략 확인 및 조회 속도 개선 필요
         String adminYn = paramMap.get("adminYn").toString();
         List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn(adminYn);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(userEntityList, new TypeToken<List<UserDTO>>() {
+        return modelMapper.map(userEntityList, new TypeToken<List<UserDTO.Response>>() {
         }.getType());
     }
 
@@ -151,42 +150,42 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 카드 정보 저장 or 수정
      *
-     * @param cardDTO : 카드 정보
+     * @param cardParams : 카드 정보
      */
     @Override
-    public CardInfo saveCardInfo(CardDTO cardDTO) {
+    public CardInfo saveCardInfo(AdminDTO.saveCardInfoReq cardParams) {
         //TODO 저장 후 cardinfo onetomany column 조회 안되는 이유 확인 필요
         CardInfo result = null;
 
         //1.카드 정보 저장 or 수정
         CardInfo cardInfo = CardInfo.builder()
-                .seq(cardDTO.getCardSeq())
-                .cardComp(cardDTO.getCardComp())
-                .cardNum(cardDTO.getCardNum())
+                .seq(cardParams.getCardSeq())
+                .cardComp(cardParams.getCardComp())
+                .cardNum(cardParams.getCardNum())
                 .build();
 
         result = cardInfoRepository.saveAndFlush(cardInfo);
-        List<CardReceiptent> receiptents = cardReceiptentRepository.findAllByCardInfo_Seq(cardDTO.getCardSeq());
+        List<CardReceiptent> receiptents = cardReceiptentRepository.findAllByCardInfo_Seq(cardParams.getCardSeq());
         //2.카드 수령인 저장 or 수정(반납)
         if (!receiptents.isEmpty()) {
             CardReceiptent receiptent = receiptents.get(receiptents.size() - 1);
             if (receiptent.getReturnedAt() != null) {
-                if (cardDTO.getUserId() != null) {
-                    saveReceiptentByParams(cardDTO, result);
+                if (cardParams.getUserId() != null) {
+                    saveReceiptentByParams(cardParams, result);
                 }
             } else {
-                if (cardDTO.getUserId() == null) {
+                if (cardParams.getUserId() == null) {
                     receiptent.setReturnedAt(new Timestamp(System.currentTimeMillis()));
                     cardReceiptentRepository.save(receiptent);
-                } else if (!cardDTO.getUserId().equals(receiptent.getUser().getUserId())) {
+                } else if (!cardParams.getUserId().equals(receiptent.getUser().getUserId())) {
                     receiptent.setReturnedAt(new Timestamp(System.currentTimeMillis()));
                     cardReceiptentRepository.save(receiptent);
-                    saveReceiptentByParams(cardDTO, result);
+                    saveReceiptentByParams(cardParams, result);
                 }
             }
         } else {
-            if (cardDTO.getUserId() != null) {
-                saveReceiptentByParams(cardDTO, result);
+            if (cardParams.getUserId() != null) {
+                saveReceiptentByParams(cardParams, result);
             }
         }
 
@@ -197,11 +196,11 @@ public class AdminServiceImpl implements AdminService {
      * 사용자 전체 목록 조회
      */
     @Override
-    public List<UserDTO> searchUserList() {
+    public List<UserDTO.Response> searchUserList() {
         List<User> userList = userRepository.findAll();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(userList, new TypeToken<List<UserDTO>>() {
+        return modelMapper.map(userList, new TypeToken<List<UserDTO.Response>>() {
         }.getType());
     }
 
@@ -280,11 +279,11 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 카드 수령인 정보 저장
      *
-     * @param cardDTO  : 카드 DTO
+     * @param cardParams  : 카드 DTO
      * @param cardInfo : 카드 정보
      */
-    private void saveReceiptentByParams(CardDTO cardDTO, CardInfo cardInfo) {
-        User userInfo = userRepository.findByUserId(cardDTO.getUserId());
+    private void saveReceiptentByParams(AdminDTO.saveCardInfoReq cardParams, CardInfo cardInfo) {
+        User userInfo = userRepository.findByUserId(cardParams.getUserId());
         CardReceiptent cardReceiptent = CardReceiptent.builder()
                 .cardInfo(cardInfo)
                 .user(userInfo)

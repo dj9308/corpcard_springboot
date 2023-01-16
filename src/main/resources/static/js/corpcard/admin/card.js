@@ -137,8 +137,7 @@ const $card = (function () {
    */
   const paintTable = function (data) {
     const tbody = document.querySelector("#cardTable>tbody");
-
-    $cmmn.emptyTable("cardTable");
+    $("#cardTable>tbody").empty();
 
     if ($cmmn.isNullorEmpty(data)) {
       const newCell = tbody.insertRow().insertCell();
@@ -218,7 +217,7 @@ const $card = (function () {
   const paintUserTable = function (data) {
     const tbody = document.querySelector("#addUserTable>tbody");
 
-    $cmmn.emptyTable("addUserTable");
+    $("#addUserTable>tbody").empty();
 
     if ($cmmn.isNullorEmpty(data)) {
       const newCell = tbody.insertRow().insertCell();

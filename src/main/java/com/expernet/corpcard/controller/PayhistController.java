@@ -1,16 +1,14 @@
 package com.expernet.corpcard.controller;
 
+import com.expernet.corpcard.dto.PayhistDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.service.PayhistService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.annotation.Nullable;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
@@ -64,22 +62,16 @@ public class PayhistController {
 
     /**
      * 월별 총계 조회
-     *
-     * @param startYm : 시작 연월
-     * @param endYm : 종료 연월
-     * @param userId : 사용자 ID
-     * @param model    : modelMap
-     */ 
+     * @param payhistDTO : 검색 조건
+     * @param model        : modelMap
+     */
     @Validated
     @RequestMapping(value = "/searchTotalSumList", method = RequestMethod.GET)
-    public String searchTotalSumList(
-            @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "startYm") String startYm,
-            @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$") @RequestParam(value = "endYm") String endYm,
-            @Nullable @RequestParam(value = "userId") String userId, ModelMap model) {
+    public String searchTotalSumList(@Valid PayhistDTO.searchTotalSumListReq payhistDTO, ModelMap model) {
         //TODO 총 합계 조회 DB에서 계산하도록 변경 필요
         List<HashMap<String, Object>> result = new ArrayList<>();
         try {
-            result = payhistService.searchTotalSumList(startYm, endYm, userId);
+            result = payhistService.searchTotalSumList(payhistDTO);
         } finally {
             if (result.size() > 0) {
                 model.addAttribute("result", result);
@@ -98,20 +90,20 @@ public class PayhistController {
     /**
      * 결제 내역 목록 조회
      *
-     * @param paramMap : 작성연월
+     * @param searchListReq : 작성연월
      * @param model    : modelMap
      */
     @RequestMapping(value = "/searchList", method = RequestMethod.GET)
-    public String searchPayhistList(@RequestParam HashMap<String, String> paramMap, ModelMap model) {
+    public String searchPayhistList(@Valid PayhistDTO.searchListReq searchListReq, ModelMap model) {
         HashMap<String, Object> result = null;
         try {
-            result = payhistService.searchCardUsehistList(paramMap);
+            result = payhistService.searchCardUsehistList(searchListReq);
         } finally {
             if (result != null && result.get("list") != null) {
                 model.addAttribute("result", result);
                 model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", paramMap.get("WRT_YM") + "의 결제내역 조회 성공");
-                logger.info(paramMap.get("WRT_YM") + "의 결제내역 조회 성공.");
+                model.addAttribute("MSG", searchListReq.getWrtYm() + "의 결제내역 조회 성공");
+                logger.info(searchListReq.getWrtYm() + "의 결제내역 조회 성공.");
             } else {
                 model.addAttribute("CODE", "EMPTY");
                 model.addAttribute("MSG", "결제내역 없음");
@@ -155,12 +147,9 @@ public class PayhistController {
      */
     @RequestMapping(value = "/saveInfo", method = RequestMethod.POST)
     public String savePayhistList(@RequestBody CardUsehist cardUsehist, ModelMap model) {
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        UserDetails userDetails = (UserDetails) principal;
         Object result = null;
-
         try {
-            result = payhistService.saveCardUsehistInfo(cardUsehist, userDetails.getUsername());
+            result = payhistService.saveCardUsehistInfo(cardUsehist);
 
         } finally {
             if (result != null) {

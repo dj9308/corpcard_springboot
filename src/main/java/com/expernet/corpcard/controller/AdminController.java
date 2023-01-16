@@ -1,6 +1,7 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.dto.CardDTO;
+import com.expernet.corpcard.dto.AdminDTO;
+import com.expernet.corpcard.dto.EntityDTO;
 import com.expernet.corpcard.dto.UserDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.Dept;
@@ -51,7 +52,7 @@ public class AdminController {
 	 */
 	@RequestMapping("/{menuType}")
 	public String histPage(@PathVariable("menuType") String menuType, Model model){
-		if(!menuType.equals("hist") &&	//결제내역 관리
+		if(!menuType.equals("hist") &&		//결제내역 관리
 				!menuType.equals("auth") && //권한 관리
 				!menuType.equals("card")){	//카드 관리
 			return "404";
@@ -68,7 +69,7 @@ public class AdminController {
 	 */
 	@RequestMapping("/searchManagerList")
 	public String searchManagerList(@RequestParam HashMap<String, Object> paramMap, Model model){
-		List<UserDTO> result = null;
+		List<UserDTO.Response> result = null;
 		try {
 			result = adminService.searchManagerList(paramMap);
 		} finally {
@@ -177,7 +178,7 @@ public class AdminController {
 	 * @param model: modelMap
 	 */
 	@RequestMapping(value = "/saveCardInfo", method = RequestMethod.POST)
-	public String saveCardInfo(@RequestBody CardDTO cardInfo, Model model){
+	public String saveCardInfo(@RequestBody AdminDTO.saveCardInfoReq cardInfo, Model model){
 		CardInfo result = null;
 		try {
 			result = adminService.saveCardInfo(cardInfo);
@@ -202,7 +203,7 @@ public class AdminController {
 	 */
 	@RequestMapping(value = "/searchUserList", method = RequestMethod.GET)
 	public String searchUserList( Model model){
-		List<UserDTO> result = null;
+		List<UserDTO.Response> result = null;
 		try {
 			result = adminService.searchUserList();
 		} finally {

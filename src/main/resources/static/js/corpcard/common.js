@@ -77,13 +77,6 @@ const $cmmn = (function () {
     }
     return answer;
   }
-  /**
-   * 테이블 초기화
-   * @param tableId : String (Table tag id)
-   */
-  const emptyTable = function (tableId) {
-    $(`#${tableId}>tbody`).empty();
-  }
 
   /**
   * Date format 설정
@@ -203,7 +196,6 @@ const $cmmn = (function () {
     serializeObject: serializeObject,      //form 정보를 json 형식으로 변환
     uncomma: uncomma,                      //쉼표 삭제
     convertToCurrency: convertToCurrency,  //문자 삭제 및 쉼표 추가
-    emptyTable: emptyTable,                //테이블 초기화
     formatDate: formatDate,                //Date format 설정
     initHistToast: initHistToast,          //첨부파일 toast 이벤트
     paintUserInfo: paintUserInfo,          //navbar에 사용자 정보 출력

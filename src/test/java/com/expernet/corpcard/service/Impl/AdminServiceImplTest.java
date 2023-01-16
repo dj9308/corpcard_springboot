@@ -9,9 +9,6 @@ import com.expernet.corpcard.repository.CardInfoRepository;
 import com.expernet.corpcard.repository.CardReceiptentRepository;
 import com.expernet.corpcard.repository.UserAddInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.modelmapper.ModelMapper;
@@ -24,7 +21,6 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -50,7 +46,8 @@ public class AdminServiceImplTest {
         List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn("Y");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        List<UserDTO> test= modelMapper.map(userEntityList, new TypeToken<List<UserDTO>>() {}.getType());
+        List<UserDTO.Response> test = modelMapper.map(userEntityList, new TypeToken<List<UserDTO.Response>>() {
+        }.getType());
         assertNotNull(test);
     }
 
@@ -64,7 +61,7 @@ public class AdminServiceImplTest {
         List<User> test = userRepository.findAllByUserIdIn(userIdList);
         List<UserAddInfo> addInfos = new ArrayList<>();
 
-        for(User user : test){
+        for (User user : test) {
             UserAddInfo info = user.getUserAddInfo();
             info.setAdminYn("Y");
             addInfos.add(info);

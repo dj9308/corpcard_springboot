@@ -113,37 +113,37 @@ public class CommonServiceImpl implements CommonService {
     /**
      * 제출 정보 상태 수정
      *
-     * @param stateDTO : 제출 정보 및 수정할 상태 정보
+     * @param stateParams : 제출 정보 및 수정할 상태 정보
      */
     @Override
-    public Object updateState(CommonDTO.UpdateState stateDTO) {
+    public Object updateState(CommonDTO.UpdateState stateParams) {
         Object result = null;
         UsehistSubmitInfo submitInfo = null;
         StateInfo stateInfo = null;
 
         //1.상태를 수정할 제출 정보 조회
-        if (stateDTO.getSubmitSeq() != null) {
-            submitInfo = usehistSubmitInfoRepository.findBySeq(stateDTO.getSubmitSeq());
-        } else if (stateDTO.getWriterId() != null && stateDTO.getWrtYm() != null) {
+        if (stateParams.getSubmitSeq() != null) {
+            submitInfo = usehistSubmitInfoRepository.findBySeq(stateParams.getSubmitSeq());
+        } else if (stateParams.getWriterId() != null && stateParams.getWrtYm() != null) {
             submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(
-                    stateDTO.getWriterId(), stateDTO.getWrtYm());
+                    stateParams.getWriterId(), stateParams.getWrtYm());
         }
         //2.상태 변경
         if (submitInfo != null) {
             User checkerInfo;
             //확인자 정보 삽입
-            if (stateDTO.getCheckerId() != null) {
-                checkerInfo = userRepository.findByUserId(stateDTO.getCheckerId());
+            if (stateParams.getCheckerId() != null) {
+                checkerInfo = userRepository.findByUserId(stateParams.getCheckerId());
                 submitInfo.setCheckerId(checkerInfo.getUserId());
                 submitInfo.setCheckerNm(checkerInfo.getUserNm());
                 submitInfo.setCheckerOfcds(checkerInfo.getOfcds());
             }
             //결재 완료일 삽입
-            if (stateDTO.getStateCd().equals("C")) {
+            if (stateParams.getStateCd().equals("C")) {
                 submitInfo.setApproveDate(new Timestamp(System.currentTimeMillis()));
             }
             //상태 seq 삽입
-            stateInfo = stateInfoRepository.findByStateCd(stateDTO.getStateCd());
+            stateInfo = stateInfoRepository.findByStateCd(stateParams.getStateCd());
             submitInfo.setStateInfo(stateInfo);
 
             result = usehistSubmitInfoRepository.save(submitInfo);

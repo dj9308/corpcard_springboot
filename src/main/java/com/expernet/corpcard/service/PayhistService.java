@@ -1,5 +1,6 @@
 package com.expernet.corpcard.service;
 
+import com.expernet.corpcard.dto.PayhistDTO;
 import com.expernet.corpcard.entity.AttachmentInfo;
 import com.expernet.corpcard.entity.CardUsehist;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -7,7 +8,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,17 +33,15 @@ public interface PayhistService {
     /**
      * 월별 총계 조회
      *
-     * @param startYm   : 시작 연월
-     * @param endYm     : 종료 연월
-     * @param userId : 사용자 ID
+     * @param payhistDTO   : 검색 조건
      */
-    List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, String userId);
+    List<HashMap<String, Object>> searchTotalSumList(PayhistDTO.searchTotalSumListReq payhistDTO);
 
     /**
      * 법인카드 결제 내역 목록 조회
-     * @param paramMap: 제출 seq
+     * @param searchListReq: 제출 정보
      */
-    HashMap<String, Object> searchCardUsehistList(HashMap<String, String> paramMap);
+    HashMap<String, Object> searchCardUsehistList(PayhistDTO.searchListReq searchListReq);
 
     /**
      * 법인카드 결제 내역 딘일 정보 조회
@@ -54,9 +52,8 @@ public interface PayhistService {
     /**
      * 법인카드 결제 내역 저장
      * @param cardUsehist: 결제 내역 정보
-     * @param userId : 사용자 ID
      */
-    Object saveCardUsehistInfo(CardUsehist cardUsehist, String userId);
+    Object saveCardUsehistInfo(CardUsehist cardUsehist);
 
     /**
      * 법인카드 결제 내역 삭제

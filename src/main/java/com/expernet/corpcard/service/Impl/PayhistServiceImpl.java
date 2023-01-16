@@ -1,6 +1,7 @@
 package com.expernet.corpcard.service.Impl;
 
 
+import com.expernet.corpcard.dto.PayhistDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.PayhistService;
@@ -13,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -90,42 +93,41 @@ public class PayhistServiceImpl implements PayhistService {
     /**
      * 월별 총계 조회
      *
-     * @param startYm : 시작 연월
-     * @param endYm   : 종료 연월
-     * @param userId  : 사용자 ID
+     * @param payhistDTO : 검색 조건
      */
     @Override
-    public List<HashMap<String, Object>> searchTotalSumList(String startYm, String endYm, String userId) {
-        return cardUsehistRepository.selectSumGroupByUserId(userId, startYm, endYm);
+    public List<HashMap<String, Object>> searchTotalSumList(PayhistDTO.searchTotalSumListReq payhistDTO) {
+        return cardUsehistRepository.selectSumGroupByUserId(payhistDTO.getUserId(), payhistDTO.getStartYm(),
+                payhistDTO.getEndYm());
     }
 
     /**
      * 법인카드 사용내역 조회
      *
-     * @param paramMap: 제출 seq
+     * @param searchListReq: 제출 정보
      */
     @Override
-    public HashMap<String, Object> searchCardUsehistList(HashMap<String, String> paramMap) {
+    public HashMap<String, Object> searchCardUsehistList(PayhistDTO.searchListReq searchListReq) {
         HashMap<String, Object> result = new HashMap<>();
-        String writerId = paramMap.get("WRITER_ID");
-        String wrtYm = paramMap.get("WRT_YM");
+        String writerId = searchListReq.getUserId();
+        String wrtYm = searchListReq.getWrtYm();
+        String classCd = searchListReq.getClassCd();
+
         UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
-        String classCd = paramMap.getOrDefault("CLASS_CD", null);
 
         if (submitInfo != null) {
-            List<CardUsehist> list = cardUsehistRepository.
-                    findAllBySeqAndClassCd(submitInfo.getSeq(), classCd);
+            long submitSeq = submitInfo.getSeq();
+            Sort sort = Sort.by(Sort.Direction.ASC, "useDate");
+            List<CardUsehist> list = cardUsehistRepository.findAllBySubmitSeqAndClassCd(submitSeq, classCd, sort);
             if (list.size() > 0) {
                 //제출 내역
                 result.put("submitInfo", submitInfo);
                 //사용 내역 리스트
                 result.put("list", list);
                 //분류별 합계
-                result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitInfo.getSeq(),
-                        classCd));
+                result.put("sumByClass", cardUsehistRepository.selectSumGroupByClassSeq(submitSeq, classCd));
                 //총계
-                result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(submitInfo.getSeq(),
-                        classCd));
+                result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(submitSeq, classCd));
             }
         }
         return result;
@@ -146,10 +148,13 @@ public class PayhistServiceImpl implements PayhistService {
      * 법인카드 사용내역 저장
      *
      * @param cardUsehist : 결제 내역 정보
-     * @param userId      : 사용자 ID
      */
     @Override
-    public Object saveCardUsehistInfo(CardUsehist cardUsehist, String userId) {
+    public Object saveCardUsehistInfo(CardUsehist cardUsehist) {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        UserDetails userDetails = (UserDetails) principal;
+        String userId = userDetails.getUsername();
+
         //1.제출 정보 존재여부 확인
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM");
         String wrtYm = format.format(cardUsehist.getUseDate());
@@ -157,10 +162,11 @@ public class PayhistServiceImpl implements PayhistService {
 
         //2.제출 정보 없을 시 생성
         if (submitInfo == null) {
-            HashMap<String, Object> paramMap = new HashMap<>();
-            paramMap.put("WRITER_ID", userId);
-            paramMap.put("WRT_YM", wrtYm);
-            submitInfo = saveSubmitInfo(paramMap);
+            PayhistDTO.searchListReq searchListReq = PayhistDTO.searchListReq.builder()
+                    .userId(userId)
+                    .wrtYm(wrtYm)
+                    .build();
+            submitInfo = saveSubmitInfo(searchListReq);
         }
 
         //3.결제내역 저장
@@ -409,6 +415,28 @@ public class PayhistServiceImpl implements PayhistService {
                 .writerNm(userInfo.getUserNm())
                 .wrtYm(paramMap.get("WRT_YM").toString())
                 .build();
+        return usehistSubmitInfoRepository.save(histInfo);
+    }
+
+    /**
+     * 제출 내역 저장
+     *
+     * @param searchListReq: 사용자 정보 및 작성 연월
+     */
+    private UsehistSubmitInfo saveSubmitInfo(PayhistDTO.searchListReq searchListReq) {
+        User userInfo = userRepository.findByUserId(searchListReq.getUserId());
+        Dept deptInfo = userInfo.getDept();
+
+        UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
+                .stateInfo(StateInfo.builder().seq(1).build())
+                .writerId(userInfo.getUserId())
+                .writerDept(deptInfo.getUpper().getDeptNm())
+                .writerTeam(deptInfo.getDeptNm())
+                .writerOfcds(userInfo.getOfcds())
+                .writerNm(userInfo.getUserNm())
+                .wrtYm(searchListReq.getWrtYm())
+                .build();
+
         return usehistSubmitInfoRepository.save(histInfo);
     }
 }

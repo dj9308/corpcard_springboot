@@ -219,7 +219,7 @@ const $adminHist = (function () {
   const paintApprovalTable = function (data) {
     const tbody = document.querySelector("#approvalTable>tbody");
     //1.table 초기화
-    $cmmn.emptyTable("approvalTable");
+    $("#approvalTable>tbody").empty();
     //2.table row 생성
     if (data.length === 0) {
       const newCell = tbody.insertRow().insertCell();
@@ -387,7 +387,7 @@ const $adminHist = (function () {
   const paintPayhistTable = function (data) {
     const tbody = document.querySelector("#histTable > tbody");
 
-    $cmmn.emptyTable("histTable");  //테이블 초기화
+    $("#histTable>tbody").empty();
 
     if ($cmmn.isNullorEmpty(data)) {
       const newCell = tbody.insertRow().insertCell();

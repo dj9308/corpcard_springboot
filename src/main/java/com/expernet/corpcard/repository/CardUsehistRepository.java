@@ -1,6 +1,7 @@
 package com.expernet.corpcard.repository;
 
 import com.expernet.corpcard.entity.CardUsehist;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -25,7 +26,9 @@ public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> 
     @Query(value = "SELECT cu FROM CardUsehist cu " +
             "WHERE cu.usehistSubmitInfo.seq = :submitSeq " +
             "AND (:classCd is null or cu.usehistSubmitInfo.stateInfo.stateCd = :classCd) ")
-    List<CardUsehist> findAllBySeqAndClassCd(@Param("submitSeq") long submitSeq, @Param("classCd") String classCd);
+    List<CardUsehist> findAllBySubmitSeqAndClassCd(@Param("submitSeq") long submitSeq,
+                                                   @Param("classCd") String classCd,
+                                                   Sort sort);
 
     /**
      * 결제 내역 조회
@@ -99,5 +102,4 @@ public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> 
     List<HashMap<String, Object>> selectSumGroupByUserId(@Param("userId") String userId,
                                                         @Param("startYm") String startYm,
                                                         @Param("endYm") String endYm);
-
 }

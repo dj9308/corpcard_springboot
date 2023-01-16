@@ -137,7 +137,7 @@ const $auth = (function () {
   const paintTable = function (data) {
     const tbody = document.querySelector("#authTable>tbody");
 
-    $cmmn.emptyTable("authTable");
+    $("#authTable>tbody").empty();
 
     if ($cmmn.isNullorEmpty(data)) {
       const newCell = tbody.insertRow().insertCell();
@@ -185,7 +185,7 @@ const $auth = (function () {
   const paintUserTable = function (data) {
     const tbody = document.querySelector("#addManagerTable>tbody");
 
-    $cmmn.emptyTable("addManagerTable");
+    $("#addManagerTable>tbody").empty();
 
     if ($cmmn.isNullorEmpty(data)) {
       const newCell = tbody.insertRow().insertCell();
