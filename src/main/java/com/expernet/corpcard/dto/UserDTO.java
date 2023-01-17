@@ -7,6 +7,8 @@ import lombok.*;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserDTO {
@@ -68,7 +70,7 @@ public class UserDTO {
         private String chiefTitle;
         private Timestamp createdAt;
         private Timestamp updatedAt;
-        private List<DeptDTO> lower;
+        private DeptDTO upper;
 
         public DeptDTO(Dept entity) {
             this.seq = entity.getSeq();
@@ -78,7 +80,7 @@ public class UserDTO {
             this.chiefTitle = entity.getChiefTitle();
             this.createdAt = entity.getCreatedAt();
             this.updatedAt = entity.getUpdatedAt();
-            this.lower = entity.getLower().stream().map(DeptDTO::new).collect(Collectors.toList());
+            this.upper = new DeptDTO(Objects.requireNonNull(entity.getUpper()));
         }
     }
 }

@@ -114,6 +114,7 @@ const $auth = (function () {
       success: function (data) {
         if (data.CODE === "SUCCESS") {
           if (adminYn === "Y") {
+            $("#checkAll").prop('checked', false);
             paintTable(data.result);
           } else {
             paintUserTable(data.result);
@@ -145,7 +146,6 @@ const $auth = (function () {
       newCell.setAttribute('colspan', '6');
       newCell.classList.add("fw-bold");
       newCell.innerText = "등록된 관리자가 없습니다.";
-
     } else {
       //1.총 건수 설정
       document.querySelector("#listTotCnt").innerText = data.length;
@@ -162,8 +162,7 @@ const $auth = (function () {
         //No.
         newRow.insertCell().innerHTML = (i + 1).toString();
         //부서
-        newRow.insertCell().innerHTML = $cmmn.isNullorEmpty(rowData.dept.upper) ?
-          '' : rowData.dept.upper.deptNm;
+        newRow.insertCell().innerHTML = $cmmn.isNullorEmpty(rowData.dept.upper) ? '' : rowData.dept.upper.deptNm;
         //팀
         newRow.insertCell().innerHTML = rowData.dept.deptNm;
         //직급

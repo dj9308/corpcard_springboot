@@ -199,8 +199,7 @@ public class AdminServiceImpl implements AdminService {
         List<User> userList = userRepository.findAll();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(userList, new TypeToken<List<UserDTO.Response>>() {
-        }.getType());
+        return modelMapper.map(userList, new TypeToken<List<UserDTO.Response>>() {}.getType());
     }
 
     /**
