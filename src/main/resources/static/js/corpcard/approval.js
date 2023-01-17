@@ -42,8 +42,17 @@ const $approval = (function () {
     })
     //반려 btn
     $("#rejectHist").on("click", function () {
+        $("#rejectMsg").val("");
+        const rejectModal = new bootstrap.Modal(document.querySelector('#rejectModal'), {
+          keyboard: false
+        })
+        rejectModal.show();
+    })
+    //modal 반려 btn
+    $("#rejectBtn").on("click", function () {
       if (confirm("해당 결재 건을 반려 처리하겠습니까?")) {
         updateState("D", uptStateBtn(true));
+        $("#modalCloseBtn").trigger("click");
       }
     })
   }
@@ -452,6 +461,10 @@ const $approval = (function () {
      * @param {function} callback : Callback function
      */
   const updateState = function (stateCd, callback) {
+    let rejectMsg;
+    if(stateCd === 'D'){
+        rejectMsg = $("#rejectMsg").val();
+    }
 
     $.ajax({
       type: "PATCH",
@@ -461,6 +474,7 @@ const $approval = (function () {
         submitSeq: submitSeq,
         stateCd: stateCd,
         checkerId: userId,
+        rejectMsg: rejectMsg,
       },
       success: function (data) {
         if (data.CODE === "SUCCESS") {

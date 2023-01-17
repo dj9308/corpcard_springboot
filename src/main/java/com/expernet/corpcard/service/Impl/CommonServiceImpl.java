@@ -164,7 +164,6 @@ public class CommonServiceImpl implements CommonService {
     public Object updateState(CommonDTO.UpdateState stateParams) {
         Object result = null;
         UsehistSubmitInfo submitInfo = null;
-        StateInfo stateInfo = null;
 
         //1.상태를 수정할 제출 정보 조회
         if (stateParams.getSubmitSeq() != null) {
@@ -187,8 +186,12 @@ public class CommonServiceImpl implements CommonService {
             if (stateParams.getStateCd().equals("C")) {
                 submitInfo.setApproveDate(new Timestamp(System.currentTimeMillis()));
             }
+            //반려 사유 삽입
+            if(stateParams.getStateCd().equals("D") && stateParams.getRejectMsg() != null){
+                submitInfo.setRejectMsg(stateParams.getRejectMsg());
+            }
             //상태 seq 삽입
-            stateInfo = stateInfoRepository.findByStateCd(stateParams.getStateCd());
+            StateInfo stateInfo = stateInfoRepository.findByStateCd(stateParams.getStateCd());
             submitInfo.setStateInfo(stateInfo);
 
             result = usehistSubmitInfoRepository.save(submitInfo);

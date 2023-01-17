@@ -52,6 +52,9 @@ public class UsehistSubmitInfo {
     @Column(name = "APPROVE_DATE")
     private Timestamp approveDate;
 
+    @Column(name = "REJECT_MSG")
+    private String rejectMsg;
+
     @CreationTimestamp
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;

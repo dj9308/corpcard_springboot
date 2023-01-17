@@ -1,5 +1,6 @@
 package com.expernet.corpcard.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
@@ -34,5 +35,6 @@ public class CommonDTO {
         private final String checkerId;
         @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$")
         private final String wrtYm;
+        private String rejectMsg;
     }
 }

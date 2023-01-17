@@ -115,7 +115,7 @@ const $cmmn = (function () {
     const toastList = toastElList.map(function (toastEl) {
       return new bootstrap.Toast(toastEl)
     });
-    if ($(`${toastId}`).hasClass("show")) {
+    if ($(`#${toastId}`).hasClass("show")) {
       toastList.forEach(toast => toast.hide());
     } else {
       toastList.forEach(toast => toast.show());
