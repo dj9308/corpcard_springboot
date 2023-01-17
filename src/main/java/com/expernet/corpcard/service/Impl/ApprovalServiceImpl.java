@@ -10,6 +10,7 @@ import com.expernet.corpcard.repository.UsehistSubmitInfoRepository;
 import com.expernet.corpcard.repository.UserRepository;
 import com.expernet.corpcard.service.ApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -111,8 +112,8 @@ public class ApprovalServiceImpl implements ApprovalService {
     public HashMap<String, Object> searchPayhistList(HashMap<String, Object> paramMap) {
         HashMap<String, Object> result = new HashMap<>();
         long seq = Long.parseLong(paramMap.get("SEQ").toString());
-
-        List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(seq);
+        Sort sort = Sort.by(Sort.Direction.ASC, "useDate");
+        List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(seq, sort);
         if (list.size() > 0) {
             //사용 내역 리스트
             result.put("list", list);

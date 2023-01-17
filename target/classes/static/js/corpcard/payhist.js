@@ -61,15 +61,15 @@ const $payhist = (function () {
           if (data.CODE === "SUCCESS") {
             //4.결제 목록 조회
             selectPayhistList();
-            if($("#histUpdate").is(":visible")){
-                changeForm("save");
+            if ($("#histUpdate").is(":visible")) {
+              changeForm("save");
             }
           } else if (data.CODE === "ERR") {
             alert("결제 내역 저장에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
           }
         },
         error: function (request, status, error) {
-            alert("결제 내역 저장에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
+          alert("결제 내역 저장에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
         }
       });
     });
@@ -114,7 +114,7 @@ const $payhist = (function () {
       let a = "";
       $.each(array, function (i, row) {
         $.each(row, function (j, cell) {
-          if(j === 1) {
+          if (j === 1) {
             cell = `=\"${cell}\"`;
           }
           if (j !== 2 && cell.includes(",")) {
@@ -176,8 +176,8 @@ const $payhist = (function () {
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
-            if($("#histUpdate").is(":visible")){
-                changeForm("save");
+            if ($("#histUpdate").is(":visible")) {
+              changeForm("save");
             }
             selectPayhistList();
           } else {
@@ -284,6 +284,8 @@ const $payhist = (function () {
         paintTable(data.result);
         //3)제출 상태 조회 및 버튼 disable 처리
         changeTagStyle(data.result.submitInfo.stateInfo);
+        //4)반려 사유
+        $("#rejectMsgBtn").attr("data-bs-content", data.result.submitInfo.rejectMsg || ' ');
       } else if (data.CODE === "EMPTY") {
         paintTable();
         changeTagStyle();
@@ -294,45 +296,53 @@ const $payhist = (function () {
     setLimitHistDate();
   }
 
-    /**
-    * 결재 상태에 따른 Tag style 변경
-    * @param {JSON} stateInfo : 변경 완료된 상태 정보
-    */
-    const changeTagStyle = function (stateInfo) {
-      //tag disable 스타일 변경
-      function disableBtn(isDisable) {
-        isDisable ? $("#deleteRow").css("display", "none") : $("#deleteRow").css("display", "");
-        isDisable ? $("#submitHist").css("display", "none") : $("#submitHist").css("display", "");
-        isDisable ? $("#atchAddBtn").css("display", "none") : $("#atchAddBtn").css("display", "");
-        isDisable ? $("#atchDelBtn").css("display", "none") : $("#atchDelBtn").css("display", "");
-        $("#histForm :input").attr("disabled", isDisable);
-        $("#histForm select").attr("disabled", isDisable);
-      }
+  /**
+  * 결재 상태에 따른 Tag style 변경
+  * @param {JSON} stateInfo : 변경 완료된 상태 정보
+  */
+  const changeTagStyle = function (stateInfo) {
+    //tag disable 스타일 변경
+    function disableBtn(isDisable) {
+      isDisable ? $("#deleteRow").css("display", "none") : $("#deleteRow").css("display", "");
+      isDisable ? $("#submitHist").css("display", "none") : $("#submitHist").css("display", "");
+      isDisable ? $("#atchAddBtn").css("display", "none") : $("#atchAddBtn").css("display", "");
+      isDisable ? $("#atchDelBtn").css("display", "none") : $("#atchDelBtn").css("display", "");
+      $("#histForm :input").attr("disabled", isDisable);
+      $("#histForm select").attr("disabled", isDisable);
+    }
 
-      if ($cmmn.isNullorEmpty(stateInfo)) {
-        $("#stateNm").text("결재 전");
-        $("#submitCancel").css("display", "none");
-        disableBtn(false);
-        return false;
-      } else {
-        $("#stateNm").text(stateInfo.stateNm);
-      }
+    if ($cmmn.isNullorEmpty(stateInfo)) {
+      $("#stateNm").text("결재 전");
+      $("#submitCancel").css("display", "none");
+      $("#rejectMsgBtn").css("display", "none");
+      disableBtn(false);
+    } else {
+      $("#stateNm").text(stateInfo.stateNm);
 
       switch (stateInfo.stateCd) {
         case "B":
           $("#submitCancel").css("display", "");
+          $("#rejectMsgBtn").css("display", "none");
           disableBtn(true);
           break;
         case "C":
           $("#submitCancel").css("display", "none");
+          $("#rejectMsgBtn").css("display", "none");
           disableBtn(true);
+          break;
+        case "D":
+          $("#submitCancel").css("display", "none");
+          $("#rejectMsgBtn").css("display", "");
+          disableBtn(false);
           break;
         default:
           $("#submitCancel").css("display", "none");
+          $("#rejectMsgBtn").css("display", "none");
           disableBtn(false);
           break;
       }
     }
+  }
 
   /**
   * 결제 내역 테이블 생성
@@ -360,6 +370,9 @@ const $payhist = (function () {
         chkbox.setAttribute("type", "checkbox");
         chkbox.setAttribute("value", rowData.seq);
         chkbox.className += "form-check-input me-1 table-check";
+        chkbox.addEventListener("click", function(event){
+          event.stopPropagation();
+        });
         newRow.insertCell().appendChild(chkbox);
         //사용일
         newRow.insertCell().innerHTML = $cmmn.formatDate(rowData.useDate, "mm.dd");
@@ -516,8 +529,8 @@ const $payhist = (function () {
   const initCharts = function () {
     //검색 기간 Date Picker 설정
     const now = new Date;
-    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-7), 'YYYY-mm');
-    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-1), 'YYYY-mm');
+    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 7), 'YYYY-mm');
+    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 1), 'YYYY-mm');
     $("#datepicker").val(`${startYm} - ${endYm}`);
 
     $('#datepicker').daterangepicker({
@@ -550,8 +563,8 @@ const $payhist = (function () {
     }
     if ($cmmn.isNullorEmpty(startYm) || $cmmn.isNullorEmpty(endYm)) {
       const now = new Date;
-      startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-7), 'YYYY-mm');
-      endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-1), 'YYYY-mm');
+      startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 7), 'YYYY-mm');
+      endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 1), 'YYYY-mm');
     }
 
     const wrtYmList = [];
@@ -692,7 +705,7 @@ const $payhist = (function () {
     initChartAnimation(pieChartDom, pieOption);
     document.querySelector("#curYm").innerText = `${yearMonth.split("-")[0]}년 ${yearMonth.split("-")[1]}월`;
     document.querySelector("#curYmSum").innerText = `${$cmmn.isNullorEmpty(result) ? "0" :
-        $cmmn.convertToCurrency(result.sum)}원`;
+      $cmmn.convertToCurrency(result.sum)}원`;
   }
 
   /**
@@ -706,7 +719,7 @@ const $payhist = (function () {
 
     if (chartDom.id === "chartBar") {
       myChart.on('click', function (params) {
-        selectHistList(params.name, "C",function (data) {
+        selectHistList(params.name, "C", function (data) {
           paintPieChart(params.name, data);
         });
       });
@@ -738,26 +751,31 @@ const $payhist = (function () {
     document.querySelector("#checkAll").addEventListener('click', function () {
       $(".table-check").prop('checked', $(this).prop('checked'));
     });
+
+    //반려 사유 팝오버
+    const popover = new bootstrap.Popover(document.querySelector('#rejectMsgBtn'), {
+      container: 'body'
+    });
   }
 
-    /**
-    * 결제 내역 form 변경
-    * @param {String} type : save(저장) or update(수정)
-    */
-    const changeForm = function (type) {
-      if($cmmn.isNullorEmpty(type)){
-          type = "save";
-      }
-      if(type === "save"){
-        $("#histSave").css("display", "");
-        $("#histUpdate").css("display", "none");
-        $("#histTable > tbody > tr").removeClass("table-active");
-        $("#histForm")[0].reset();
-      }else{
-        $("#histSave").css("display", "none");
-        $("#histUpdate").css("display", "");
-      }
+  /**
+  * 결제 내역 form 변경
+  * @param {String} type : save(저장) or update(수정)
+  */
+  const changeForm = function (type) {
+    if ($cmmn.isNullorEmpty(type)) {
+      type = "save";
     }
+    if (type === "save") {
+      $("#histSave").css("display", "");
+      $("#histUpdate").css("display", "none");
+      $("#histTable > tbody > tr").removeClass("table-active");
+      $("#histForm")[0].reset();
+    } else {
+      $("#histSave").css("display", "none");
+      $("#histUpdate").css("display", "");
+    }
+  }
 
   /**
    * 첨부파일 toast 설정
@@ -866,14 +884,14 @@ const $payhist = (function () {
    * @param {String} classCd : 제출 code
    * @param {function} callback : Callback function
    */
-  const selectHistList = function (yearMonth, classCd ,callback) {
+  const selectHistList = function (yearMonth, classCd, callback) {
     const data = {
-        userId: userId,
-        wrtYm: yearMonth
+      userId: userId,
+      wrtYm: yearMonth
     };
 
-    if(!$cmmn.isNullorEmpty(classCd)){
-        data.classCd = classCd;
+    if (!$cmmn.isNullorEmpty(classCd)) {
+      data.classCd = classCd;
     }
 
     $.ajax({
@@ -890,31 +908,31 @@ const $payhist = (function () {
     });
   }
 
- /**
-  * 해당연월 수령한 카드 목록 조회
-  * @param {String} yearMonth : 작성연월
-  */
-  const selectCardList = function(yearMonth){
-    if($cmmn.isNullorEmpty(yearMonth)){
-        yearMonth = $cmmn.formatDate("", "YYYY-mm");
+  /**
+   * 해당연월 수령한 카드 목록 조회
+   * @param {String} yearMonth : 작성연월
+   */
+  const selectCardList = function (yearMonth) {
+    if ($cmmn.isNullorEmpty(yearMonth)) {
+      yearMonth = $cmmn.formatDate("", "YYYY-mm");
     }
 
     const data = {
-      userId : userId,
+      userId: userId,
       wrtYm: yearMonth,
     }
 
     //카드 목록 조회
-    $cmmn.selectCardList(data, function(list){
-        const cardSelect = document.querySelector("#cardSelect");
-        $("#cardSelect option").not("option:first").remove();
+    $cmmn.selectCardList(data, function (list) {
+      const cardSelect = document.querySelector("#cardSelect");
+      $("#cardSelect option").not("option:first").remove();
 
-        for (let i in list) {
-          const option = document.createElement('option');
-          option.text = `${list[i].cardComp} ${list[i].cardNum}`;
-          option.value = list[i].seq;
-          cardSelect.options.add(option);
-        }
+      for (let i in list) {
+        const option = document.createElement('option');
+        option.text = `${list[i].cardComp} ${list[i].cardNum}`;
+        option.value = list[i].seq;
+        cardSelect.options.add(option);
+      }
     });
   }
 
@@ -923,6 +941,11 @@ const $payhist = (function () {
    * @param {JSON} data : 결제 금액 리스트 및 합계
    */
   const makePDF = function (data) {
+    let checkerNm = '';
+    if (data.submitInfo.stateInfo.stateCd === 'C' && !$cmmn.isNullorEmpty(data.submitInfo.checkerNm)) {
+      checkerNm = data.submitInfo.checkerNm;
+    }
+
     const documentDefinition = {
       content: [
         {
@@ -947,7 +970,7 @@ const $payhist = (function () {
                 style: 'default'
               },
               {
-                text: data.submitInfo.checkerNm || '',
+                text: checkerNm,
                 style: 'default'
               }]
             ],
@@ -976,7 +999,8 @@ const $payhist = (function () {
                   style: 'th',
                 },
                 {
-                  text: data.submitInfo.approveDate || '',
+                  text: $cmmn.isNullorEmpty(data.submitInfo.approveDate) ? '' :
+                    $cmmn.formatDate(data.submitInfo.approveDate),
                   style: 'default',
                 }],
               [{

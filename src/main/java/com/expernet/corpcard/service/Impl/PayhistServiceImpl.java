@@ -181,9 +181,10 @@ public class PayhistServiceImpl implements PayhistService {
         } catch (JsonProcessingException e) {
             return 0;
         }
-        long preCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq()).size();
+        Sort sort = Sort.by(Sort.Direction.ASC, "useDate");
+        long preCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq(), sort).size();
         cardUsehistRepository.deleteAllById(list);
-        long curCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq()).size();
+        long curCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq(), sort).size();
 
         if (list.size() == preCnt - curCnt) {
             result = list.size();

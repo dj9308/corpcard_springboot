@@ -26,7 +26,8 @@
                 <tr>
                     <th class="pe-3" style="width:10%;">검색 기간</th>
                     <td style="width:20%;">
-                        <input type="text" id="statDatePicker" class="form-control" style="width:250px">
+                        <input type="text" id="statDatePicker" class="form-control" style="width:250px;
+                        background-color:#ffffff;" readonly>
                     </td>
                     <td style="width: 45%;"></td>
                     <th class="pe-3 fs-3 fw-bold" style="width:10%;" align="right">합계 :</th>
@@ -86,13 +87,15 @@
                         </td>
                         <th class="ps-1" style="width:5%; text-align:right;">기간</th>
                         <td style="width:20%">
-                            <input type="text" name="submitDate" id="datepicker" class="form-control form-control-sm">
+                            <input type="text" name="submitDate" id="datepicker" class="form-control form-control-sm"
+                                   style="background-color:#ffffff;" readonly>
                         </td>
                         <td class="ps-2">
                             <input type="submit" id="histSubmit" class="btn btn-secondary btn-sm" value="조회">
                         </td>
                         <td style="width: 20%" align="right">
-                            <input type="text" id="listSearch" class="form-control form-control-sm" placeholder="SEARCH" style="width:120px;">
+                            <input type="text" id="listSearch" class="form-control form-control-sm" placeholder="SEARCH"
+                                   style="width:120px;">
                         </td>
                     </tr>
                 </table>
@@ -230,7 +233,7 @@
                 <img th:src="@{/icons/paperclip.svg}" class="rounded me-2">
                 <strong class="me-auto">첨부파일</strong>
                 <small>
-                    파일 <span id="atchCnt"></span>개
+                    파일 <span id="atchCnt">0</span>개
                 </small>
                 <button type="button" class="ms-2 btn btn-outline-secondary btn-sm" id="atchAddBtn">추가</button>
                 <label for="atchUpload" class="" style="display:none">
@@ -258,6 +261,7 @@
     $(function () {
         $adminHist.init();
     });
+
 </script>
 </body>
 </html>

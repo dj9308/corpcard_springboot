@@ -56,16 +56,15 @@ const $adminHist = (function () {
 
     //결제 내역 작성 or 수정
     $("#histForm").on("submit", function (event) {
+      event.preventDefault();
       const histMoney = document.querySelector("#histMoney");
       if (new RegExp(/[^0-9,]/, "g").test(histMoney.value)) {
         alert("금액은 숫자만 입력 가능합니다.");
         histMoney.focus();
         return false;
       }
-      event.preventDefault();
-      const data = $cmmn.serializeObject("histForm");
-
       //1.카드 정보 설정 & 금액 쉼표 삭제
+      const data = $cmmn.serializeObject("histForm");
       const cardSelect = document.querySelector("#cardSelect");
       const cardInfo = cardSelect.options[cardSelect.selectedIndex].text;
       data.money = $cmmn.uncomma(data.money);
@@ -242,7 +241,7 @@ const $adminHist = (function () {
         //제출날짜
         newRow.insertCell().innerHTML = data[i].wrtYm;
         //합계
-        newRow.insertCell().innerHTML = $cmmn.convertToCurrency(data[i].sum);
+        newRow.insertCell().innerHTML = $cmmn.isNullorEmpty(data[i].sum) ? '-' : $cmmn.convertToCurrency(data[i].sum);
         //submit seq
         const seqCell = newRow.insertCell();
         seqCell.innerHTML = data[i].seq.toString();
@@ -263,8 +262,6 @@ const $adminHist = (function () {
     */
   const rowEvtHandler = function (row) {
     $(row).on("click", function () {
-      changeForm("save");
-
       if (!$(this).hasClass("table-active")) {
         //사용 내역 조회
         const submitSeq = $(this).find("td:eq(7)").text();
@@ -272,6 +269,18 @@ const $adminHist = (function () {
         $(this).addClass("table-active");
         selectPayhistList();
         selectAtchList(submitSeq);
+
+        //사용 일시 범위 제한
+        const chosenDate = $(this).find("td:eq(5)").text();
+        const dateInput = document.querySelector("#useDate");
+        const date = new Date(chosenDate);
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1;
+        dateInput.setAttribute('min', `${year}-${month < 10 ? `0${month}` : month}-01`);
+        dateInput.setAttribute('max', `${year}-${month < 10 ? `0${month}` : month}-${new Date(year, month, 0).getDate()}`);
+
+        //버튼 disable 해제
+        disableBtn(false);
       }
     });
   }
@@ -350,9 +359,6 @@ const $adminHist = (function () {
     }
   }
 
-
-
-
   /**
       * 결제 내역 목록 조회
       * @param {String} seq : 제출 내역 seq
@@ -369,9 +375,9 @@ const $adminHist = (function () {
       success: function (data) {
         if (data.CODE == "SUCCESS") {
           paintPayhistTable(data.result);
+          changeForm("save");
         } else {
           paintPayhistTable();
-          alert("결제 내역 조회에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
         }
       },
       error: function () {
@@ -394,6 +400,7 @@ const $adminHist = (function () {
       newCell.setAttribute('colspan', '14');
       newCell.classList.add("fw-bold");
       newCell.innerText = "해당 결재 건의 법인카드 사용 내역이 없습니다.";
+      $("#approvalTable > tbody > tr.table-active").find("td:eq(6)").text("-");
       return false;
     } else {
       //1.총 건수 설정
@@ -408,6 +415,9 @@ const $adminHist = (function () {
         chkbox.setAttribute("type", "checkbox");
         chkbox.setAttribute("value", rowData.seq);
         chkbox.className += "form-check-input me-1 table-check";
+        chkbox.addEventListener("click", function(event){
+          event.stopPropagation();
+        });
         newRow.insertCell().appendChild(chkbox);
         //사용일
         newRow.insertCell().innerHTML = $cmmn.formatDate(rowData.useDate, "mm.dd");
@@ -448,6 +458,7 @@ const $adminHist = (function () {
       }
       //총계
       newRow.insertCell().innerHTML = $cmmn.convertToCurrency(data.sum);
+      $("#approvalTable > tbody > tr.table-active").find("td:eq(6)").text($cmmn.convertToCurrency(data.sum));
     }
   }
 
@@ -456,9 +467,7 @@ const $adminHist = (function () {
   * @param {Object} row : 결제 내역 테이블 row
   */
   const histRowEvtHandler = function (row) {
-    setLimitHistDate();
-
-    $(row).on("click", function () {
+    $(row).on("click", function (event) {
       if ($(this).hasClass("table-active")) {
         $(this).removeClass("table-active");
         changeForm("save");
@@ -915,6 +924,25 @@ const $adminHist = (function () {
 
     //4.결재 건 테이블 조회
     $("#histSubmit").trigger("click");
+
+    //5.초기 버튼 disable 처리
+    disableBtn();
+  }
+
+  /**
+    * 버튼 disable 처리
+    * @param {boolean} isDisable : disable 처리 여부
+    */
+  const disableBtn = function(isDisable) {
+    if($cmmn.isNullorEmpty(isDisable)){
+        isDisable = true;
+    }
+    isDisable ? $("#deleteRow").css("display", "none") : $("#deleteRow").css("display", "");
+    isDisable ? $("#submitHist").css("display", "none") : $("#submitHist").css("display", "");
+    isDisable ? $("#atchAddBtn").css("display", "none") : $("#atchAddBtn").css("display", "");
+    isDisable ? $("#atchDelBtn").css("display", "none") : $("#atchDelBtn").css("display", "");
+    $("#histForm :input").attr("disabled", isDisable);
+    $("#histForm select").attr("disabled", isDisable);
   }
 
   /**
@@ -940,20 +968,6 @@ const $adminHist = (function () {
     document.querySelector(".input-money").addEventListener("keyup", function (e) {
       $(this).val($cmmn.convertToCurrency(this.value));
     });
-  }
-
-  /**
-   * 사용일시 선택 제한
-   */
-  const setLimitHistDate = function () {
-    const chosenDate = $("#approvalTable > tbody > tr.table-active").find("td:eq(5)").text()
-    const dateInput = document.querySelector("#useDate");
-    const date = new Date(chosenDate);
-    const year = date.getFullYear();
-    const month = date.getMonth() + 1;
-
-    dateInput.setAttribute('min', `${year}-${month < 10 ? `0${month}` : month}-01`);
-    dateInput.setAttribute('max', `${year}-${month < 10 ? `0${month}` : month}-${new Date(year, month, 0).getDate()}`);
   }
 
   /**

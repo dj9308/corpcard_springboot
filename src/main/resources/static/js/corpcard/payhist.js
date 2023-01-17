@@ -370,6 +370,9 @@ const $payhist = (function () {
         chkbox.setAttribute("type", "checkbox");
         chkbox.setAttribute("value", rowData.seq);
         chkbox.className += "form-check-input me-1 table-check";
+        chkbox.addEventListener("click", function(event){
+          event.stopPropagation();
+        });
         newRow.insertCell().appendChild(chkbox);
         //사용일
         newRow.insertCell().innerHTML = $cmmn.formatDate(rowData.useDate, "mm.dd");

@@ -17,7 +17,7 @@ public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> 
      * 결제 내역 조회
      * @param submitSeq : 제출정보 seq
      */
-    List<CardUsehist> findAllByUsehistSubmitInfo_Seq(long submitSeq);
+    List<CardUsehist> findAllByUsehistSubmitInfo_Seq(long submitSeq, Sort sort);
 
     /**
      * 결제 내역 조회
