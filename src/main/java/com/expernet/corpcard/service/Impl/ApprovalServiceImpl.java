@@ -2,6 +2,7 @@ package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.dto.ApprovalSearch;
 import com.expernet.corpcard.entity.CardUsehist;
+import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.repository.CardUsehistRepository;
 import com.expernet.corpcard.repository.DeptRepository;
@@ -68,7 +69,6 @@ public class ApprovalServiceImpl implements ApprovalService {
      */
     @Override
     public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
-        //TODO CEO 분기점 기능 구현 필요
         List<String> teamList = new ArrayList<>();
         List<String> deptList = new ArrayList<>();
         String userId = paramMap.get("userId").toString();
@@ -78,22 +78,18 @@ public class ApprovalServiceImpl implements ApprovalService {
 
         //1.부서 list 생성
         User userInfo = userRepository.findByUserId(userId);
-        if(userInfo.getDept().getUpper() != null){
-            if (team.equals("ALL")) {
-                if (upperDeptCd.equals("ALL")) {
-                    upperDeptCd = userInfo.getDept().getDeptCd();
-                    deptList = deptRepository.findDeptNmByUpperCd(upperDeptCd);
-                }else{
-                    teamList = deptRepository.findDeptNmByUpperCd(upperDeptCd);
-                }
-            } else {
-                teamList.add(deptRepository.findByDeptCd(team).getDeptNm());
+        if (team.equals("ALL")) {
+            if (upperDeptCd.equals("ALL")) {
+                upperDeptCd = userInfo.getDept().getDeptCd();
+                Dept deptInfo = deptRepository.findByDeptCd(upperDeptCd);
+                searchSubDeptNm(teamList, deptInfo.getLower());
+            }else{
+                Dept deptInfo = deptRepository.findByDeptCd(upperDeptCd);
+                searchSubDeptNm(teamList, deptInfo.getLower());
             }
-        }else{
-            //CEO
-
+        } else {
+            teamList.add(deptRepository.findByDeptCd(team).getDeptNm());
         }
-
         //2.entity 생성
         ApprovalSearch approvalSearch = ApprovalSearch.builder()
                 .deptList((deptList.size() == 0) ? null : deptList)
@@ -117,8 +113,6 @@ public class ApprovalServiceImpl implements ApprovalService {
         long seq = Long.parseLong(paramMap.get("SEQ").toString());
 
         List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(seq);
-
-
         if (list.size() > 0) {
             //사용 내역 리스트
             result.put("list", list);
@@ -128,5 +122,21 @@ public class ApprovalServiceImpl implements ApprovalService {
             result.put("sum", cardUsehistRepository.selectTotalSumBySubmitSeq(seq, null));
         }
         return result;
+    }
+
+    /**
+     * 하위 부서 코드 조회
+     *
+     * @param subDeptList : 하위 부서 정보
+     */
+    private void searchSubDeptNm(List<String> result, List<Dept> subDeptList) {
+        if (subDeptList.size() != 0) {
+            for (Dept dept : subDeptList) {
+                result.add(dept.getDeptNm());
+                if (dept.getLower().size() != 0) {
+                    searchSubDeptNm(result, dept.getLower());
+                }
+            }
+        }
     }
 }
