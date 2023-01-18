@@ -125,7 +125,6 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public long deleteCardInfo(HashMap<String, Object> paramMap) {
-        //TODO cascade 이용한 자식 엔티티 삭제 처리 필요
         long result = -1;
         String listJSON = paramMap.get("cardSeqList").toString();
         List<Long> cardSeqList;
@@ -153,7 +152,6 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public CardInfo saveCardInfo(AdminDTO.saveCardInfoReq cardParams) {
-        //TODO 저장 후 cardinfo onetomany column 조회 안되는 이유 확인 필요
         CardInfo result = null;
 
         //1.카드 정보 저장 or 수정

@@ -292,19 +292,15 @@ public class SchedulerServiceImpl implements SchedulerService {
      */
     public void insertUserAddInfo(List<User> toSaveUserAddList) {
         List<UserAddInfo> userInfoList = new ArrayList<>();
-
         if (toSaveUserAddList != null) {
             try{
                 for (User user : toSaveUserAddList) {
-                    //TODO 비밀번호 설정 방식 재고 필요
                     String password = passwordEncoder.encode(user.getUserId()+user.getUserId());
-
                     UserAddInfo userAddInfo = UserAddInfo.builder()
                             .userPasswd(password)
                             .adminYn("N")
                             .user(user)
                             .build();
-
                     userInfoList.add(userAddInfo);
                 }
                 userAddInfoRepository.saveAll(userInfoList);
