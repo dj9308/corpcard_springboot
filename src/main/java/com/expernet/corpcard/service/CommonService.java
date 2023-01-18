@@ -46,7 +46,7 @@ public interface CommonService {
      * 카드 목록 조회
      * @param commonDTO : 검색 조건(사용자 정보)
      */
-    List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) throws ParseException;
+    List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO);
 
     /**
      * 월별 총계 조회

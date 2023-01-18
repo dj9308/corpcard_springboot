@@ -99,23 +99,12 @@ public class CommonServiceImpl implements CommonService {
      * @param commonDTO : 사용자 정보
      */
     @Override
-    public List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) throws ParseException {
+    public List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) {
         List<CardInfo> result;
         String userId = commonDTO.getUserId();
         String wrtYm = commonDTO.getWrtYm();
         if(userId != null){
-            //해당 월의 첫날 & 마지막 날 설정
-            Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
-            Date parsedDate = dateFormat.parse(wrtYm);
-            calendar.setTime(parsedDate);
-            calendar.set(Calendar.DAY_OF_MONTH,1);
-            Timestamp startDate = new Timestamp(calendar.getTimeInMillis());
-
-            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-            Timestamp endDate = new Timestamp(calendar.getTimeInMillis());
-
-            result = cardInfoRepository.findAllByUserIdAndReceivedAt(userId, startDate, endDate);
+            result = cardInfoRepository.findAllByUserIdAndReceivedAt(userId, wrtYm);
         }else{
             result = cardInfoRepository.findAll();
         }

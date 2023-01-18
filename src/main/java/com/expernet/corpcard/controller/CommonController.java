@@ -118,10 +118,6 @@ public class CommonController {
         List<CardInfo> cardList = new ArrayList<>();
         try {
             cardList = commonService.searchCardList(commonDTO);
-        } catch (ParseException e) {
-            model.addAttribute("CODE", "ERR");
-            model.addAttribute("MSG", "카드 목록 조회 실패");
-            logger.error("카드 목록 조회 실패");
         } finally {
             if (cardList != null) {
                 model.addAttribute("result", cardList);

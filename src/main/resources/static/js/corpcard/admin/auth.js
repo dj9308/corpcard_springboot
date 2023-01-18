@@ -31,11 +31,8 @@ const $auth = (function () {
         return $(this).text().toLowerCase().indexOf(value) > -1;
       }).show();
       $("#listTotCnt").text($("#authTable > tbody > tr:visible").length);
-      if($("#authTable > tbody > tr:visible").find(".table-check:not(:checked)").length === 0){
-        $("#checkAll").prop('checked', true);
-      }else{
-        $("#checkAll").prop('checked', false);
-      }
+      $("#authTable > tbody > tr:visible").find(".table-check:not(:checked)").length === 0 ?
+        $("#checkAll").prop('checked', true) : $("#checkAll").prop('checked', false);
     });
 
     //추가 버튼
@@ -46,13 +43,13 @@ const $auth = (function () {
 
     //삭제 버튼
     $("#deleteAuth").on('click', function () {
-        //1.체크된 row 조회
-        const idList = [];
-        $('.table-check').each(function (index) {
-          if ($(this).is(":checked")) {
-            idList.push($(this).parent().parent().find("td:eq(6)").text());
-          }
-        });
+      //1.체크된 row 조회
+      const idList = [];
+      $('.table-check').each(function (index) {
+        if ($(this).is(":checked")) {
+          idList.push($(this).parent().parent().find("td:eq(6)").text());
+        }
+      });
       if (confirm(`선택한 ${idList.length}명의 관리자 권한을 삭제하겠습니까?`)) {
         if (idList.length === 0) {
           return alert("삭제하려는 결제 내역이 없습니다.");
@@ -99,9 +96,9 @@ const $auth = (function () {
     $("#checkAll").on('click', function () {
       const trList = $("#authTable > tbody > tr:visible");
       trList.find(".table-check").prop('checked', $(this).prop('checked'));
-      if($(this).is(":checked")){
+      if ($(this).is(":checked")) {
         trList.addClass("table-active");
-      }else{
+      } else {
         trList.removeClass("table-active");
       }
     });
@@ -189,14 +186,14 @@ const $auth = (function () {
     }
     //체크박스 설정
     $('.table-check').on('click', function () {
-      if($(this).is(":checked")){
+      if ($(this).is(":checked")) {
         $(this).parent().parent().addClass("table-active");
-      }else{
+      } else {
         $(this).parent().parent().removeClass("table-active");
       }
-      if($(".table-check:not(:checked)").length > 0){
+      if ($(".table-check:not(:checked)").length > 0) {
         $("#checkAll").prop('checked', false);
-      }else{
+      } else {
         $("#checkAll").prop('checked', true);
       }
     });

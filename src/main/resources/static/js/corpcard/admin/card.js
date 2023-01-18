@@ -31,7 +31,9 @@ const $card = (function () {
       $("#cardTable > tbody > tr").filter(function () {
         return $(this).text().toLowerCase().indexOf(value) > -1;
       }).show();
-      document.querySelector("#listTotCnt").innerText = $("#cardTable > tbody > tr:visible").length;
+      $("#listTotCnt").text($("#cardTable > tbody > tr:visible").length);
+      $("#cardTable > tbody > tr:visible").find(".table-check:not(:checked)").length === 0 ?
+        $("#checkAll").prop('checked', true) : $("#checkAll").prop('checked', false);
     });
 
     //추가 버튼
@@ -49,7 +51,6 @@ const $card = (function () {
 
     //삭제 버튼
     $("#deleteCard").on('click', function () {
-      if (confirm("선택한 카드 정보를 삭제하겠습니까?")) {
         //1.체크된 row 조회
         const seqList = [];
         $('.table-check').each(function (index) {
@@ -59,12 +60,12 @@ const $card = (function () {
         });
         if (seqList.length === 0) {
           return alert("삭제하려는 카드 정보가 없습니다.");
+        }else if (confirm(`선택한 ${seqList.length}개의 카드 정보를 삭제하겠습니까?`)){
+            //2.카드 정보 삭제
+            deleteCard(seqList, selectCardList);
+            $("#checkAll").prop('checked', false);
+            $(".table-check").prop('checked', false);
         }
-        //2.카드 정보 삭제
-        deleteCard(seqList, selectCardList);
-        $("#checkAll").prop('checked', false);
-        $(".table-check").prop('checked', false);
-      }
     });
 
     //카드 추가 모달 Search Input
@@ -118,7 +119,10 @@ const $card = (function () {
       url: "/admin/searchCardList",
       success: function (data) {
         if (data.CODE === "SUCCESS") {
-            paintTable(data.result);
+          $("#checkAll").prop('checked', false);
+          $(".table-check").prop('checked', false);
+          $("#listSearch").val("");
+          paintTable(data.result);
         } else if (data.CODE === "EMPTY") {
           paintTable();
         } else {
@@ -208,6 +212,14 @@ const $card = (function () {
         });
       }
     }
+    //체크박스 설정
+    $('.table-check').on('click', function () {
+      if ($(".table-check:not(:checked)").length > 0) {
+        $("#checkAll").prop('checked', false);
+      } else {
+        $("#checkAll").prop('checked', true);
+      }
+    });
   }
 
   /**
