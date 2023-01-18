@@ -30,7 +30,12 @@ const $auth = (function () {
       $("#authTable > tbody > tr").filter(function () {
         return $(this).text().toLowerCase().indexOf(value) > -1;
       }).show();
-      document.querySelector("#listTotCnt").innerText = $("#authTable > tbody > tr:visible").length;
+      $("#listTotCnt").text($("#authTable > tbody > tr:visible").length);
+      if($("#authTable > tbody > tr:visible").find(".table-check:not(:checked)").length === 0){
+        $("#checkAll").prop('checked', true);
+      }else{
+        $("#checkAll").prop('checked', false);
+      }
     });
 
     //추가 버튼
@@ -41,14 +46,14 @@ const $auth = (function () {
 
     //삭제 버튼
     $("#deleteAuth").on('click', function () {
-      if (confirm("선택한 사용자의 관리자 권한을 삭제하겠습니까?")) {
         //1.체크된 row 조회
         const idList = [];
         $('.table-check').each(function (index) {
-          if ($(this).is(":checked") && $(this).is(":visible")) {
+          if ($(this).is(":checked")) {
             idList.push($(this).parent().parent().find("td:eq(6)").text());
           }
         });
+      if (confirm(`선택한 ${idList.length}명의 관리자 권한을 삭제하겠습니까?`)) {
         if (idList.length === 0) {
           return alert("삭제하려는 결제 내역이 없습니다.");
         }
@@ -90,9 +95,15 @@ const $auth = (function () {
     //관리자 조회
     selectManagerList();
 
-    //체크박스 전체 설정
-    document.querySelector("#checkAll").addEventListener('click', function () {
-      $(".table-check").prop('checked', $(this).prop('checked'));
+    //전체 체크박스 설정
+    $("#checkAll").on('click', function () {
+      const trList = $("#authTable > tbody > tr:visible");
+      trList.find(".table-check").prop('checked', $(this).prop('checked'));
+      if($(this).is(":checked")){
+        trList.addClass("table-active");
+      }else{
+        trList.removeClass("table-active");
+      }
     });
   }
 
@@ -116,6 +127,7 @@ const $auth = (function () {
           if (adminYn === "Y") {
             $("#checkAll").prop('checked', false);
             paintTable(data.result);
+            $("#listSearch").val("");
           } else {
             paintUserTable(data.result);
           }
@@ -175,6 +187,19 @@ const $auth = (function () {
         userIdCell.style.display = "none";
       }
     }
+    //체크박스 설정
+    $('.table-check').on('click', function () {
+      if($(this).is(":checked")){
+        $(this).parent().parent().addClass("table-active");
+      }else{
+        $(this).parent().parent().removeClass("table-active");
+      }
+      if($(".table-check:not(:checked)").length > 0){
+        $("#checkAll").prop('checked', false);
+      }else{
+        $("#checkAll").prop('checked', true);
+      }
+    });
   }
 
   /**
