@@ -3,6 +3,7 @@ package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.dto.CommonDTO;
 import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.dto.common.SearchCardListDTO;
 import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
 import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.*;
@@ -14,10 +15,9 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -99,16 +99,18 @@ public class CommonServiceImpl implements CommonService {
      * @param commonDTO : 사용자 정보
      */
     @Override
-    public List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO) {
-        List<CardInfo> result;
+    public List<SearchCardListDTO> searchCardList(SearchCardListDTO.Request commonDTO) {
+        List<CardInfo> cardInfoList;
         String userId = commonDTO.getUserId();
         String wrtYm = commonDTO.getWrtYm();
         if(userId != null){
-            result = cardInfoRepository.findAllByUserIdAndReceivedAt(userId, wrtYm);
+            cardInfoList = cardInfoRepository.findAllByUserIdAndReceivedAt(userId, wrtYm);
         }else{
-            result = cardInfoRepository.findAll();
+            cardInfoList = cardInfoRepository.findAll();
         }
-        return result;
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return modelMapper.map(cardInfoList, new TypeToken<List<SearchCardListDTO>>() {}.getType());
     }
 
     /**
@@ -117,7 +119,7 @@ public class CommonServiceImpl implements CommonService {
      * @param payhistDTO : 검색 조건
      */
     @Override
-    public List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.request payhistDTO) {
+    public List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.Request payhistDTO) {
         return cardUsehistRepository.selectSumGroupByUserId(payhistDTO.getUserId(), payhistDTO.getStartYm(),
                 payhistDTO.getEndYm());
     }

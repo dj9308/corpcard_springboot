@@ -1,10 +1,10 @@
 package com.expernet.corpcard.controller;
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchCardListDTO;
 import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
 import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.CardInfo;
-import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.CommonService;
@@ -22,9 +22,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -110,14 +108,14 @@ public class CommonController {
     /**
      * 카드 목록 조회
      *
-     * @param commonDTO : 검색 조건
+     * @param params : 검색 조건
      * @param model    : modelMap
      */
     @RequestMapping(value = "/cardList", method = RequestMethod.GET)
-    public String searchCardList(@Valid CommonDTO.SearchCardList commonDTO, Model model) {
-        List<CardInfo> cardList = new ArrayList<>();
+    public String searchCardList(@Valid SearchCardListDTO.Request params, Model model) {
+        List<SearchCardListDTO> cardList = new ArrayList<>();
         try {
-            cardList = commonService.searchCardList(commonDTO);
+            cardList = commonService.searchCardList(params);
         } finally {
             if (cardList != null) {
                 model.addAttribute("result", cardList);
@@ -140,7 +138,7 @@ public class CommonController {
      */
     @Validated
     @RequestMapping(value = "/searchTotalSumList", method = RequestMethod.GET)
-    public String searchTotalSumList(@Valid SearchTotalSumListDTO.request params, ModelMap model) {
+    public String searchTotalSumList(@Valid SearchTotalSumListDTO.Request params, ModelMap model) {
         List<SearchTotalSumListDTO> result = new ArrayList<>();
         try {
             result = commonService.searchTotalSumList(params);

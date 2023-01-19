@@ -152,7 +152,7 @@ public class PayhistServiceImpl implements PayhistService {
 
         //2.제출 정보 없을 시 생성
         if (submitInfo == null) {
-            PayhistDTO.searchListReq searchListReq = PayhistDTO.searchListReq.builder()
+            PayhistDTO.SearchListReq searchListReq = PayhistDTO.SearchListReq.builder()
                     .userId(userId)
                     .wrtYm(wrtYm)
                     .build();
@@ -414,7 +414,7 @@ public class PayhistServiceImpl implements PayhistService {
      *
      * @param searchListReq: 사용자 정보 및 작성 연월
      */
-    private UsehistSubmitInfo saveSubmitInfo(PayhistDTO.searchListReq searchListReq) {
+    private UsehistSubmitInfo saveSubmitInfo(PayhistDTO.SearchListReq searchListReq) {
         User userInfo = userRepository.findByUserId(searchListReq.getUserId());
         Dept deptInfo = userInfo.getDept();
 

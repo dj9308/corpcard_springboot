@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -71,7 +70,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) -> {
                     try {
                         auth    //권한에 따른 접근 제한
-                                .requestMatchers("/login", "/common/**", "/fragments/**").permitAll()
+                                .requestMatchers("/login", "/fragments/**").permitAll()
                                 .requestMatchers("/css/**", "/js/**", "/font/**", "/icons/**").permitAll()
                                 .requestMatchers("/approval").hasRole("CHIEF")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")

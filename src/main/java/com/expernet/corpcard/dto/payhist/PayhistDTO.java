@@ -4,7 +4,6 @@ package com.expernet.corpcard.dto.payhist;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
-import org.springframework.web.bind.annotation.RequestParam;
 
 public class PayhistDTO {
     /**
@@ -14,7 +13,7 @@ public class PayhistDTO {
     @Setter
     @AllArgsConstructor
     @Builder
-    public static class searchListReq {
+    public static class SearchListReq {
         private String userId;  //사용자 ID
         @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$")
         private String wrtYm;   //작성 연월

@@ -2,15 +2,13 @@ package com.expernet.corpcard.service;
 
 
 import com.expernet.corpcard.dto.CommonDTO;
+import com.expernet.corpcard.dto.common.SearchCardListDTO;
 import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
 import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
 import com.expernet.corpcard.entity.CardInfo;
-import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 
-import java.text.ParseException;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -44,16 +42,16 @@ public interface CommonService {
 
     /**
      * 카드 목록 조회
-     * @param commonDTO : 검색 조건(사용자 정보)
+     * @param params : 검색 조건(사용자 정보)
      */
-    List<CardInfo> searchCardList(CommonDTO.SearchCardList commonDTO);
+    List<SearchCardListDTO> searchCardList(SearchCardListDTO.Request params);
 
     /**
      * 월별 총계 조회
      *
      * @param payhistDTO   : 검색 조건
      */
-    List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.request payhistDTO);
+    List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.Request payhistDTO);
 
     /**
      * 법인카드 결제 내역 딘일 정보 조회

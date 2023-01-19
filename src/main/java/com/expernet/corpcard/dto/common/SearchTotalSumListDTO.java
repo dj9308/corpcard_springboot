@@ -22,7 +22,7 @@ public class SearchTotalSumListDTO {
     @Setter
     @AllArgsConstructor
     @Builder
-    public static class request {
+    public static class Request {
         @NotBlank
         @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$")
         private String startYm;

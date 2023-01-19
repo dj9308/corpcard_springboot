@@ -3,6 +3,7 @@ package com.expernet.corpcard.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import org.bouncycastle.util.Times;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -36,9 +37,20 @@ public class CardReceiptent {
     private Timestamp returnedAt;
 
     @Builder
-    public CardReceiptent(long seq, CardInfo cardInfo, User user){
+    public CardReceiptent(long seq, CardInfo cardInfo, User user, Timestamp receivedAt,
+                          Timestamp returnedAt){
         this.seq = seq;
         this.cardInfo = cardInfo;
         this.user = user;
+        this.receivedAt = receivedAt;
+        this.returnedAt = returnedAt;
+    }
+
+    public CardReceiptent(CardReceiptent t){
+        this.seq = seq;
+        this.cardInfo = cardInfo;
+        this.user = user;
+        this.receivedAt = receivedAt;
+        this.returnedAt = returnedAt;
     }
 }
