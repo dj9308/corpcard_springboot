@@ -174,6 +174,7 @@ public class CommonServiceImpl implements CommonService {
             //결재 완료일 삽입
             if (stateParams.getStateCd().equals("C")) {
                 submitInfo.setApproveDate(new Timestamp(System.currentTimeMillis()));
+                submitInfo.setRejectMsg("");
             }
             //반려 사유 삽입
             if(stateParams.getStateCd().equals("D") && stateParams.getRejectMsg() != null){

@@ -51,14 +51,6 @@ public class SecurityConfig {
     private LoginService loginService;
 
     /**
-     * UserDetailsService Bean Setting
-     */
-    @Bean
-    public UserDetailsService userDetailsService() {
-        return loginService;
-    }
-
-    /**
      * BCrypt Encoder Bean Setting
      */
     @Bean
