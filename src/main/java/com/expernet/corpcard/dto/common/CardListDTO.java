@@ -3,7 +3,6 @@ package com.expernet.corpcard.dto.common;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.CardReceiptent;
 import com.expernet.corpcard.entity.User;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
-public class SearchCardListDTO {
+public class CardListDTO {
     private long seq;
     private String cardComp;
     private String cardNum;
@@ -23,7 +22,7 @@ public class SearchCardListDTO {
     private Timestamp updatedAt;
     private List<CardReceiptentDTO> cardReceiptents = new ArrayList<>();
     @Builder
-    public SearchCardListDTO(CardInfo entity){
+    public CardListDTO(CardInfo entity){
         this.seq = entity.getSeq();
         this.cardComp = entity.getCardComp();
         this.cardNum = entity.getCardNum();

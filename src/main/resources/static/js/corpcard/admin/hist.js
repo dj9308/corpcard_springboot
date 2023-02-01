@@ -506,7 +506,7 @@ const $adminHist = (function () {
     //1.해당 seq의 결제 내역 조회
     $.ajax({
       type: "GET",
-      url: "/common/searchInfo",
+      url: "/common/payhistInfo",
       dataType: "json",
       data: {
         seq: seq,
@@ -590,7 +590,7 @@ const $adminHist = (function () {
     //1.월별 총계 조회
     $.ajax({
       type: "GET",
-      url: "/common/searchTotalSumList",
+      url: "/common/totalSumList",
       dataType: "json",
       async: false,
       data: {

@@ -468,7 +468,7 @@ const $approval = (function () {
 
     $.ajax({
       type: "PATCH",
-      url: "/common/updateState",
+      url: "/common/stateInfo",
       dataType: "json",
       data: {
         submitSeq: submitSeq,

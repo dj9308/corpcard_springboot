@@ -168,31 +168,6 @@ public class PayhistController {
     }
 
     /**
-     * 법인카드 결제 내역 제출
-     *
-     * @param paramMap : 제출 정보
-     * @param model    : modelMap
-     */
-    @RequestMapping(value = "/updateState", method = RequestMethod.PATCH)
-    public String updateStateSeq(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
-        Object result = null;
-        try {
-            result = payhistService.updateStateSeq(paramMap);
-        } finally {
-            if (result != null) {
-                model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", "결제 내역 제출 성공");
-                logger.info("제출 성공");
-            } else {
-                model.addAttribute("CODE", "ERR");
-                model.addAttribute("MSG", "결제 내역 제출 실패");
-                logger.error("결제 내역 제출 실패");
-            }
-        }
-        return "jsonView";
-    }
-
-    /**
      * 첨부파일 조회
      *
      * @param paramMap  : 제출 정보

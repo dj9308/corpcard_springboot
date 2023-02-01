@@ -11,10 +11,10 @@ const $cmmn = (function () {
 
   /**
    * null이면 true 반환
-   * @param checkValue : node
+   * @param {String} checkValue : value
    */
   const isNullorEmpty = function (checkValue) {
-    //null 확인
+    //null check
     if (checkValue == null || typeof checkValue === 'undefined') {
       return true;
     }
@@ -25,9 +25,9 @@ const $cmmn = (function () {
     return false;
   }
 
-  /**
+/**
  * form 정보를 json 형식으로 변환
- * @param formId : formId
+ * @param {String} formId : formId
  */
   const serializeObject = function (formId) {
     const form = $(`#${formId}`);
@@ -51,7 +51,7 @@ const $cmmn = (function () {
 
   /**
    * 쉼표 삭제
-   * @param value : String
+   * @param {String} value : input value
    */
   const uncomma = function (value) {
     const str = new String(value);
@@ -60,7 +60,7 @@ const $cmmn = (function () {
 
   /**
    * 문자 삭제 및 쉼표 추가
-   * @param value : String (input value)
+   * @param {String} value : input value
    */
   const convertToCurrency = function (obj) {
     let answer = new String(obj);
@@ -128,7 +128,7 @@ const $cmmn = (function () {
   const paintUserInfo = function () {
     $.ajax({
       type: "GET",
-      url: "/common/searchUserInfo",
+      url: "/common/userInfo",
       dataType: "json",
       success: function (data) {
         if (data.CODE === "SUCCESS") {
@@ -200,6 +200,6 @@ const $cmmn = (function () {
     initHistToast: initHistToast,          //첨부파일 toast 이벤트
     paintUserInfo: paintUserInfo,          //navbar에 사용자 정보 출력
     selectClassList: selectClassList,      //분류 목록 조회 AJAX
-    selectCardList: selectCardList,      //카드 목록 조회 AJAX
+    selectCardList: selectCardList,        //카드 목록 조회 AJAX
   }
 }());

@@ -1,6 +1,6 @@
 package com.expernet.corpcard.repository;
 
-import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
+import com.expernet.corpcard.dto.common.TotalSumListDTO;
 import com.expernet.corpcard.entity.CardUsehist;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -92,7 +92,7 @@ public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> 
      * @param startYm   : 검색조건 시작 연월
      * @param endYm     : 검색조건 마지막 연월
      */
-    @Query(value = "SELECT new com.expernet.corpcard.dto.common.SearchTotalSumListDTO( " +
+    @Query(value = "SELECT new com.expernet.corpcard.dto.common.TotalSumListDTO( " +
             "cu.usehistSubmitInfo.seq, cu.usehistSubmitInfo.wrtYm, sum(cu.money)) " +
             "FROM CardUsehist cu " +
             "WHERE (:userId is null or cu.usehistSubmitInfo.user.userId = :userId) " +
@@ -100,7 +100,7 @@ public interface CardUsehistRepository extends JpaRepository<CardUsehist, Long> 
             "AND cu.usehistSubmitInfo.stateInfo.stateCd = 'C' " +
             "GROUP BY cu.usehistSubmitInfo.wrtYm " +
             "ORDER BY cu.usehistSubmitInfo.wrtYm ASC")
-    List<SearchTotalSumListDTO> selectSumGroupByUserId(@Param("userId") String userId,
-                                        @Param("startYm") String startYm,
-                                        @Param("endYm") String endYm);
+    List<TotalSumListDTO> selectSumGroupByUserId(@Param("userId") String userId,
+                                                 @Param("startYm") String startYm,
+                                                 @Param("endYm") String endYm);
 }

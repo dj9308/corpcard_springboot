@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 @Setter
 @AllArgsConstructor
 @Builder
-public class SearchPayhistInfoDTO {
+public class PayhistInfoDTO {
     private long seq;
     private ClassInfo classInfo;
     private String useHist;

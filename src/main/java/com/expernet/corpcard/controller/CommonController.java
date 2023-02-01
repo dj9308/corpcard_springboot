@@ -1,10 +1,9 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.dto.CommonDTO;
-import com.expernet.corpcard.dto.common.SearchCardListDTO;
-import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
-import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
-import com.expernet.corpcard.entity.CardInfo;
+import com.expernet.corpcard.dto.common.StateInfoDTO;
+import com.expernet.corpcard.dto.common.TotalSumListDTO;
+import com.expernet.corpcard.dto.common.CardListDTO;
+import com.expernet.corpcard.dto.common.PayhistInfoDTO;
 import com.expernet.corpcard.entity.ClassInfo;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.service.CommonService;
@@ -58,13 +57,14 @@ public class CommonController {
     /**
      * 사용자 정보 조회
      *
-     * @param model : modelMap
+     * @param model     : Model
+     * @param principal : 접속한 사용자 ID
      */
-    @RequestMapping("/searchUserInfo")
-    public String searchUserInfo(Model model, Principal principal) {
+    @RequestMapping(value = "/userInfo", method = RequestMethod.GET)
+    public String getUserInfo(Model model, Principal principal) {
         User userInfo = null;
         try {
-            userInfo = commonService.searchUserInfo(principal.getName());
+            userInfo = commonService.getUserInfo(principal.getName());
         } finally {
             if (userInfo != null) {
                 model.addAttribute("result", userInfo);
@@ -83,13 +83,13 @@ public class CommonController {
     /**
      * 전체 분류 목록 조회
      *
-     * @param model : modelMap
+     * @param model : Model
      */
-    @RequestMapping("/classList")
-    public String searchClassList(Model model) {
-        List<ClassInfo> classList = new ArrayList<>();
+    @RequestMapping(value = "/classList", method = RequestMethod.GET)
+    public String getClassList(Model model) {
+        List<ClassInfo> classList = null;
         try {
-            classList = commonService.searchClassList();
+            classList = commonService.getClassList();
         } finally {
             if (classList != null) {
                 model.addAttribute("result", classList);
@@ -109,13 +109,13 @@ public class CommonController {
      * 카드 목록 조회
      *
      * @param params : 검색 조건
-     * @param model    : modelMap
+     * @param model  : modelMap
      */
     @RequestMapping(value = "/cardList", method = RequestMethod.GET)
-    public String searchCardList(@Valid SearchCardListDTO.Request params, Model model) {
-        List<SearchCardListDTO> cardList = new ArrayList<>();
+    public String getCardList(@Valid CardListDTO.Request params, Model model) {
+        List<CardListDTO> cardList = null;
         try {
-            cardList = commonService.searchCardList(params);
+            cardList = commonService.getCardList(params);
         } finally {
             if (cardList != null) {
                 model.addAttribute("result", cardList);
@@ -133,18 +133,18 @@ public class CommonController {
 
     /**
      * 월별 총계 조회
+     *
      * @param params : 검색 조건
-     * @param model        : modelMap
+     * @param model  : modelMap
      */
-    @Validated
-    @RequestMapping(value = "/searchTotalSumList", method = RequestMethod.GET)
-    public String searchTotalSumList(@Valid SearchTotalSumListDTO.Request params, ModelMap model) {
-        List<SearchTotalSumListDTO> result = new ArrayList<>();
+    @RequestMapping(value = "/totalSumList", method = RequestMethod.GET)
+    public String getTotalSumList(@Valid TotalSumListDTO.Request params, ModelMap model) {
+        List<TotalSumListDTO> totalSumList = new ArrayList<>();
         try {
-            result = commonService.searchTotalSumList(params);
+            totalSumList = commonService.getTotalSumList(params);
         } finally {
-            if (result.size() > 0) {
-                model.addAttribute("result", result);
+            if (totalSumList.size() > 0) {
+                model.addAttribute("result", totalSumList);
                 model.addAttribute("CODE", "SUCCESS");
                 model.addAttribute("MSG", "결제내역 조회 성공");
                 logger.info("결제내역 조회 성공");
@@ -160,15 +160,15 @@ public class CommonController {
     /**
      * 결제 내역 단일 정보 조회
      *
-     * @param seq : 결제 내역 seq
-     * @param model    : modelMap
+     * @param seq   : 결제 내역 seq
+     * @param model : modelMap
      */
     @Validated
-    @RequestMapping(value = "/searchInfo", method = RequestMethod.GET)
-    public String searchPayhistInfo(@NotNull @RequestParam(value = "seq") long seq, ModelMap model) {
-        SearchPayhistInfoDTO result = null;
+    @RequestMapping(value = "/payhistInfo", method = RequestMethod.GET)
+    public String getPayhistInfo(@NotNull @RequestParam(value = "seq") long seq, ModelMap model) {
+        PayhistInfoDTO result = null;
         try {
-            result = commonService.searchCardUsehistInfo(seq);
+            result = commonService.getCardUsehistInfo(seq);
         } finally {
             if (result != null) {
                 model.addAttribute("result", result);
@@ -187,14 +187,14 @@ public class CommonController {
     /**
      * 제출 정보 상태 수정
      *
-     * @param commonDTO : 제출 정보 및 수정할 상태 정보
-     * @param model    : modelMap
+     * @param params : 제출 정보 및 수정할 상태 정보
+     * @param model     : modelMap
      */
-    @RequestMapping(value = "/updateState", method = RequestMethod.PATCH)
-    public String updateState(@Valid CommonDTO.UpdateState commonDTO, ModelMap model) {
+    @RequestMapping(value = "/stateInfo", method = RequestMethod.PATCH)
+    public String patchState(@Valid StateInfoDTO.Request params, ModelMap model) {
         Object result = null;
         try {
-            result = commonService.updateState(commonDTO);
+            result = commonService.patchState(params);
         } finally {
             if (result != null) {
                 model.addAttribute("result", result);

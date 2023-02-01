@@ -1,11 +1,10 @@
 package com.expernet.corpcard.service.Impl;
 
 
-import com.expernet.corpcard.dto.CommonDTO;
-import com.expernet.corpcard.dto.UserDTO;
-import com.expernet.corpcard.dto.common.SearchCardListDTO;
-import com.expernet.corpcard.dto.common.SearchPayhistInfoDTO;
-import com.expernet.corpcard.dto.common.SearchTotalSumListDTO;
+import com.expernet.corpcard.dto.common.CardListDTO;
+import com.expernet.corpcard.dto.common.PayhistInfoDTO;
+import com.expernet.corpcard.dto.common.StateInfoDTO;
+import com.expernet.corpcard.dto.common.TotalSumListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.CommonService;
@@ -81,47 +80,47 @@ public class CommonServiceImpl implements CommonService {
      * @param userId : 로그인한 사용자 ID
      */
     @Override
-    public User searchUserInfo(String userId) {
+    public User getUserInfo(String userId) {
         return userRepository.findByUserId(userId);
     }
 
     /**
-     * 분류 목록 조회
+     * 분류 목록 전체 조회
      */
     @Override
-    public List<ClassInfo> searchClassList() {
+    public List<ClassInfo> getClassList() {
         return classInfoRepository.findAll();
     }
 
     /**
      * 카드 목록 조회
      *
-     * @param commonDTO : 사용자 정보
+     * @param params : 사용자 정보
      */
     @Override
-    public List<SearchCardListDTO> searchCardList(SearchCardListDTO.Request commonDTO) {
+    public List<CardListDTO> getCardList(CardListDTO.Request params) {
         List<CardInfo> cardInfoList;
-        String userId = commonDTO.getUserId();
-        String wrtYm = commonDTO.getWrtYm();
-        if(userId != null){
-            cardInfoList = cardInfoRepository.findAllByUserIdAndReceivedAt(userId, wrtYm);
+
+        if(params.getUserId() != null){
+            cardInfoList = cardInfoRepository.findAllByUserIdAndReceivedAt(params.getUserId(),
+                    params.getWrtYm());
         }else{
             cardInfoList = cardInfoRepository.findAll();
         }
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(cardInfoList, new TypeToken<List<SearchCardListDTO>>() {}.getType());
+        return modelMapper.map(cardInfoList, new TypeToken<List<CardListDTO>>() {}.getType());
     }
 
     /**
      * 월별 총계 조회
      *
-     * @param payhistDTO : 검색 조건
+     * @param params : 검색 조건
      */
     @Override
-    public List<SearchTotalSumListDTO> searchTotalSumList(SearchTotalSumListDTO.Request payhistDTO) {
-        return cardUsehistRepository.selectSumGroupByUserId(payhistDTO.getUserId(), payhistDTO.getStartYm(),
-                payhistDTO.getEndYm());
+    public List<TotalSumListDTO> getTotalSumList(TotalSumListDTO.Request params) {
+        return cardUsehistRepository.selectSumGroupByUserId(params.getUserId(), params.getStartYm(),
+                params.getEndYm());
     }
 
     /**
@@ -129,13 +128,13 @@ public class CommonServiceImpl implements CommonService {
      * @param seq: 결제 내역 seq
      */
     @Override
-    public SearchPayhistInfoDTO searchCardUsehistInfo(long seq) {
-        SearchPayhistInfoDTO result = null;
+    public PayhistInfoDTO getCardUsehistInfo(long seq) {
+        PayhistInfoDTO result = null;
         CardUsehist usehist = cardUsehistRepository.findById(seq).orElse(null);
         if(usehist != null){
-            result = SearchPayhistInfoDTO.builder()
+            result = PayhistInfoDTO.builder()
                     .seq(usehist.getSeq())
-                    .classInfo(SearchPayhistInfoDTO.ClassInfo.builder().seq(usehist.getClassInfo().getSeq()).build())
+                    .classInfo(PayhistInfoDTO.ClassInfo.builder().seq(usehist.getClassInfo().getSeq()).build())
                     .useHist(usehist.getUseHist())
                     .cardComp(usehist.getCardComp())
                     .cardNum(usehist.getCardNum())
@@ -149,41 +148,41 @@ public class CommonServiceImpl implements CommonService {
     /**
      * 제출 정보 상태 수정
      *
-     * @param stateParams : 제출 정보 및 수정할 상태 정보
+     * @param params : 제출 정보 및 수정할 상태 정보
      */
     @Override
-    public Object updateState(CommonDTO.UpdateState stateParams) {
+    public Object patchState(StateInfoDTO.Request params) {
         Object result = null;
         UsehistSubmitInfo submitInfo = null;
 
         //1.상태를 수정할 제출 정보 조회
-        if (stateParams.getSubmitSeq() != null) {
-            submitInfo = usehistSubmitInfoRepository.findBySeq(stateParams.getSubmitSeq());
-        } else if (stateParams.getWriterId() != null && stateParams.getWrtYm() != null) {
+        if (params.getSubmitSeq() != null) {
+            submitInfo = usehistSubmitInfoRepository.findBySeq(params.getSubmitSeq());
+        } else if (params.getWriterId() != null && params.getWrtYm() != null) {
             submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(
-                    stateParams.getWriterId(), stateParams.getWrtYm());
+                    params.getWriterId(), params.getWrtYm());
         }
         //2.상태 변경
         if (submitInfo != null) {
             User checkerInfo;
             //확인자 정보 삽입
-            if (stateParams.getCheckerId() != null) {
-                checkerInfo = userRepository.findByUserId(stateParams.getCheckerId());
+            if (params.getCheckerId() != null) {
+                checkerInfo = userRepository.findByUserId(params.getCheckerId());
                 submitInfo.setCheckerId(checkerInfo.getUserId());
                 submitInfo.setCheckerNm(checkerInfo.getUserNm());
                 submitInfo.setCheckerOfcds(checkerInfo.getOfcds());
             }
             //결재 완료일 삽입
-            if (stateParams.getStateCd().equals("C")) {
+            if (params.getStateCd().equals("C")) {
                 submitInfo.setApproveDate(new Timestamp(System.currentTimeMillis()));
                 submitInfo.setRejectMsg("");
             }
             //반려 사유 삽입
-            if(stateParams.getStateCd().equals("D") && stateParams.getRejectMsg() != null){
-                submitInfo.setRejectMsg(stateParams.getRejectMsg());
+            if(params.getStateCd().equals("D") && params.getRejectMsg() != null){
+                submitInfo.setRejectMsg(params.getRejectMsg());
             }
             //상태 seq 삽입
-            StateInfo stateInfo = stateInfoRepository.findByStateCd(stateParams.getStateCd());
+            StateInfo stateInfo = stateInfoRepository.findByStateCd(params.getStateCd());
             submitInfo.setStateInfo(stateInfo);
 
             result = usehistSubmitInfoRepository.save(submitInfo);

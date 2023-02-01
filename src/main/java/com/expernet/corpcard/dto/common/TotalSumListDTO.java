@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class SearchTotalSumListDTO {
+public class TotalSumListDTO {
     private long seq;
     private String wrtYm;
     private long sum;
