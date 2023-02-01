@@ -78,7 +78,7 @@ const $adminHist = (function () {
       //2.결제 내역 저장 or 수정
       $.ajax({
         type: "POST",
-        url: "/payhist/saveInfo",
+        url: "/payhist/info",
         data: JSON.stringify(data),
         contentType: "application/json",
         dataType: 'json',
@@ -120,7 +120,7 @@ const $adminHist = (function () {
       //2.체크된 row list 삭제
       $.ajax({
         type: "DELETE",
-        url: "/payhist/deleteList",
+        url: "/payhist/list",
         dataType: "json",
         data: {
           WRITER_ID: $(submitInfo).find("td:eq(8)").text(),
@@ -153,8 +153,8 @@ const $adminHist = (function () {
       //formData 설정
       const formData = new FormData();
       const data = {
-        WRITER_ID: $("#approvalTable > tbody > tr.table-active").find("td:eq(8)").text(),
-        WRT_YM: $("#approvalTable > tbody > tr.table-active").find("td:eq(5)").text(),
+        writerId: $("#approvalTable > tbody > tr.table-active").find("td:eq(8)").text(),
+        wrtYm: $("#approvalTable > tbody > tr.table-active").find("td:eq(5)").text(),
       };
       formData.append('key', new Blob([JSON.stringify(data)], { type: "application/json" }));
       for (let i = 0; i < this.files.length; i++) {
@@ -163,7 +163,7 @@ const $adminHist = (function () {
       //첨부파일 업로드
       $.ajax({
         type: "POST",
-        url: "/payhist/uploadAtch",
+        url: "/payhist/atchList",
         enctype: 'multipart/form-data',
         data: formData,
         processData: false,
@@ -192,10 +192,10 @@ const $adminHist = (function () {
       //2.체크된 row list 삭제
       $.ajax({
         type: "DELETE",
-        url: "/payhist/deleteAtchList",
+        url: "/payhist/atchList",
         dataType: "json",
         data: {
-          SEQ_LIST: JSON.stringify(atchList)
+          seqList : atchList
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
@@ -293,10 +293,10 @@ const $adminHist = (function () {
     if (!$cmmn.isNullorEmpty(seq)) {
       $.ajax({
         type: "GET",
-        url: "/payhist/searchAtchList",
+        url: "/payhist/atchList",
         dataType: "json",
         data: {
-          SEQ: seq
+          seq: seq
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {

@@ -258,10 +258,10 @@ const $approval = (function () {
   const selectAtchList = function (seq) {
     $.ajax({
       type: "GET",
-      url: "/payhist/searchAtchList",
+      url: "/payhist/atchList",
       dataType: "json",
       data: {
-        SEQ: seq
+        seq: seq
       },
       success: function (data) {
         if (data.CODE === "SUCCESS") {
@@ -435,11 +435,11 @@ const $approval = (function () {
     if (!$cmmn.isNullorEmpty(data)) {
       $.ajax({
         type: "GET",
-        url: "/payhist/searchAtchList",
+        url: "/payhist/atchList",
         dataType: "json",
         data: {
-          WRITER_ID: data.userId,
-          WRT_YM: data.wrtYm,
+          writerId: data.userId,
+          wrtYm: data.wrtYm,
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {

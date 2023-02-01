@@ -53,7 +53,7 @@ const $payhist = (function () {
       //3.결제 내역 저장 or 수정
       $.ajax({
         type: "POST",
-        url: "/payhist/saveInfo",
+        url: "/payhist/info",
         data: JSON.stringify(data),
         contentType: "application/json",
         dataType: 'json',
@@ -167,12 +167,10 @@ const $payhist = (function () {
       //2.체크된 row list 삭제
       $.ajax({
         type: "DELETE",
-        url: "/payhist/deleteList",
+        url: "/payhist/list",
         dataType: "json",
         data: {
-          WRITER_ID: userId,
-          WRT_YM: wrtYm,
-          SEQ_LIST: JSON.stringify(seqList)
+          seqList: seqList
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
@@ -202,8 +200,8 @@ const $payhist = (function () {
       //formData 설정
       const formData = new FormData();
       const data = {
-        WRITER_ID: userId,
-        WRT_YM: wrtYm,
+        writerId: userId,
+        wrtYm: wrtYm,
       };
       formData.append('key', new Blob([JSON.stringify(data)], { type: "application/json" }));
       for (let i = 0; i < this.files.length; i++) {
@@ -212,7 +210,7 @@ const $payhist = (function () {
       //첨부파일 업로드
       $.ajax({
         type: "POST",
-        url: "/payhist/uploadAtch",
+        url: "/payhist/atchList",
         enctype: 'multipart/form-data',
         data: formData,
         processData: false,
@@ -241,10 +239,10 @@ const $payhist = (function () {
       //2.체크된 row list 삭제
       $.ajax({
         type: "DELETE",
-        url: "/payhist/deleteAtchList",
+        url: "/payhist/atchList",
         dataType: "json",
         data: {
-          SEQ_LIST: JSON.stringify(atchList)
+          seqList : atchList
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
@@ -312,7 +310,7 @@ const $payhist = (function () {
     }
 
     if ($cmmn.isNullorEmpty(stateInfo)) {
-      $("#stateNm").text("결재 전");
+      $("#stateNm").text("제출 전");
       $("#submitCancel").css("display", "none");
       $("#rejectMsgBtn").css("display", "none");
       disableBtn(false);
@@ -447,7 +445,7 @@ const $payhist = (function () {
     //1.해당 seq의 결제 내역 조회
     $.ajax({
       type: "GET",
-      url: "/common/searchInfo",
+      url: "/common/payhistInfo",
       dataType: "json",
       data: {
         seq: seq,
@@ -575,7 +573,7 @@ const $payhist = (function () {
     //1.월별 총계 조회
     $.ajax({
       type: "GET",
-      url: "/common/searchTotalSumList",
+      url: "/common/totalSumList",
       dataType: "json",
       async: false,
       data: {
@@ -789,11 +787,11 @@ const $payhist = (function () {
     //2.해당 연월의 첨부파일 리스트 조회
     $.ajax({
       type: "GET",
-      url: "/payhist/searchAtchList",
+      url: "/payhist/atchList",
       dataType: "json",
       data: {
-        WRITER_ID: userId,
-        WRT_YM: wrtYm,
+        writerId: userId,
+        wrtYm: wrtYm,
       },
       success: function (data) {
         if (data.CODE === "SUCCESS") {
@@ -858,7 +856,7 @@ const $payhist = (function () {
   const updateState = function (stateCd, callback) {
     $.ajax({
       type: "PATCH",
-      url: "/common/updateState",
+      url: "/common/stateInfo",
       dataType: "json",
       data: {
         writerId: userId,
@@ -896,7 +894,7 @@ const $payhist = (function () {
 
     $.ajax({
       type: "GET",
-      url: "/payhist/searchList",
+      url: "/payhist/list",
       data: data,
       dataType: "json",
       success: function (data) {

@@ -1,10 +1,9 @@
 package com.expernet.corpcard.service;
 
-import com.expernet.corpcard.dto.payhist.PayhistDTO;
-import com.expernet.corpcard.dto.payhist.SearchPayhistListDTO;
+import com.expernet.corpcard.dto.payhist.AtchListDTO;
+import com.expernet.corpcard.dto.payhist.ListDTO;
 import com.expernet.corpcard.entity.AttachmentInfo;
 import com.expernet.corpcard.entity.CardUsehist;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,56 +34,38 @@ public interface PayhistService {
      * 법인카드 결제 내역 목록 조회
      * @param params: 제출 정보
      */
-    HashMap<String, Object> searchCardUsehistList(SearchPayhistListDTO.request params);
-
-    /**
-     * 법인카드 결제 내역 딘일 정보 조회
-     * @param paramMap: 결제 내역 seq
-     */
-    CardUsehist searchCardUsehistInfo(HashMap<String, Object> paramMap);
+    HashMap<String, Object> getList(ListDTO.Request params);
 
     /**
      * 법인카드 결제 내역 저장
      * @param cardUsehist: 결제 내역 정보
      */
-    Object saveCardUsehistInfo(CardUsehist cardUsehist);
+    Object saveInfo(CardUsehist cardUsehist);
 
     /**
      * 법인카드 결제 내역 삭제
-     * @param paramMap): 제출 정보 & 결제내역 seq list
+     * @param seqList : 삭제할 결제 내역 목록
      */
-    long deleteCardUsehistInfo(HashMap<String, Object> paramMap) throws JsonProcessingException;
-
-    /**
-     * 법인카드 결제 내역 수정
-     * @param cardUsehist: 결제 내역
-     */
-    Object updateCardUsehistInfo(CardUsehist cardUsehist);
-
-    /**
-     * 법인카드 결제 내역 제출
-     * @param paramMap : 제출 정보
-     */
-    Object updateStateSeq(HashMap<String, Object> paramMap);
+    long deleteList(List<Long> seqList);
 
     /**
      * 첨부파일 조회
-     * @param paramMap  : 제출 정보
+     * @param params  : 제출 정보
      */
-    List<AttachmentInfo> searchAtchList(HashMap<String, Object> paramMap);
+    List<AttachmentInfo> getAtchList(AtchListDTO.Request params);
 
     /**
      * 첨부파일 업로드
-     * @param paramMap  : 제출 정보
+     * @param params  : 제출 정보
      * @param fileList  : 업로드된 파일 list
      */
-    List<AttachmentInfo> uploadAtch(HashMap<String, Object> paramMap, List<MultipartFile> fileList);
+    List<AttachmentInfo> uploadAtch(HashMap<String, String> params, List<MultipartFile> fileList);
 
     /**
      * 첨부파일 삭제
-     * @param paramMap  : 첨부파일 seq list
+     * @param seqList  : 첨부파일 seq list
      */
-    long deleteAtch(HashMap<String, Object> paramMap);
+    long deleteAtch(List<Long> seqList);
 
     /**
      * 첨부파일 다운로드

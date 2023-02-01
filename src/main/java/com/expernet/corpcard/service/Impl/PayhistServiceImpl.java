@@ -1,14 +1,12 @@
 package com.expernet.corpcard.service.Impl;
 
 
+import com.expernet.corpcard.dto.payhist.AtchListDTO;
 import com.expernet.corpcard.dto.payhist.PayhistDTO;
-import com.expernet.corpcard.dto.payhist.SearchPayhistListDTO;
+import com.expernet.corpcard.dto.payhist.ListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.PayhistService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -97,7 +95,7 @@ public class PayhistServiceImpl implements PayhistService {
      * @param params: 제출 정보
      */
     @Override
-    public HashMap<String, Object> searchCardUsehistList(SearchPayhistListDTO.request params) {
+    public HashMap<String, Object> getList(ListDTO.Request params) {
         HashMap<String, Object> result = new HashMap<>();
         String writerId = params.getUserId();
         String wrtYm = params.getWrtYm();
@@ -124,23 +122,12 @@ public class PayhistServiceImpl implements PayhistService {
     }
 
     /**
-     * 법인카드 결제 내역 딘일 정보 조회
-     *
-     * @param paramMap: 결제 내역 seq
-     */
-    @Override
-    public CardUsehist searchCardUsehistInfo(HashMap<String, Object> paramMap) {
-        return cardUsehistRepository.findById(Long.valueOf(String.valueOf(paramMap.get("seq"))))
-                .orElse(null);
-    }
-
-    /**
-     * 법인카드 사용내역 저장
+     * 법인카드 사용내역 저장 or 수정
      *
      * @param cardUsehist : 결제 내역 정보
      */
     @Override
-    public Object saveCardUsehistInfo(CardUsehist cardUsehist) {
+    public Object saveInfo(CardUsehist cardUsehist) {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         UserDetails userDetails = (UserDetails) principal;
         String userId = userDetails.getUsername();
@@ -156,7 +143,21 @@ public class PayhistServiceImpl implements PayhistService {
                     .userId(userId)
                     .wrtYm(wrtYm)
                     .build();
-            submitInfo = saveSubmitInfo(searchListReq);
+
+            User userInfo = userRepository.findByUserId(searchListReq.getUserId());
+            Dept deptInfo = userInfo.getDept();
+
+            UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
+                    .stateInfo(StateInfo.builder().seq(1).build())
+                    .writerId(userInfo.getUserId())
+                    .writerDept(deptInfo.getUpper().getDeptNm())
+                    .writerTeam(deptInfo.getDeptNm())
+                    .writerOfcds(userInfo.getOfcds())
+                    .writerNm(userInfo.getUserNm())
+                    .wrtYm(searchListReq.getWrtYm())
+                    .build();
+
+            submitInfo = usehistSubmitInfoRepository.save(histInfo);
         }
 
         //3.결제내역 저장
@@ -167,67 +168,28 @@ public class PayhistServiceImpl implements PayhistService {
     /**
      * 법인카드 사용내역 삭제
      *
-     * @param paramMap: 제출 정보 & 삭제할 seq list
+     * @param seqList: 제출 정보 & 삭제할 seq list
      */
     @Override
-    public long deleteCardUsehistInfo(HashMap<String, Object> paramMap) {
-        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
-        String seqJSON = paramMap.get("SEQ_LIST").toString();
-        long result = 0;
-        List<Long> list;
-        try {
-            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            return 0;
-        }
-        Sort sort = Sort.by(Sort.Direction.ASC, "useDate");
-        long preCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq(), sort).size();
-        cardUsehistRepository.deleteAllById(list);
-        long curCnt = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(submitInfo.getSeq(), sort).size();
-
-        if (list.size() == preCnt - curCnt) {
-            result = list.size();
-        }
-        return result;
-    }
-
-    /**
-     * 법인카드 사용내역 수정
-     *
-     * @param cardUsehist: 사용내역
-     */
-    @Override
-    public Object updateCardUsehistInfo(CardUsehist cardUsehist) {
-        return cardUsehistRepository.save(cardUsehist);
-    }
-
-    /**
-     * 법인카드 제출 상태 변경
-     *
-     * @param paramMap : 제출 정보
-     */
-    @Override
-    public Object updateStateSeq(HashMap<String, Object> paramMap) {
-        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
-        long seq = Long.parseLong(paramMap.get("SEQ").toString());
-        submitInfo.setStateInfo(StateInfo.builder().seq(seq).build());
-        return usehistSubmitInfoRepository.save(submitInfo);
+    public long deleteList(List<Long> seqList) {
+        cardUsehistRepository.deleteAllById(seqList);
+        return seqList.size();
     }
 
     /**
      * 첨부파일 조회
      *
-     * @param paramMap : 제출 정보
+     * @param params : 제출 정보
      */
     @Override
-    public List<AttachmentInfo> searchAtchList(HashMap<String, Object> paramMap) {
+    public List<AttachmentInfo> getAtchList(AtchListDTO.Request params) {
         List<AttachmentInfo> result;
         long seq = -1;
-        if (paramMap.get("SEQ") != null) {
-            seq = Long.parseLong(paramMap.get("SEQ").toString());
+        if (params.getSeq() != 0) {
+            seq = params.getSeq();
         } else {
-            UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+            UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(
+                    params.getWriterId(), params.getWrtYm());
             if (submitInfo != null) {
                 seq = submitInfo.getSeq();
             }
@@ -243,19 +205,33 @@ public class PayhistServiceImpl implements PayhistService {
     /**
      * 첨부파일 업로드
      *
-     * @param paramMap : 제출 정보
+     * @param params : 제출 정보
      * @param fileList : 업로드된 파일 list
      */
     @Override
-    public List<AttachmentInfo> uploadAtch(HashMap<String, Object> paramMap, List<MultipartFile> fileList) {
+    public List<AttachmentInfo> uploadAtch(HashMap<String, String> params, List<MultipartFile> fileList) {
         List<AttachmentInfo> result = new ArrayList<>();
 
         //1.제출 정보 조회
-        UsehistSubmitInfo submitInfo = searchSubmitInfo(paramMap);
+        UsehistSubmitInfo submitInfo = usehistSubmitInfoRepository.findByWriterIdAndWrtYm(
+                params.get("writerId"), params.get("wrtYm"));
 
         //2.제출 정보 없을 시 생성
         if (submitInfo == null) {
-            submitInfo = saveSubmitInfo(paramMap);
+            User userInfo = userRepository.findByUserId(params.get("writerId"));
+            Dept deptInfo = deptRepository.findByDeptCd(userInfo.getDept().getDeptCd());
+            StateInfo stateInfo = StateInfo.builder().seq(1).build();
+
+            UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
+                    .stateInfo(stateInfo)
+                    .writerId(userInfo.getUserId())
+                    .writerDept(deptInfo.getUpper().getDeptNm())
+                    .writerTeam(deptInfo.getDeptNm())
+                    .writerOfcds(userInfo.getOfcds())
+                    .writerNm(userInfo.getUserNm())
+                    .wrtYm(params.get("wrtYm"))
+                    .build();
+            submitInfo = usehistSubmitInfoRepository.save(histInfo);
         }
 
         //3.첨부파일 저장
@@ -297,22 +273,13 @@ public class PayhistServiceImpl implements PayhistService {
     /**
      * 업로드된 파일 삭제
      *
-     * @param paramMap: 첨부파일 seq list
+     * @param seqList: 첨부파일 seq list
      */
     @Override
-    public long deleteAtch(HashMap<String, Object> paramMap) {
-        //1.seq 리스트 데이터 설정
-        String seqJSON = paramMap.get("SEQ_LIST").toString();
-        List<Long> list;
+    public long deleteAtch(List<Long> seqList) {
         long result = 0;
-        try {
-            list = new ObjectMapper().readValue(seqJSON, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            return result;
-        }
-        //2.파일 및 첨부파일 정보 삭제
-        for (long seq : list) {
+
+        for (long seq : seqList) {
             AttachmentInfo fileInfo = attachmentInfoRepository.findById(seq).orElse(null);
             if (fileInfo != null) {
                 File file = new File(fileInfo.getFilePath() + File.separator + fileInfo.getSeq());
@@ -322,9 +289,7 @@ public class PayhistServiceImpl implements PayhistService {
                 }
             }
         }
-        if (list.size() != result) {
-            result = 0;
-        }
+
         return result;
     }
 
@@ -374,60 +339,5 @@ public class PayhistServiceImpl implements PayhistService {
                 outs.flush();
             }
         }
-    }
-
-    /**
-     * 제출 내역 조회
-     *
-     * @param paramMap: 사용자 정보 및 작성년월
-     */
-    private UsehistSubmitInfo searchSubmitInfo(HashMap<String, Object> paramMap) {
-        String writerId = paramMap.get("WRITER_ID").toString();
-        String wrtYm = paramMap.get("WRT_YM").toString();
-        return usehistSubmitInfoRepository.findByWriterIdAndWrtYm(writerId, wrtYm);
-    }
-
-    /**
-     * 제출 내역 저장
-     *
-     * @param paramMap: 사용자 정보 및 작성년월
-     */
-    private UsehistSubmitInfo saveSubmitInfo(HashMap<String, Object> paramMap) {
-        User userInfo = userRepository.findByUserId(paramMap.get("WRITER_ID").toString());
-        Dept deptInfo = deptRepository.findByDeptCd(userInfo.getDept().getDeptCd());
-        StateInfo stateInfo = StateInfo.builder().seq(1).build();
-
-        UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
-                .stateInfo(stateInfo)
-                .writerId(userInfo.getUserId())
-                .writerDept(deptInfo.getUpper().getDeptNm())
-                .writerTeam(deptInfo.getDeptNm())
-                .writerOfcds(userInfo.getOfcds())
-                .writerNm(userInfo.getUserNm())
-                .wrtYm(paramMap.get("WRT_YM").toString())
-                .build();
-        return usehistSubmitInfoRepository.save(histInfo);
-    }
-
-    /**
-     * 제출 내역 저장
-     *
-     * @param searchListReq: 사용자 정보 및 작성 연월
-     */
-    private UsehistSubmitInfo saveSubmitInfo(PayhistDTO.SearchListReq searchListReq) {
-        User userInfo = userRepository.findByUserId(searchListReq.getUserId());
-        Dept deptInfo = userInfo.getDept();
-
-        UsehistSubmitInfo histInfo = UsehistSubmitInfo.builder()
-                .stateInfo(StateInfo.builder().seq(1).build())
-                .writerId(userInfo.getUserId())
-                .writerDept(deptInfo.getUpper().getDeptNm())
-                .writerTeam(deptInfo.getDeptNm())
-                .writerOfcds(userInfo.getOfcds())
-                .writerNm(userInfo.getUserNm())
-                .wrtYm(searchListReq.getWrtYm())
-                .build();
-
-        return usehistSubmitInfoRepository.save(histInfo);
     }
 }

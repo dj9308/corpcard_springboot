@@ -1,10 +1,9 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.dto.payhist.PayhistDTO;
-import com.expernet.corpcard.dto.payhist.SearchPayhistListDTO;
+import com.expernet.corpcard.dto.payhist.AtchListDTO;
+import com.expernet.corpcard.dto.payhist.ListDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.service.PayhistService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -66,11 +65,11 @@ public class PayhistController {
      * @param params : 검색 조건
      * @param model    : modelMap
      */
-    @RequestMapping(value = "/searchList", method = RequestMethod.GET)
-    public String searchPayhistList(@Valid SearchPayhistListDTO.request params, ModelMap model) {
+    @RequestMapping(value = "/list", method = RequestMethod.GET)
+    public String getPayhistList(@Valid ListDTO.Request params, ModelMap model) {
         HashMap<String, Object> result = null;
         try {
-            result = payhistService.searchCardUsehistList(params);
+            result = payhistService.getList(params);
         } finally {
             if (result != null && result.get("list") != null) {
                 model.addAttribute("result", result);
@@ -87,72 +86,17 @@ public class PayhistController {
     }
 
     /**
-     * 결제 내역 저장
-     *
-     * @param cardUsehist : 결제 내역 정보
-     * @param model       : modelMap
-     */
-    @RequestMapping(value = "/saveInfo", method = RequestMethod.POST)
-    public String savePayhistList(@RequestBody CardUsehist cardUsehist, ModelMap model) {
-        Object result = null;
-        try {
-            result = payhistService.saveCardUsehistInfo(cardUsehist);
-
-        } finally {
-            if (result != null) {
-                model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", "결제 내역 저장 성공");
-                logger.info("결제 내역 저장 성공");
-            } else {
-                model.addAttribute("CODE", "ERR");
-                model.addAttribute("MSG", "결제 내역 저장 실패");
-                logger.error("결제 내역 저장 실패");
-            }
-        }
-
-        return "jsonView";
-    }
-
-    /**
-     * 결제 내역 수정
-     *
-     * @param cardUsehist : 사용 내역
-     * @param model       : modelMap
-     */
-    @RequestMapping(value = "/updateInfo", method = RequestMethod.POST)
-    public String updatePayhistInfo(@RequestBody CardUsehist cardUsehist, ModelMap model) {
-        Object result = null;
-        try {
-            result = payhistService.updateCardUsehistInfo(cardUsehist);
-        } finally {
-            if (result != null) {
-                model.addAttribute("CODE", "SUCCESS");
-                model.addAttribute("MSG", "결제 내역 수정 성공");
-                logger.info("결제 내역 수정 성공");
-            } else {
-                model.addAttribute("CODE", "ERR");
-                model.addAttribute("MSG", "결제 내역 수정 실패");
-                logger.error("결제 내역 수정 실패");
-            }
-        }
-        return "jsonView";
-    }
-
-    /**
      * 결제 내역 리스트 삭제
      *
-     * @param paramMap : row seq list
-     * @param model    : modelMap
+     * @param params   : 삭제할 결제 내역 목록
+     * @param model     : modelMap
      */
-    @RequestMapping(value = "/deleteList", method = RequestMethod.DELETE)
-    public String deletePayhistList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+    @RequestMapping(value = "/list", method = RequestMethod.DELETE)
+    public String deleteList(ListDTO.DeleteReq params, ModelMap model) {
+        List<Long> seqList = params.getSeqList();
         long result = 0;
         try {
-            result = payhistService.deleteCardUsehistInfo(paramMap);
-        } catch (JsonProcessingException e) {
-            model.addAttribute("CODE", "ERR");
-            model.addAttribute("MSG", "결제 내역 삭제 실패");
-            logger.error("결제 내역 삭제 실패");
+            result = payhistService.deleteList(seqList);
         } finally {
             if (result > 0) {
                 model.addAttribute("CODE", "SUCCESS");
@@ -168,16 +112,41 @@ public class PayhistController {
     }
 
     /**
+     * 결제 내역 저장 or 수정
+     *
+     * @param cardUsehist : 결제 내역 정보
+     * @param model       : modelMap
+     */
+    @RequestMapping(value = "/info", method = RequestMethod.POST)
+    public String saveInfo(@RequestBody CardUsehist cardUsehist, ModelMap model) {
+        Object result = null;
+        try {
+            result = payhistService.saveInfo(cardUsehist);
+        } finally {
+            if (result != null) {
+                model.addAttribute("CODE", "SUCCESS");
+                model.addAttribute("MSG", "결제 내역 저장 성공");
+                logger.info("결제 내역 저장 성공");
+            } else {
+                model.addAttribute("CODE", "ERR");
+                model.addAttribute("MSG", "결제 내역 저장 실패");
+                logger.error("결제 내역 저장 실패");
+            }
+        }
+        return "jsonView";
+    }
+
+    /**
      * 첨부파일 조회
      *
-     * @param paramMap  : 제출 정보
+     * @param params    : 제출 정보
      * @param model     : modelMap
      */
-    @RequestMapping(value = "/searchAtchList", method = RequestMethod.GET)
-    public String searchAtchList(@RequestParam HashMap<String, Object> paramMap, ModelMap model) {
+    @RequestMapping(value = "/atchList", method = RequestMethod.GET)
+    public String searchAtchList(@Valid AtchListDTO.Request params, ModelMap model) {
         List<AttachmentInfo> result = null;
         try {
-            result = payhistService.searchAtchList(paramMap);
+            result = payhistService.getAtchList(params);
         } finally {
             if (result != null) {
                 if(result.isEmpty()){
@@ -206,8 +175,8 @@ public class PayhistController {
      * @param fileList  : 업로드된 파일 list
      * @param model     : modelMap
      */
-    @RequestMapping(value = "/uploadAtch", method = RequestMethod.POST, produces = "application/text; charset=utf8")
-    public String uploadAtch(@RequestPart(value = "key") HashMap<String, Object> paramMap,
+    @RequestMapping(value = "/atchList", method = RequestMethod.POST, produces = "application/text; charset=utf8")
+    public String uploadAtch(@RequestPart(value = "key") HashMap<String, String> paramMap,
                              @RequestPart(value = "files") List<MultipartFile> fileList,
                              ModelMap model) {
         List<AttachmentInfo> result = new ArrayList<>();
@@ -231,15 +200,15 @@ public class PayhistController {
     /**
      * 업로드된 첨부파일 리스트 삭제
      *
-     * @param paramMap  : 삭제할 첨부파일 Seq List
+     * @param params  : 삭제할 첨부파일 Seq List
      * @param model     : modelMap
      */
-    @RequestMapping(value = "/deleteAtchList", method = RequestMethod.DELETE)
-    public String deleteAtchList(@RequestParam HashMap<String, Object> paramMap,
-                             ModelMap model) {
+    @RequestMapping(value = "/atchList", method = RequestMethod.DELETE)
+    public String deleteAtchList(AtchListDTO.DeleteReq params, ModelMap model) {
+        List<Long> seqList = params.getSeqList();
         long result = 0;
         try {
-            result = payhistService.deleteAtch(paramMap);
+            result = payhistService.deleteAtch(seqList);
         } finally {
             if (result > 0) {
                 model.addAttribute("CODE", "SUCCESS");
