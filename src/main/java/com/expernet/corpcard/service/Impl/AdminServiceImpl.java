@@ -207,7 +207,7 @@ public class AdminServiceImpl implements AdminService {
      */
     @Override
     public HashMap<String, Object> searchPayList(String wrtYm) {
-        HashMap<String, Object> result = new HashMap<>();
+        HashMap<String, Object> result = null;
         List<UsehistSubmitInfo> submitInfos = usehistSubmitInfoRepository.findByWrtYm(wrtYm);
         List<Long> seqList = new ArrayList<>();
 
@@ -217,6 +217,7 @@ public class AdminServiceImpl implements AdminService {
 
         List<CardUsehist> list = cardUsehistRepository.findAllByUserhistSubmitInfo_SeqIn(seqList);
         if (list.size() > 0) {
+            result = new HashMap<>();
             //사용 내역 리스트
             result.put("list", list);
             //분류별 합계

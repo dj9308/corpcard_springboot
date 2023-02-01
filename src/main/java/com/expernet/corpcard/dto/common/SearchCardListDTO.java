@@ -55,7 +55,6 @@ public class SearchCardListDTO {
     @AllArgsConstructor
     @Builder
     public static class Request {
-        @NotNull
         private String userId;  //사용자 ID
         @Pattern(regexp = "^\\d{4}\\-(0?[1-9]|1[012])$")
         private String wrtYm;   //작성 연월

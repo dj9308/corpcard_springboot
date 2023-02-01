@@ -31,13 +31,13 @@ import java.util.List;
 @Service("LoginService")
 public class LoginServiceImpl implements LoginService {
     /**
-     * Security Configuration Repository
+     * User Repository
      */
     @Autowired
     private UserRepository userRepository;
 
     /**
-     * Security return user info
+     * load Security UserDetails
      * @param userId : user ID
      */
     @Override
@@ -48,7 +48,6 @@ public class LoginServiceImpl implements LoginService {
         if (userinfo == null) {
             throw new UsernameNotFoundException("해당 사용자가 없습니다.");
         }
-
         if(userinfo.getChiefYn().toString().equals("Y")){
             roles.add("CHIEF");
         }

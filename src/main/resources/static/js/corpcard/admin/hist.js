@@ -681,7 +681,7 @@ const $adminHist = (function () {
     const dataList = [];
     let result = data.result;
 
-    if (data.CODE === "SUCCESS") {
+    if (data.CODE === "SUCCESS" && !$cmmn.isNullorEmpty(result)) {
       for (let i = 0; i < result.sumByTeam.length; i++) {
         const object = {};
         object.value = result.sumByTeam[i].sum;

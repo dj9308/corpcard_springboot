@@ -1,3 +1,7 @@
-com\expernet\corpcard\service\Impl\SchedulerServiceImplTest$1.class
 com\expernet\corpcard\CorpcardApplicationTests.class
+com\expernet\corpcard\service\Impl\AdminServiceImplTest$1.class
+com\expernet\corpcard\service\Impl\CommonServiceImplTest.class
+com\expernet\corpcard\service\Impl\AdminServiceImplTest.class
+com\expernet\corpcard\service\Impl\ApprovalServiceImplTest.class
 com\expernet\corpcard\service\Impl\SchedulerServiceImplTest.class
+com\expernet\corpcard\service\Impl\SchedulerServiceImplTest$1.class

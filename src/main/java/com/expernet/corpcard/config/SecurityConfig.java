@@ -2,8 +2,6 @@ package com.expernet.corpcard.config;
 
 import com.expernet.corpcard.service.LoginService;
 import jakarta.servlet.http.HttpSession;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity;
@@ -38,11 +36,6 @@ import java.util.Collection;
 @ConditionalOnDefaultWebSecurity
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SecurityConfig {
-    /**
-     * Logger
-     */
-    private static final Logger logger = LoggerFactory.getLogger(SecurityConfig.class);
-
     /**
      * Login Service
      */
@@ -87,9 +80,9 @@ public class SecurityConfig {
                 .loginProcessingUrl("/login_proc")
                 .successHandler((request, response, authentication) -> {
                     Collection<GrantedAuthority> credentials = (Collection<GrantedAuthority>) authentication.getAuthorities();
-                    if(credentials.stream().anyMatch(a->a.getAuthority().equals("ROLE_CHIEF"))){
+                    if (credentials.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHIEF"))) {
                         response.sendRedirect("/approval");
-                    }else{
+                    } else {
                         response.sendRedirect("/payhist");
                     }
                 })
@@ -99,7 +92,7 @@ public class SecurityConfig {
                     request.getRequestDispatcher("/viewLogin").forward(request, response);
                 })
                 .permitAll()
-            .and()
+                .and()
                 //로그아웃
                 .logout()
                 .logoutUrl("/logout")
