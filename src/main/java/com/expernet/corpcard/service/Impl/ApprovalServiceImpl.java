@@ -1,6 +1,7 @@
 package com.expernet.corpcard.service.Impl;
 
 import com.expernet.corpcard.dto.ApprovalSearch;
+import com.expernet.corpcard.dto.approval.ListDTO;
 import com.expernet.corpcard.entity.CardUsehist;
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.User;
@@ -48,12 +49,11 @@ public class ApprovalServiceImpl implements ApprovalService {
     /**
      * 부서 정보 조회
      *
-     * @param paramMap: 팀장 ID
+     * @param userId: 사용자 ID
      */
     @Override
-    public HashMap<String, Object> searchDeptInfo(HashMap<String, Object> paramMap) {
+    public HashMap<String, Object> getDeptInfo(String userId) {
         HashMap<String, Object> result = new HashMap<>();
-        String userId = paramMap.get("USER_ID").toString();
         User userInfo = userRepository.findByUserId(userId);
         String upperDeptCd = userInfo.getDept().getUpperDeptCd();
         if (upperDeptCd != null) {
@@ -66,19 +66,17 @@ public class ApprovalServiceImpl implements ApprovalService {
     /**
      * 결재 건 목록 조회
      *
-     * @param paramMap: 검색 조건
+     * @param params: 검색 조건
      */
     @Override
-    public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
+    public List<HashMap<String, Object>> getList(ListDTO.Request params) {
         List<String> teamList = new ArrayList<>();
-        List<String> deptList = new ArrayList<>();
-        String userId = paramMap.get("userId").toString();
-        String team = paramMap.get("team").toString();
-        String upperDeptCd = paramMap.get("dept").toString();
-        String[] submitDate = paramMap.get("submitDate").toString().split(" - ");
+        String team = params.getTeam();
+        String upperDeptCd = params.getDept();
+        String[] submitDate = params.getSubmitDate().split(" - ");
 
         //1.부서 list 생성
-        User userInfo = userRepository.findByUserId(userId);
+        User userInfo = userRepository.findByUserId(params.getUserId());
         if (team.equals("ALL")) {
             if (upperDeptCd.equals("ALL")) {
                 upperDeptCd = userInfo.getDept().getDeptCd();
@@ -93,9 +91,8 @@ public class ApprovalServiceImpl implements ApprovalService {
         }
         //2.entity 생성
         ApprovalSearch approvalSearch = ApprovalSearch.builder()
-                .deptList((deptList.size() == 0) ? null : deptList)
                 .teamList((teamList.size() == 0) ? null : teamList)
-                .writerNm((paramMap.get("writerNm") != null) ? paramMap.get("writerNm").toString() : null)
+                .writerNm((params.getWriterNm() != null) ? params.getWriterNm() : null)
                 .startDate(submitDate[0])
                 .endDate(submitDate[1])
                 .build();
@@ -106,12 +103,11 @@ public class ApprovalServiceImpl implements ApprovalService {
 
     /**
      * 법인카드 사용 내역 목록 조회
-     * @param paramMap: 검색 조건(seq)
+     * @param seq: 검색 조건
      */
     @Override
-    public HashMap<String, Object> searchPayhistList(HashMap<String, Object> paramMap) {
+    public HashMap<String, Object> getPayhistList(long seq) {
         HashMap<String, Object> result = new HashMap<>();
-        long seq = Long.parseLong(paramMap.get("SEQ").toString());
         Sort sort = Sort.by(Sort.Direction.ASC, "useDate");
         List<CardUsehist> list = cardUsehistRepository.findAllByUsehistSubmitInfo_Seq(seq, sort);
         if (list.size() > 0) {

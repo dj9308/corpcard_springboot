@@ -1,14 +1,18 @@
 package com.expernet.corpcard.controller;
 
+import com.expernet.corpcard.dto.approval.ListDTO;
 import com.expernet.corpcard.service.ApprovalService;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 
@@ -54,14 +58,14 @@ public class ApprovalController {
 
 	/**
 	 * 부서 및 팀 조회
-	 * @param paramMap: 사용자 ID
+	 * @param principal: 사용자 정보
 	 * @param model: modelMap
 	 */
-	@RequestMapping("/searchDeptInfo")
-	public String selectDeptInfo(@RequestParam HashMap<String, Object> paramMap, Model model){
+	@RequestMapping("/deptInfo")
+	public String getDeptInfo(Principal principal, Model model){
 		HashMap<String, Object> result = new HashMap<>();
 		try {
-			result = approvalService.searchDeptInfo(paramMap);
+			result = approvalService.getDeptInfo(principal.getName());
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);
@@ -79,14 +83,14 @@ public class ApprovalController {
 
 	/**
 	 * 결재 건 목록 조회
-	 * @param paramMap: 검색 조건
+	 * @param params: 검색 조건
 	 * @param model: modelMap
 	 */
-	@RequestMapping("/searchList")
-	public String searchApprovalList(@RequestParam HashMap<String, Object> paramMap, Model model){
+	@RequestMapping(value = "/list", method = RequestMethod.GET)
+	public String getList(@Valid ListDTO.Request params, Model model){
 		List<HashMap<String, Object>> result = null;
 		try {
-			result = approvalService.searchApprovalList(paramMap);
+			result = approvalService.getList(params);
 		} finally {
 			if (result != null) {
 				if(result.size() == 0){
@@ -110,14 +114,14 @@ public class ApprovalController {
 
 	/**
 	 * 법인카드 사용 내역 목록 조회
-	 * @param paramMap: 검색 조건(seq)
+	 * @param seq: 검색 조건
 	 * @param model: modelMap
 	 */
-	@RequestMapping("/searchPayhistList")
-	public String searchPayhistList(@RequestParam HashMap<String, Object> paramMap, Model model){
+	@RequestMapping(value = "/payhistList", method = RequestMethod.GET)
+	public String getPayhistList(@RequestParam(value = "seq") long seq, Model model){
 		HashMap<String, Object> result = null;
 		try {
-			result = approvalService.searchPayhistList(paramMap);
+			result = approvalService.getPayhistList(seq);
 		} finally {
 			if (result != null && result.get("list") != null) {
 				model.addAttribute("result", result);

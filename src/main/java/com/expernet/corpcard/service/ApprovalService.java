@@ -1,14 +1,7 @@
 package com.expernet.corpcard.service;
 
-import com.expernet.corpcard.entity.AttachmentInfo;
-import com.expernet.corpcard.entity.CardUsehist;
-import com.expernet.corpcard.entity.UsehistSubmitInfo;
-import com.expernet.corpcard.entity.User;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.web.multipart.MultipartFile;
+import com.expernet.corpcard.dto.approval.ListDTO;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,21 +26,21 @@ public interface ApprovalService {
 
     /**
      * 부서 정보 조회
-     * @param paramMap : 팀장 ID
+     * @param userId : 팀장 ID
      */
-    HashMap<String, Object> searchDeptInfo(HashMap<String, Object> paramMap);
+    HashMap<String, Object> getDeptInfo(String userId);
 
     /**
      * 결재 건 목록 조회
-     * @param paramMap: 검색 조건
+     * @param params : 검색 조건
      */
-    List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap);
+    List<HashMap<String, Object>> getList(ListDTO.Request params);
 
     /**
      * 법인카드 사용 내역 목록 조회
-     * @param paramMap: 검색 조건(seq)
+     * @param seq : 검색 조건
      */
-    HashMap<String, Object> searchPayhistList(HashMap<String, Object> paramMap);
+    HashMap<String, Object> getPayhistList(long seq);
 
 
 }

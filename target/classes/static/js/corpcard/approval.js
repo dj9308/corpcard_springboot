@@ -70,7 +70,8 @@ const $approval = (function () {
     //2.결재 건 목록 조회
     $.ajax({
       type: "GET",
-      url: "/approval/searchList",
+      url: "/approval/list",
+      dataType: "json",
       data: data,
       success: function (data) {
         if (data.CODE === "SUCCESS") {
@@ -170,10 +171,10 @@ const $approval = (function () {
   const selectPayhistList = function (submitSeq) {
     $.ajax({
       type: "GET",
-      url: "/approval/searchPayhistList",
+      url: "/approval/payhistList",
       dataType: "json",
       data: {
-        SEQ: submitSeq
+        seq : submitSeq
       },
       success: function (data) {
         if (data.CODE == "SUCCESS") {
@@ -334,10 +335,7 @@ const $approval = (function () {
     const teamSelect = document.querySelector("#teamSelect");
     $.ajax({
       type: "GET",
-      url: "/approval/searchDeptInfo",
-      data: {
-        USER_ID: userId
-      },
+      url: "/approval/deptInfo",
       async: false,
       success: function (data) {
         if (data.CODE === "SUCCESS") {

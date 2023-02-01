@@ -304,7 +304,7 @@ const $payhist = (function () {
       isDisable ? $("#deleteRow").css("display", "none") : $("#deleteRow").css("display", "");
       isDisable ? $("#submitHist").css("display", "none") : $("#submitHist").css("display", "");
       isDisable ? $("#atchAddBtn").css("display", "none") : $("#atchAddBtn").css("display", "");
-      isDisable ? $("#atchDelBtn").css("display", "none") : $("#atchDelBtn").css("display", "");
+      isDisable ? $("#atchDelBtn").css("display", "none"          ) : $("#atchDelBtn").css("display", "");
       $("#histForm :input").attr("disabled", isDisable);
       $("#histForm select").attr("disabled", isDisable);
     }

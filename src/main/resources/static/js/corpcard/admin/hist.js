@@ -367,10 +367,10 @@ const $adminHist = (function () {
     const submitSeq = $("#approvalTable > tbody > tr.table-active").find("td:eq(7)").text();
     $.ajax({
       type: "GET",
-      url: "/approval/searchPayhistList",
+      url: "/approval/payhistList",
       dataType: "json",
       data: {
-        SEQ: submitSeq
+        seq: submitSeq
       },
       success: function (data) {
         if (data.CODE == "SUCCESS") {
