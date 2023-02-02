@@ -1,14 +1,13 @@
 package com.expernet.corpcard.service.Impl;
 
-import com.expernet.corpcard.dto.AdminDTO;
-import com.expernet.corpcard.dto.ApprovalSearch;
-import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.dto.common.ApprovalDTO;
+import com.expernet.corpcard.dto.admin.ApprovalListDTO;
+import com.expernet.corpcard.dto.admin.UserListDTO;
+import com.expernet.corpcard.dto.admin.AuthDTO;
+import com.expernet.corpcard.dto.admin.CardInfoDTO;
 import com.expernet.corpcard.entity.*;
 import com.expernet.corpcard.repository.*;
 import com.expernet.corpcard.service.AdminService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
@@ -17,12 +16,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.*;
 
-import static org.junit.Assert.assertNotNull;
-
-@Transactional
+@Transactional(rollbackFor = SQLException.class)
 @RequiredArgsConstructor
 @Service("AdminService")
 public class AdminServiceImpl implements AdminService {
@@ -69,41 +67,30 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 관리자 권한 조회
      *
-     * @param paramMap : 사용자 정보
+     * @param adminYn : 관리자 여부
      */
     @Override
-    public List<UserDTO.Response> searchManagerList(HashMap<String, Object> paramMap) {
-        String adminYn = paramMap.get("adminYn").toString();
+    public List<UserListDTO.Response> getManagerList(String adminYn) {
         List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn(adminYn);
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(userEntityList, new TypeToken<List<UserDTO.Response>>() {
+        return modelMapper.map(userEntityList, new TypeToken<List<UserListDTO.Response>>() {
         }.getType());
     }
 
     /**
      * 관리자 권한 변경
      *
-     * @param paramMap : 권한 변경할 사용자 정보
+     * @param params : 권한 변경할 사용자 정보
      */
     @Override
-    public Object updateAuth(HashMap<String, Object> paramMap) {
-        String adminYn = paramMap.get("adminYn").toString();
-        String listJSON = paramMap.get("userIdList").toString();
-        List<String> userIdList;
-        try {
-            userIdList = new ObjectMapper().readValue(listJSON, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            return null;
-        }
-
-        List<User> userInfoList = userRepository.findAllByUserIdIn(userIdList);
+    public Object updateAuth(AuthDTO.PatchReq params) {
+        List<User> userInfoList = userRepository.findAllByUserIdIn(params.getUserIdList());
         List<UserAddInfo> addInfoList = new ArrayList<>();
 
         for (User user : userInfoList) {
             UserAddInfo info = user.getUserAddInfo();
-            info.setAdminYn(adminYn);
+            info.setAdminYn(params.getAdminYn());
             addInfoList.add(info);
         }
 
@@ -114,75 +101,70 @@ public class AdminServiceImpl implements AdminService {
      * 카드 목록 조회
      */
     @Override
-    public List<CardInfo> searchCardList() {
+    public List<CardInfo> getCardList() {
         return cardInfoRepository.findAll();
     }
 
     /**
      * 카드 정보 삭제
      *
-     * @param paramMap : 카드 정보
+     * @param cardSeqList : 카드 시퀀스 목록
      */
     @Override
-    public long deleteCardInfo(HashMap<String, Object> paramMap) {
-        long result = -1;
-        String listJSON = paramMap.get("cardSeqList").toString();
-        List<Long> cardSeqList;
-        try {
-            cardSeqList = new ObjectMapper().readValue(listJSON, new TypeReference<>() {
-            });
-        } catch (JsonProcessingException e) {
-            return -1;
-        }
+    public long deleteCardList(List<Long> cardSeqList) throws SQLException {
+        long result;
+
         int prevCnt = cardInfoRepository.findAll().size();
         cardReceiptentRepository.deleteAllByCardInfo_SeqIn(cardSeqList);
         cardInfoRepository.deleteAllByIdInBatch(cardSeqList);
         int afterCnt = cardInfoRepository.findAll().size();
-
         if (prevCnt - afterCnt == cardSeqList.size()) {
             result = cardSeqList.size();
+        }else{
+            throw new SQLException();
         }
+        
         return result;
     }
 
     /**
      * 카드 정보 저장 or 수정
      *
-     * @param cardParams : 카드 정보
+     * @param params : 카드 정보
      */
     @Override
-    public CardInfo saveCardInfo(AdminDTO.saveCardInfoReq cardParams) {
+    public CardInfo saveCardInfo(CardInfoDTO.PostReq params) {
         CardInfo result = null;
 
         //1.카드 정보 저장 or 수정
         CardInfo cardInfo = CardInfo.builder()
-                .seq(cardParams.getCardSeq())
-                .cardComp(cardParams.getCardComp())
-                .cardNum(cardParams.getCardNum())
+                .seq(params.getCardSeq())
+                .cardComp(params.getCardComp())
+                .cardNum(params.getCardNum())
                 .build();
-
         result = cardInfoRepository.saveAndFlush(cardInfo);
-        List<CardReceiptent> receiptents = cardReceiptentRepository.findAllByCardInfo_Seq(cardParams.getCardSeq());
+        List<CardReceiptent> receiptents = cardReceiptentRepository.findAllByCardInfo_Seq(params.getCardSeq());
+
         //2.카드 수령인 저장 or 수정(반납)
         if (!receiptents.isEmpty()) {
             CardReceiptent receiptent = receiptents.get(receiptents.size() - 1);
             if (receiptent.getReturnedAt() != null) {
-                if (cardParams.getUserId() != null) {
-                    saveReceiptentByParams(cardParams, result);
+                if (params.getUserId() != null) {
+                    saveReceiptentByParams(params, result);
                 }
             } else {
-                if (cardParams.getUserId() == null) {
+                if (params.getUserId() == null) {
                     receiptent.setReturnedAt(new Timestamp(System.currentTimeMillis()));
                     cardReceiptentRepository.save(receiptent);
-                } else if (!cardParams.getUserId().equals(receiptent.getUser().getUserId())) {
+                } else if (!params.getUserId().equals(receiptent.getUser().getUserId())) {
                     receiptent.setReturnedAt(new Timestamp(System.currentTimeMillis()));
                     cardReceiptentRepository.save(receiptent);
-                    saveReceiptentByParams(cardParams, result);
+                    saveReceiptentByParams(params, result);
                 }
             }
         } else {
-            if (cardParams.getUserId() != null) {
-                saveReceiptentByParams(cardParams, result);
+            if (params.getUserId() != null) {
+                saveReceiptentByParams(params, result);
             }
         }
 
@@ -193,11 +175,11 @@ public class AdminServiceImpl implements AdminService {
      * 사용자 전체 목록 조회
      */
     @Override
-    public List<UserDTO.Response> searchUserList() {
+    public List<UserListDTO.Response> getUserList() {
         List<User> userList = userRepository.findAll();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        return modelMapper.map(userList, new TypeToken<List<UserDTO.Response>>() {}.getType());
+        return modelMapper.map(userList, new TypeToken<List<UserListDTO.Response>>() {}.getType());
     }
 
     /**
@@ -206,7 +188,7 @@ public class AdminServiceImpl implements AdminService {
      * @param wrtYm: 작성연월
      */
     @Override
-    public HashMap<String, Object> searchPayList(String wrtYm) {
+    public HashMap<String, Object> getPayList(String wrtYm) {
         HashMap<String, Object> result = null;
         List<UsehistSubmitInfo> submitInfos = usehistSubmitInfoRepository.findByWrtYm(wrtYm);
         List<Long> seqList = new ArrayList<>();
@@ -232,7 +214,7 @@ public class AdminServiceImpl implements AdminService {
      * 최상위 부서 조회
      */
     @Override
-    public Dept searchTopDeptInfo() {
+    public Dept getUpperDeptInfo() {
         List<Dept> deptList = deptRepository.findAllByUpper_deptCd(null);
         return deptList.get(0);
     }
@@ -240,14 +222,14 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 결재 건 목록 조회
      *
-     * @param paramMap : 검색 조건
+     * @param params : 검색 조건
      */
     @Override
-    public List<HashMap<String, Object>> searchApprovalList(HashMap<String, Object> paramMap) {
+    public List<HashMap<String, Object>> getApprovalList(ApprovalListDTO.Request params) {
         List<String> teamList = new ArrayList<>();
-        String teamCd = paramMap.get("team").toString();
-        String deptCd = paramMap.get("dept").toString();
-        String[] submitDate = paramMap.get("submitDate").toString().split(" - ");
+        String teamCd = params.getTeam();
+        String deptCd = params.getDept();
+        String[] submitDate = params.getSubmitDate().split(" - ");
 
         if (!deptCd.equals("ALL")) {
             if (teamCd.equals("ALL")) { //팀 전체
@@ -261,10 +243,10 @@ public class AdminServiceImpl implements AdminService {
         }
 
         //2.entity 생성
-        ApprovalSearch approvalSearch = ApprovalSearch.builder()
+        ApprovalDTO approvalSearch = ApprovalDTO.builder()
                 .stateCd("C")
                 .teamList((teamList.size() == 0) ? null : teamList)
-                .writerNm((paramMap.get("writerNm") != null) ? paramMap.get("writerNm").toString() : null)
+                .writerNm((params.getWriterNm() != null) ? params.getWriterNm() : null)
                 .startDate(submitDate[0])
                 .endDate(submitDate[1])
                 .build();
@@ -276,11 +258,11 @@ public class AdminServiceImpl implements AdminService {
     /**
      * 카드 수령인 정보 저장
      *
-     * @param cardParams  : 카드 DTO
+     * @param params  : 카드 정보 DTO
      * @param cardInfo : 카드 정보
      */
-    private void saveReceiptentByParams(AdminDTO.saveCardInfoReq cardParams, CardInfo cardInfo) {
-        User userInfo = userRepository.findByUserId(cardParams.getUserId());
+    private void saveReceiptentByParams(CardInfoDTO.PostReq params, CardInfo cardInfo) {
+        User userInfo = userRepository.findByUserId(params.getUserId());
         CardReceiptent cardReceiptent = CardReceiptent.builder()
                 .cardInfo(cardInfo)
                 .user(userInfo)

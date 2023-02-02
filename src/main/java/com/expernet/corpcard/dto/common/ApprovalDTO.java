@@ -1,15 +1,14 @@
-package com.expernet.corpcard.dto;
+package com.expernet.corpcard.dto.common;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ApprovalSearch {
+public class ApprovalDTO {
     String stateCd;
     List<String> deptList;
     List<String> teamList;
@@ -18,8 +17,8 @@ public class ApprovalSearch {
     String endDate;
 
     @Builder
-    public ApprovalSearch(String stateCd, List<String> deptList, List<String> teamList, String writerNm,
-                          String startDate, String endDate){
+    public ApprovalDTO(String stateCd, List<String> deptList, List<String> teamList, String writerNm,
+                       String startDate, String endDate){
         this.stateCd = stateCd;
         this.deptList = deptList;
         this.teamList = teamList;

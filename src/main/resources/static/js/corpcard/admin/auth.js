@@ -118,7 +118,7 @@ const $auth = (function () {
       data: {
         adminYn: adminYn
       },
-      url: "/admin/searchManagerList",
+      url: "/admin/managerList",
       success: function (data) {
         if (data.CODE === "SUCCESS") {
           if (adminYn === "Y") {
@@ -245,7 +245,7 @@ const $auth = (function () {
   }
 
   /**
-   * 관리자 권한 변경 AJAX
+   * 관리자 권한 추가 AJAX
    * @param {Array} userIdList : 변경할 사용자 ID Array
    * @param {String} adminYn : 관리자 권한 여부
    * @param {function} callback : Callback function
@@ -257,11 +257,12 @@ const $auth = (function () {
 
     $.ajax({
       type: "PATCH",
-      url: "/admin/updateAuth",
+      url: "/admin/auth",
       data: {
-        userIdList: JSON.stringify(userIdList),
+        userIdList: userIdList,
         adminYn: adminYn
       },
+      dataType: "json",
       success: function (data) {
         if (data.CODE === "SUCCESS") {
           callback();

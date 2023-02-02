@@ -1,6 +1,6 @@
 package com.expernet.corpcard.service.Impl;
 
-import com.expernet.corpcard.dto.ApprovalSearch;
+import com.expernet.corpcard.dto.common.ApprovalDTO;
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.User;
 import com.expernet.corpcard.repository.DeptRepository;
@@ -66,7 +66,7 @@ public class ApprovalServiceImplTest {
         }
 
         //2.entity 생성
-        ApprovalSearch approvalSearch = ApprovalSearch.builder()
+        ApprovalDTO approvalSearch = ApprovalDTO.builder()
                 .teamList((teamList.size() == 0) ? null : teamList)
                 .startDate(submitDate[0])
                 .endDate(submitDate[1])

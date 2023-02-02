@@ -116,7 +116,7 @@ const $card = (function () {
   const selectCardList = function () {
     $.ajax({
       type: "GET",
-      url: "/admin/searchCardList",
+      url: "/admin/cardList",
       success: function (data) {
         if (data.CODE === "SUCCESS") {
           $("#checkAll").prop('checked', false);
@@ -277,7 +277,7 @@ const $card = (function () {
     const searchUserList = function (callback) {
       $.ajax({
         type: "GET",
-        url: "/admin/searchUserList",
+        url: "/admin/userList",
         success: function (data) {
           if (data.CODE === "SUCCESS") {
             callback(data.result);
@@ -303,9 +303,9 @@ const $card = (function () {
 
     $.ajax({
       type: "DELETE",
-      url: "/admin/deleteCard",
+      url: "/admin/cardList",
       data: {
-        cardSeqList: JSON.stringify(cardSeqList),
+        cardSeqList: cardSeqList,
       },
       success: function (data) {
         if (data.CODE === "SUCCESS") {
@@ -330,7 +330,7 @@ const $card = (function () {
 
       $.ajax({
         type: "POST",
-        url: "/admin/saveCardInfo",
+        url: "/admin/cardInfo",
         data: JSON.stringify(data),
         contentType: "application/json",
         dataType: 'json',

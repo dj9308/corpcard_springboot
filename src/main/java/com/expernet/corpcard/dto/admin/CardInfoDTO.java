@@ -1,19 +1,18 @@
-package com.expernet.corpcard.dto;
+package com.expernet.corpcard.dto.admin;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
-public class AdminDTO {
-    /**
-     * 카드 정보 저장 Request
-     */
+public class CardInfoDTO {
+
     @Getter
     @AllArgsConstructor
     @Builder
-    public static class saveCardInfoReq {
+    public static class PostReq{
         @NotBlank
         private long cardSeq;
         @NotBlank

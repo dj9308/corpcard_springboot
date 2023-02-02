@@ -1,17 +1,13 @@
-package com.expernet.corpcard.dto.approval;
+package com.expernet.corpcard.dto.admin;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-public class ListDTO {
-
+public class ApprovalListDTO {
     @Getter
     @Setter
     public static class Request{
-        @NotEmpty
         private String userId;
         private String team;
         private String dept;

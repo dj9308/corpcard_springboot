@@ -63,6 +63,8 @@ const $payhist = (function () {
             selectPayhistList();
             if ($("#histUpdate").is(":visible")) {
               changeForm("save");
+            }else{
+              $('input[name=useHist]').focus();
             }
           } else if (data.CODE === "ERR") {
             alert("결제 내역 저장에 실패했습니다. 관리자에게 문의해주시기 바랍니다.");
@@ -262,7 +264,7 @@ const $payhist = (function () {
       if (confirm("제출을 취소하시겠습니까?")) {
         updateState("A", function (data) {
           alert("제출이 취소되었습니다.");
-          changeTagStyle(data);
+          changeTagStyle(data.stateInfo);
         });
       }
     });

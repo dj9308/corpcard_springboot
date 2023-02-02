@@ -1,4 +1,4 @@
-package com.expernet.corpcard.dto;
+package com.expernet.corpcard.dto.admin;
 
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.entity.User;
@@ -6,12 +6,9 @@ import com.expernet.corpcard.entity.UserAddInfo;
 import lombok.*;
 
 import java.sql.Timestamp;
-import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-public class UserDTO {
+public class UserListDTO {
     @Getter
     @Setter
     @NoArgsConstructor

@@ -1,6 +1,6 @@
 package com.expernet.corpcard.service.Impl;
 
-import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.dto.admin.UserListDTO;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.CardReceiptent;
 import com.expernet.corpcard.entity.User;
@@ -46,7 +46,7 @@ public class AdminServiceImplTest {
         List<User> userEntityList = userRepository.findAllByUserAddInfo_AdminYn("Y");
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
-        List<UserDTO.Response> test = modelMapper.map(userEntityList, new TypeToken<List<UserDTO.Response>>() {
+        List<UserListDTO.Response> test = modelMapper.map(userEntityList, new TypeToken<List<UserListDTO.Response>>() {
         }.getType());
         assertNotNull(test);
     }

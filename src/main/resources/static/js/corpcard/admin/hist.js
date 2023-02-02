@@ -35,7 +35,7 @@ const $adminHist = (function () {
       //2.결재 건 목록 조회
       $.ajax({
         type: "GET",
-        url: "/admin/searchApprovalList",
+        url: "/admin/approvalList",
         data: data,
         success: function (data) {
           if (data.CODE === "SUCCESS") {
@@ -85,6 +85,11 @@ const $adminHist = (function () {
         success: function (data) {
           if (data.CODE === "SUCCESS") {
             selectPayhistList();
+            if ($("#histUpdate").is(":visible")) {
+              changeForm("save");
+            }else{
+              $('input[name=useHist]').focus();
+            }
           } else if (data.CODE === "ERR") {
             console.log(data.MSG);
           }
@@ -123,13 +128,16 @@ const $adminHist = (function () {
         url: "/payhist/list",
         dataType: "json",
         data: {
-          WRITER_ID: $(submitInfo).find("td:eq(8)").text(),
-          WRT_YM: $(submitInfo).find("td:eq(5)").text(),
-          SEQ_LIST: JSON.stringify(seqList)
+          writerId: $(submitInfo).find("td:eq(8)").text(),
+          wrtYm: $(submitInfo).find("td:eq(5)").text(),
+          seqList: seqList
         },
         success: function (data) {
           if (data.CODE === "SUCCESS") {
             selectPayhistList();
+            if ($("#histUpdate").is(":visible")) {
+              changeForm("save");
+            }
           } else {
             return alert("결제 내역 삭제를 싪패했습니다. 관리자에게 문의해주시기 바랍니다.");
           }
@@ -281,6 +289,9 @@ const $adminHist = (function () {
 
         //버튼 disable 해제
         disableBtn(false);
+
+        //결제내역 작성 form 초기화
+        changeForm("save");
       }
     });
   }
@@ -375,7 +386,6 @@ const $adminHist = (function () {
       success: function (data) {
         if (data.CODE == "SUCCESS") {
           paintPayhistTable(data.result);
-          changeForm("save");
         } else {
           paintPayhistTable();
         }
@@ -546,8 +556,8 @@ const $adminHist = (function () {
    */
   const initStatsDatePicker = function () {
     const now = new Date;
-    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 6), 'YYYY-mm');
-    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
+    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 7), 'YYYY-mm');
+    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-1), 'YYYY-mm');
     $("#statDatePicker").val(`${startYm} - ${endYm}`);
 
     $('#statDatePicker').daterangepicker({
@@ -578,8 +588,8 @@ const $adminHist = (function () {
 
     if ($cmmn.isNullorEmpty(startYm) || $cmmn.isNullorEmpty(endYm)) {
       const now = new Date;
-      startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 6), 'YYYY-mm');
-      endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
+      startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 7), 'YYYY-mm');
+      endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-1), 'YYYY-mm');
     }
 
     const wrtYmList = [];
@@ -793,7 +803,7 @@ const $adminHist = (function () {
   const selectHistList = function (yearMonth, callback) {
     $.ajax({
       type: "GET",
-      url: "/admin/searchPayList",
+      url: "/admin/payList",
       dataType: "json",
       data: {
         wrtYm: yearMonth
@@ -847,7 +857,7 @@ const $adminHist = (function () {
     //1.부서 및 팀 select 설정
     $.ajax({
       type: "GET",
-      url: "/admin/searchTopDeptInfo",
+      url: "/admin/upperDeptInfo",
       dataType: "json",
       async: false,
       success: function (data) {
@@ -901,8 +911,8 @@ const $adminHist = (function () {
 
     //2.기간 Date picker
     const now = new Date;
-    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 3), 'YYYY-mm');
-    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()), 'YYYY-mm');
+    const startYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth() - 4), 'YYYY-mm');
+    const endYm = $cmmn.formatDate(new Date(now.getFullYear(), now.getMonth()-1), 'YYYY-mm');
     $("#datepicker").val(`${startYm} - ${endYm}`);
 
     $('#datepicker').daterangepicker({

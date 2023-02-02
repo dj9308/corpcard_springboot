@@ -92,7 +92,7 @@ public class PayhistController {
      * @param model     : modelMap
      */
     @RequestMapping(value = "/list", method = RequestMethod.DELETE)
-    public String deleteList(ListDTO.DeleteReq params, ModelMap model) {
+    public String deleteList(@Valid ListDTO.DeleteReq params, ModelMap model) {
         List<Long> seqList = params.getSeqList();
         long result = 0;
         try {

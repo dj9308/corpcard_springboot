@@ -1,18 +1,18 @@
 package com.expernet.corpcard.controller;
 
-import com.expernet.corpcard.dto.AdminDTO;
-import com.expernet.corpcard.dto.EntityDTO;
-import com.expernet.corpcard.dto.UserDTO;
+import com.expernet.corpcard.dto.admin.*;
 import com.expernet.corpcard.entity.CardInfo;
 import com.expernet.corpcard.entity.Dept;
 import com.expernet.corpcard.service.AdminService;
 import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,7 +50,7 @@ public class AdminController {
 	 * @param menuType: 관리자 소메뉴
 	 * @param model: ModelMap
 	 */
-	@RequestMapping("/{menuType}")
+	@RequestMapping(value = "/{menuType}",method = RequestMethod.GET)
 	public String histPage(@PathVariable("menuType") String menuType, Model model){
 		if(!menuType.equals("hist") &&		//결제내역 관리
 				!menuType.equals("auth") && //권한 관리
@@ -64,14 +64,14 @@ public class AdminController {
 
 	/**
 	 * 관리자 목록 조회
-	 * @param paramMap: 관리자 여부
+	 * @param adminYn: 관리자 여부
 	 * @param model: modelMap
 	 */
-	@RequestMapping("/searchManagerList")
-	public String searchManagerList(@RequestParam HashMap<String, Object> paramMap, Model model){
-		List<UserDTO.Response> result = null;
+	@RequestMapping(value = "/managerList", method = RequestMethod.GET)
+	public String getManagerList(@RequestParam(value = "adminYn") String adminYn, Model model){
+		List<UserListDTO.Response> result = null;
 		try {
-			result = adminService.searchManagerList(paramMap);
+			result = adminService.getManagerList(adminYn);
 		} finally {
 			if (result != null) {
 				if(result.size() == 0){
@@ -95,14 +95,14 @@ public class AdminController {
 
 	/**
 	 * 관리자 권한 변경
-	 * @param paramMap: 사용자 정보
+	 * @param params: 사용자 정보
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/updateAuth", method = RequestMethod.PATCH)
-	public String updateAuth(@RequestParam HashMap<String, Object> paramMap, Model model){
+	@RequestMapping(value = "/auth", method = RequestMethod.PATCH)
+	public String updateAuth(@Valid AuthDTO.PatchReq params, Model model){
 		Object result = null;
 		try {
-			result = adminService.updateAuth(paramMap);
+			result = adminService.updateAuth(params);
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);
@@ -122,11 +122,11 @@ public class AdminController {
 	 * 카드 목록 조회
 	 * @param model: modelMap
 	 */
-	@RequestMapping("/searchCardList")
-	public String searchCardList(Model model){
+	@RequestMapping(value = "/cardList", method = RequestMethod.GET)
+	public String getCardList(Model model){
 		List<CardInfo> result = null;
 		try {
-			result = adminService.searchCardList();
+			result = adminService.getCardList();
 		} finally {
 			if (result != null) {
 				if(result.size() == 0){
@@ -150,15 +150,20 @@ public class AdminController {
 
 	/**
 	 * 카드 정보 삭제
-	 * @param paramMap: 카드 seq
+	 * @param params: 카드 seq
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/deleteCard", method = RequestMethod.DELETE)
-	public String deleteCard(@RequestParam HashMap<String, Object> paramMap, Model model){
+	@RequestMapping(value = "/cardList", method = RequestMethod.DELETE)
+	public String deleteCardList(@Valid CardListDTO.DeleteReq params, Model model) {
+		List<Long> cardSeqList = params.getCardSeqList();
 		long result = -1;
 		try {
-			result = adminService.deleteCardInfo(paramMap);
-		} finally {
+			result = adminService.deleteCardList(cardSeqList);
+		} catch(SQLException e){
+			model.addAttribute("CODE", "ERR");
+			model.addAttribute("MSG", "카드 정보 삭제 실패");
+			logger.error("카드 정보 삭제 실패");
+		} finally{
 			if (result != -1) {
 				model.addAttribute("CODE", "SUCCESS");
 				model.addAttribute("MSG", "카드 정보 삭제 성공");
@@ -174,14 +179,14 @@ public class AdminController {
 
 	/**
 	 * 카드 정보 저장 or 수정
-	 * @param cardInfo: 카드 정보
+	 * @param params: 카드 정보
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/saveCardInfo", method = RequestMethod.POST)
-	public String saveCardInfo(@RequestBody AdminDTO.saveCardInfoReq cardInfo, Model model){
+	@RequestMapping(value = "/cardInfo", method = RequestMethod.POST)
+	public String saveCardInfo(@Valid CardInfoDTO.PostReq params, Model model){
 		CardInfo result = null;
 		try {
-			result = adminService.saveCardInfo(cardInfo);
+			result = adminService.saveCardInfo(params);
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);
@@ -201,11 +206,11 @@ public class AdminController {
 	 * 사용자 목록 조회
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/searchUserList", method = RequestMethod.GET)
-	public String searchUserList( Model model){
-		List<UserDTO.Response> result = null;
+	@RequestMapping(value = "/userList", method = RequestMethod.GET)
+	public String getUserList(Model model){
+		List<UserListDTO.Response> result = null;
 		try {
-			result = adminService.searchUserList();
+			result = adminService.getUserList();
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);
@@ -226,11 +231,11 @@ public class AdminController {
 	 * @param wrtYm: 작성연월
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/searchPayList", method = RequestMethod.GET)
-	public String searchPayList(@RequestParam(value = "wrtYm") String wrtYm, Model model){
+	@RequestMapping(value = "/payList", method = RequestMethod.GET)
+	public String getPayList(@RequestParam(value = "wrtYm") String wrtYm, Model model){
 		HashMap<String, Object> result = null;
 		try {
-			result = adminService.searchPayList(wrtYm);
+			result = adminService.getPayList(wrtYm);
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);
@@ -247,14 +252,14 @@ public class AdminController {
 	}
 
 	/**
-	 * 부서 조회
+	 * 상위 부서 조회
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/searchTopDeptInfo", method = RequestMethod.GET)
-	public String searchTopDeptInfo(Model model){
+	@RequestMapping(value = "/upperDeptInfo", method = RequestMethod.GET)
+	public String getUpperDeptInfo(Model model){
 		Dept result = null;
 		try {
-			result = adminService.searchTopDeptInfo();
+			result = adminService.getUpperDeptInfo();
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);
@@ -272,14 +277,14 @@ public class AdminController {
 
 	/**
 	 * 결재 건 목록 조회
-	 * @param paramMap: 검색 조건
+	 * @param params: 검색 조건
 	 * @param model: modelMap
 	 */
-	@RequestMapping(value = "/searchApprovalList", method = RequestMethod.GET)
-	public String searchApprovalList(@RequestParam HashMap<String, Object> paramMap, Model model){
+	@RequestMapping(value = "/approvalList", method = RequestMethod.GET)
+	public String getApprovalList(@Valid ApprovalListDTO.Request params, Model model){
 		List<HashMap<String, Object>> result = null;
 		try {
-			result = adminService.searchApprovalList(paramMap);
+			result = adminService.getApprovalList(params);
 		} finally {
 			if (result != null) {
 				model.addAttribute("result", result);

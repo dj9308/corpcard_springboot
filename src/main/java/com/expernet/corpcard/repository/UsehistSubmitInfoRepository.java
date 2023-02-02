@@ -1,6 +1,6 @@
 package com.expernet.corpcard.repository;
 
-import com.expernet.corpcard.dto.ApprovalSearch;
+import com.expernet.corpcard.dto.common.ApprovalDTO;
 import com.expernet.corpcard.entity.UsehistSubmitInfo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -29,5 +29,5 @@ public interface UsehistSubmitInfoRepository extends JpaRepository<UsehistSubmit
             "AND usi.wrtYm BETWEEN :#{#approvalSearch.startDate} AND :#{#approvalSearch.endDate} " +
             "GROUP BY usi.seq " +
             "ORDER BY usi.wrtYm DESC")
-    List<HashMap<String, Object>> findByParams(@Param("approvalSearch") ApprovalSearch approvalSearch);
+    List<HashMap<String, Object>> findByParams(@Param("approvalSearch") ApprovalDTO approvalSearch);
 }
