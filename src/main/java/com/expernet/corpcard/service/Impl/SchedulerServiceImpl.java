@@ -85,14 +85,14 @@ public class SchedulerServiceImpl implements SchedulerService {
      * @param type : user / dept
      */
     @Override
-    public Map<String, String> syncData(String type) throws Exception {
+    public Map<String, String> syncData(String type) {
         this.type = type;
         filePath = (type.equals("user")) ? userFilePath : deptFilePath;
         syncData();
         return resultMsg;
     }
 
-    private void syncData() throws Exception {
+    private void syncData() {
         getFile();
         fitFileData();
         deleteData();

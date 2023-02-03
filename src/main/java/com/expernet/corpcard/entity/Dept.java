@@ -37,7 +37,6 @@ public class Dept {
     @Column(name = "CREATED_AT")
     private Timestamp createdAt;
 
-    @UpdateTimestamp
     @Column(name = "UPDATED_AT")
     private Timestamp updatedAt;
 

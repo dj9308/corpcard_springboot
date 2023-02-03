@@ -331,8 +331,7 @@ const $card = (function () {
       $.ajax({
         type: "POST",
         url: "/admin/cardInfo",
-        data: JSON.stringify(data),
-        contentType: "application/json",
+        data: data,
         dataType: 'json',
         success: function (data) {
           if (data.CODE === "SUCCESS") {

@@ -1,5 +1,6 @@
 package com.expernet.corpcard.dto.admin;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -10,18 +11,14 @@ import lombok.Setter;
 public class CardInfoDTO {
 
     @Getter
+    @Setter
     @AllArgsConstructor
     @Builder
     public static class PostReq{
-        @NotBlank
+        @Nullable
         private long cardSeq;
-        @NotBlank
         private String cardComp;
-        @NotBlank
-        @Pattern(regexp = "^\\d{4}\\-\\d{4}\\-\\d{4}\\-\\d{4}$",
-                message = "카드번호 형식이 'xxxx-xxxx-xxxx-xxxx'여야 합니다.")
         private String cardNum;
-        private long userSeq;
         private String userId;
         private String userNm;
     }

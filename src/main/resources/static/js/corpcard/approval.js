@@ -421,7 +421,6 @@ const $approval = (function () {
       $("#approvalTable > tbody > tr").filter(function () {
         return $(this).text().toLowerCase().indexOf(value) > -1;
       }).show();
-      document.querySelector("#listTotCnt").innerText = $("#approvalTable > tbody > tr:visible").length;
     });
   }
 

@@ -183,7 +183,7 @@ public class AdminController {
 	 * @param model: modelMap
 	 */
 	@RequestMapping(value = "/cardInfo", method = RequestMethod.POST)
-	public String saveCardInfo(@Valid CardInfoDTO.PostReq params, Model model){
+	public String saveCardInfo(CardInfoDTO.PostReq params, Model model){
 		CardInfo result = null;
 		try {
 			result = adminService.saveCardInfo(params);
