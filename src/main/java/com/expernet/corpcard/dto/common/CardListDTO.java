@@ -26,8 +26,6 @@ public class CardListDTO {
         this.seq = entity.getSeq();
         this.cardComp = entity.getCardComp();
         this.cardNum = entity.getCardNum();
-        this.createdAt = entity.getCreatedAt();
-        this.updatedAt = entity.getUpdatedAt();
         this.cardReceiptents = entity.getCardReceiptents().stream().map(CardReceiptentDTO::new)
                 .collect(Collectors.toList());
     }

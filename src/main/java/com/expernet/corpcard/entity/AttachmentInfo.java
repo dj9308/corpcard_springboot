@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "ATTACHMENT_INFO")
 @NoArgsConstructor
-public class AttachmentInfo {
+public class AttachmentInfo extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
@@ -34,15 +34,6 @@ public class AttachmentInfo {
 
     @Column(name = "UPLOAD_FN")
     private long uploadFn;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
-
     @Builder
     public AttachmentInfo(long seq, UsehistSubmitInfo usehistSubmitInfo, String fileNm, String fileExtNm,
                           String filePath, long uploadFn) {

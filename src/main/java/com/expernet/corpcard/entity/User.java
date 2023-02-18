@@ -13,7 +13,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "TB_USER")
 @NoArgsConstructor
-public class User {
+public class User extends BaseEntity{
     @Id
     @Column(name = "SEQ")
     private long seq;
@@ -37,13 +37,6 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "DEPT_CD", referencedColumnName = "DEPT_CD")
     private Dept dept;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
 
     @Builder
     public User(long seq, String userId, String ofcds, String userNm, Character chiefYn, Dept dept) {

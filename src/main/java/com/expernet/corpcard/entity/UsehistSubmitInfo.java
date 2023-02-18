@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "USEHIST_SUBMIT_INFO")
 @NoArgsConstructor
-public class UsehistSubmitInfo {
+public class UsehistSubmitInfo extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
@@ -54,14 +54,6 @@ public class UsehistSubmitInfo {
 
     @Column(name = "REJECT_MSG")
     private String rejectMsg;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "WRITER_ID", referencedColumnName = "USER_ID", insertable = false, updatable = false)

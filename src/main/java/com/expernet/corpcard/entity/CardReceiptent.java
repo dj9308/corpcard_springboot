@@ -45,12 +45,4 @@ public class CardReceiptent {
         this.receivedAt = receivedAt;
         this.returnedAt = returnedAt;
     }
-
-    public CardReceiptent(CardReceiptent t){
-        this.seq = seq;
-        this.cardInfo = cardInfo;
-        this.user = user;
-        this.receivedAt = receivedAt;
-        this.returnedAt = returnedAt;
-    }
 }

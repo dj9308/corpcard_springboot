@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "STATE_INFO")
 @NoArgsConstructor
-public class StateInfo {
+public class StateInfo extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
@@ -23,14 +23,6 @@ public class StateInfo {
 
     @Column(name = "STATE_NM")
     private String stateNm;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
 
     @Builder
     public StateInfo(long seq, String stateCd, String stateNm){

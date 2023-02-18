@@ -12,7 +12,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "CARD_USEHIST")
 @NoArgsConstructor
-public class CardUsehist {
+public class CardUsehist extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
@@ -40,14 +40,6 @@ public class CardUsehist {
 
     @Column(name = "MONEY")
     private long money;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
 
     @Builder
     public CardUsehist(long seq, UsehistSubmitInfo usehistSubmitInfo, ClassInfo classInfo, String useHist,

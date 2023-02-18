@@ -32,8 +32,6 @@ public class UserListDTO {
             this.userNm = entity.getUserNm();
             this.chiefYn = entity.getChiefYn();
             this.dept = new DeptDTO(entity.getDept());
-            this.createdAt = entity.getCreatedAt();
-            this.updatedAt = entity.getUpdatedAt();
         }
     }
 
@@ -51,8 +49,6 @@ public class UserListDTO {
             this.seq = entity.getSeq();
             this.userPasswd = entity.getUserPasswd();
             this.adminYn = entity.getAdminYn();
-            this.createdAt = entity.getCreatedAt();
-            this.updatedAt = entity.getUpdatedAt();
         }
     }
 
@@ -75,8 +71,6 @@ public class UserListDTO {
             this.deptCd = entity.getDeptCd();
             this.upperDeptCd = entity.getUpperDeptCd();
             this.chiefTitle = entity.getChiefTitle();
-            this.createdAt = entity.getCreatedAt();
-            this.updatedAt = entity.getUpdatedAt();
             this.upper = new DeptDTO(Objects.requireNonNull(entity.getUpper()));
         }
     }

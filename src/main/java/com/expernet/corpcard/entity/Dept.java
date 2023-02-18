@@ -4,10 +4,7 @@ package com.expernet.corpcard.entity;
 import com.fasterxml.jackson.annotation.*;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,7 +12,7 @@ import java.util.List;
 @Entity
 @Table(name = "TB_DEPT")
 @NoArgsConstructor
-public class Dept {
+public class Dept extends BaseEntity{
 
     @Id
     @Column(name = "seq", nullable = false)
@@ -32,13 +29,6 @@ public class Dept {
 
     @Column(name = "CHIEF_TITLE", nullable = false)
     private String chiefTitle;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
 
     @JsonBackReference
     @ManyToOne(fetch = FetchType.LAZY)

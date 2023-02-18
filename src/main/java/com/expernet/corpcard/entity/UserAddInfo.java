@@ -17,7 +17,7 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "USER_ADD_INFO")
 @NoArgsConstructor
-public class UserAddInfo {
+public class UserAddInfo extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
@@ -33,14 +33,6 @@ public class UserAddInfo {
 
     @Column(name = "ADMIN_YN", columnDefinition = "char")
     private String adminYn;
-
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
 
     @Builder
     public UserAddInfo(long seq, String userPasswd, String adminYn, User user) {

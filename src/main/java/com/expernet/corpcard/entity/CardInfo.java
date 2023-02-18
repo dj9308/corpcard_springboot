@@ -15,7 +15,7 @@ import java.util.List;
 @Entity
 @Table(name = "CARD_INFO")
 @NoArgsConstructor
-public class CardInfo {
+public class CardInfo extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "SEQ")
@@ -27,19 +27,9 @@ public class CardInfo {
     @Column(name = "CARD_NUM")
     private String cardNum;
 
-    @CreationTimestamp
-    @Column(name = "CREATED_AT")
-    private Timestamp createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "UPDATED_AT")
-    private Timestamp updatedAt;
-
     @JsonManagedReference
     @OneToMany(mappedBy = "cardInfo", fetch = FetchType.LAZY)
     private List<CardReceiptent> cardReceiptents = new ArrayList<>();
-
-
     @Builder
     public CardInfo(long seq, String cardComp, String cardNum){
         this.seq = seq;
