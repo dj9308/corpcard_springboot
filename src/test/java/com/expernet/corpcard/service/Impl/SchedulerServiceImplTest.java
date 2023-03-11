@@ -144,8 +144,8 @@ public class SchedulerServiceImplTest {
     @Test
     public void syncData() {
         //given
-        type = "dept";
-        filePath = deptFilePath;
+        type = "user";
+        filePath = userFilePath;
         hasNoError = true;
 
         //when

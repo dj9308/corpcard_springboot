@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,6 +42,15 @@ public class SecurityConfig {
      */
     @Autowired
     private LoginService loginService;
+    private final TokenProvider tokenProvider;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    public SecurityConfig(LoginService loginService, TokenProvider tokenProvider, JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint, JwtAccessDeniedHandler jwtAccessDeniedHandler) {
+        this.loginService = loginService;
+        this.tokenProvider = tokenProvider;
+        this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.jwtAccessDeniedHandler = jwtAccessDeniedHandler;
+    }
 
     /**
      * BCrypt Encoder Bean Setting
@@ -59,6 +69,15 @@ public class SecurityConfig {
     public SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http    //global
                 .csrf().disable()
+                .exceptionHandling()
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                //세션 Stateless 설정
+                .and()
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                //인증 & 페이지별 권한 설정
+                .and()
                 .userDetailsService(loginService)
                 .authorizeHttpRequests((auth) -> {
                     try {
@@ -67,7 +86,10 @@ public class SecurityConfig {
                                 .requestMatchers("/css/**", "/js/**", "/font/**", "/icons/**").permitAll()
                                 .requestMatchers("/approval").hasRole("CHIEF")
                                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().authenticated();
+                                .anyRequest().authenticated()
+                                //jwt 인증으로 설정
+                                .and()
+                                .apply(new JwtSecurityConfig(tokenProvider));
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -78,6 +100,7 @@ public class SecurityConfig {
                 .usernameParameter("userId")
                 .passwordParameter("userPasswd")
                 .loginProcessingUrl("/login_proc")
+                .successHandler(new JwtAuthenticationSuccessHandler(tokenProvider))
                 .successHandler((request, response, authentication) -> {
                     Collection<GrantedAuthority> credentials = (Collection<GrantedAuthority>) authentication.getAuthorities();
                     if (credentials.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHIEF"))) {
