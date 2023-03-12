@@ -191,6 +191,18 @@ const $cmmn = (function () {
       });
     }
 
+    const hrefWithToken = function(url){
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', '/target-page');
+        xhr.setRequestHeader('Authorization', 'Bearer ' + jwtToken); // JWT 토큰을 Authorization 헤더에 담음
+        xhr.onreadystatechange = function() {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            window.location.href = url; // 페이지 이동
+          }
+        };
+        xhr.send();
+    }
+
   return {
     isNullorEmpty: isNullorEmpty,          //null이면 true 반환
     serializeObject: serializeObject,      //form 정보를 json 형식으로 변환
@@ -201,5 +213,6 @@ const $cmmn = (function () {
     paintUserInfo: paintUserInfo,          //navbar에 사용자 정보 출력
     selectClassList: selectClassList,      //분류 목록 조회 AJAX
     selectCardList: selectCardList,        //카드 목록 조회 AJAX
+    hrefWithToken:hrefWithToken,           //토큰 설정 후 페이지 이동
   }
 }());

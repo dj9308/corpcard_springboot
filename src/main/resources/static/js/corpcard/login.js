@@ -83,6 +83,45 @@ const $login = (function () {
         });
     }
 
+    /**
+     * 토큰을 로컬 스토리지에 저장
+     */
+    function saveTokenToLocalStorage(token) {
+      localStorage.setItem('jwtToken', token);
+    }
+
+    // 로그인 폼 제출 이벤트 리스너
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      fetch('/login_proc', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => {
+        if (response.ok) {
+            // 응답 헤더에서 Authorization 토큰 추출
+            const token = response.headers.get('Authorization').split(' ')[1];
+            // 추출한 토큰을 로컬 스토리지에 저장
+            localStorage.setItem('jwtToken', token);
+            // response.json()으로 응답 본문을 처리할 수 있습니다.
+            hrefWithToken('/payhist');
+            return response.json();
+        } else {
+          // 로그인 실패 시 에러 처리
+          console.error('로그인 실패:', response.status);
+        }
+      })
+      .catch(error => {
+        console.error('네트워크 에러:', error);
+      });
+    });
+
+    // 페이지 로드 시 로컬 스토리지에서 토큰을 가져와서 사용하는 함수
+    function getTokenFromLocalStorage() {
+      return localStorage.getItem('token');
+    }
+
     return {
         init: init,
     }

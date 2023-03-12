@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -101,14 +102,14 @@ public class SecurityConfig {
                 .passwordParameter("userPasswd")
                 .loginProcessingUrl("/login_proc")
                 .successHandler(new JwtAuthenticationSuccessHandler(tokenProvider))
-                .successHandler((request, response, authentication) -> {
-                    Collection<GrantedAuthority> credentials = (Collection<GrantedAuthority>) authentication.getAuthorities();
-                    if (credentials.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHIEF"))) {
-                        response.sendRedirect("/approval");
-                    } else {
-                        response.sendRedirect("/payhist");
-                    }
-                })
+//                .successHandler((request, response, authentication) -> {
+//                    Collection<GrantedAuthority> credentials = (Collection<GrantedAuthority>) authentication.getAuthorities();
+//                    if (credentials.stream().anyMatch(a -> a.getAuthority().equals("ROLE_CHIEF"))) {
+//                        response.sendRedirect("/approval");
+//                    } else {
+//                        response.sendRedirect("/payhist");
+//                    }
+//                })
                 .failureHandler((request, response, exception) -> {
                     String errorMsg = "아이디 또는 비밀번호가 맞지 않습니다. 다시 확인해 주세요.";
                     request.setAttribute("errorMsg", errorMsg);

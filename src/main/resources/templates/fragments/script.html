@@ -16,8 +16,13 @@
         !window.location.href.includes("/login_proc")){
         $cmmn.paintUserInfo();
       }
+      $.ajaxSetup({
+        beforeSend: function(xhr) {
+          var token = localStorage.getItem('jwtToken');
+          xhr.setRequestHeader('Authorization', 'Bearer ' + token);
+        }
+      });
     });
-
     </script>
 </th:block>
 </html>
